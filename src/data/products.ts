@@ -1,0 +1,43 @@
+import type { Product } from "@/types/product";
+
+export const products: Product[] = [
+  {
+    id: "prd-001",
+    name: "Ivory Vein 600",
+    slug: "ivory-vein-600",
+    category: "porcelain",
+    collection: "satin-vein",
+    price: 18,
+    finish: "Matte",
+    size: "600 x 600 mm",
+    material: "Porcelain",
+    image: "/products/ivory-vein-600.jpg",
+    summary: "Elegant marble-look porcelain with subtle movement.",
+  },
+  {
+    id: "prd-002",
+    name: "Dune Grid Mosaic",
+    slug: "dune-grid-mosaic",
+    category: "mosaic",
+    collection: "terra-form",
+    price: 24,
+    finish: "Textured",
+    size: "300 x 300 mm",
+    material: "Ceramic Mosaic",
+    image: "/products/dune-grid-mosaic.jpg",
+    summary: "A warm mosaic blend designed for shower niches and backsplashes.",
+  },
+  {
+    id: "prd-003",
+    name: "Silver Travertine",
+    slug: "silver-travertine",
+    category: "natural-stone",
+    collection: "terra-form",
+    price: 29,
+    finish: "Honed",
+    size: "400 x 800 mm",
+    material: "Travertine",
+    image: "/products/silver-travertine.jpg",
+    summary: "Natural movement with a calm, architectural palette.",
+  },
+];
