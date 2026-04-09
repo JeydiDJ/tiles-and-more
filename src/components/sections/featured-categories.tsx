@@ -19,7 +19,6 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
             className="inline-flex items-center gap-4 self-start border border-white/40 px-6 py-4 text-sm font-medium uppercase tracking-[0.14em] text-white transition hover:bg-white hover:text-black"
           >
             <span>View all collections</span>
-            <span className="text-xl leading-none">↗</span>
           </Link>
         </div>
 

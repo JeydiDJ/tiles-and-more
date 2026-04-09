@@ -21,8 +21,8 @@
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
   --color-accent: var(--accent);
-  --font-sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: "Century Gothic", "Avenir Next", Futura, "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Century Gothic", "Avenir Next", Futura, "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "Consolas", "Courier New", monospace;
 }
 
@@ -42,6 +42,9 @@ body {
     linear-gradient(180deg, #fbf6ee 0%, var(--background) 42%, #efe3d2 100%);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 a {

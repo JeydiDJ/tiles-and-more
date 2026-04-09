@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -92,6 +93,18 @@ function GlobeIcon() {
   );
 }
 
+function BrandWordmark({ scrolled }: { scrolled: boolean }) {
+  return (
+    <span
+      className="text-[1.75rem] font-semibold uppercase leading-[0.9] tracking-[0.01em] sm:text-[2rem]"
+      style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+    >
+      <span className={scrolled ? "text-[#c1272d]" : "text-white"}>TILES</span>
+      <span className={scrolled ? "text-[#333333]" : "text-white"}> &amp; MORE</span>
+    </span>
+  );
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -160,16 +173,15 @@ export function Navbar() {
               </div>
 
               <Link href="/" className="flex items-center justify-center gap-3">
-                <span className="grid h-8 w-8 place-items-center bg-[#c1272d]">
-                  <span className="h-4 w-4 rotate-45 border border-white/80" />
-                </span>
-                <span
-                  className={`font-serif text-3xl font-semibold lowercase tracking-tight transition sm:text-4xl ${
-                    isScrolled ? "text-[#1d1c1a]" : "text-white"
-                  }`}
-                >
-                  {siteConfig.name.toLowerCase()}
-                </span>
+                <Image
+                  src="/logo/tilesandmore-logo.png"
+                  alt="Tiles and More logo"
+                  width={46}
+                  height={46}
+                  className="h-10 w-10 object-contain sm:h-12 sm:w-12"
+                  priority
+                />
+                <BrandWordmark scrolled={isScrolled} />
               </Link>
 
               <div className="flex items-center justify-end gap-1 sm:gap-3">
@@ -221,10 +233,23 @@ export function Navbar() {
           </button>
           <Link
             href="/"
-            className="font-serif text-2xl font-semibold lowercase tracking-tight text-[#1d1c1a]"
+            className="flex items-center gap-3"
             onClick={() => setIsOpen(false)}
           >
-            {siteConfig.name.toLowerCase()}
+            <Image
+              src="/logo/tilesandmore-logo.png"
+              alt="Tiles and More logo"
+              width={42}
+              height={42}
+              className="h-9 w-9 object-contain"
+            />
+            <span
+              className="text-2xl font-semibold uppercase leading-[0.9] tracking-[0.01em] text-[#1d1c1a]"
+              style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+            >
+              <span className="text-[#c1272d]">TILES</span>
+              <span className="text-[#333333]"> &amp; MORE</span>
+            </span>
           </Link>
         </div>
 
