@@ -22,11 +22,11 @@ export function CollectionsSection({ collections }: CollectionsSectionProps) {
   }));
 
   return (
-    <section className="bg-[#201f1d] py-16 text-white sm:py-20">
+    <section className="bg-white py-16 text-[var(--foreground)] sm:py-20">
       <Container className="max-w-none px-6 sm:px-8 lg:px-12">
         <div className="mb-8 sm:mb-10">
-          <p className="text-sm uppercase tracking-[0.22em] text-white/40">Collections</p>
-          <h2 className="mt-3 font-sans text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <p className="text-sm uppercase tracking-[0.22em] text-[var(--muted)]">Collections</p>
+          <h2 className="mt-3 font-sans text-4xl font-medium tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
             Our projects
           </h2>
         </div>
@@ -36,7 +36,7 @@ export function CollectionsSection({ collections }: CollectionsSectionProps) {
             <Link
               key={project.id}
               href={`/collections#${project.collection.slug}`}
-              className={`group relative flex min-h-[34rem] overflow-hidden rounded-2xl ${project.theme} lg:min-h-[36rem]`}
+              className={`group relative flex min-h-[34rem] overflow-hidden border border-[var(--border)] ${project.theme} lg:min-h-[36rem]`}
             >
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.12)_40%,rgba(0,0,0,0.72)_100%)] transition duration-500 group-hover:bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.1)_38%,rgba(0,0,0,0.78)_100%)]" />
               <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.04)_100%)]" />
