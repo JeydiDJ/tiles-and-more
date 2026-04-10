@@ -130,6 +130,10 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-30 w-full">
@@ -143,18 +147,18 @@ export function Navbar() {
                   : "border-b border-white/10 bg-[#171615] text-white"
             }`}
           >
-            <div className="grid min-h-[5.5rem] grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 sm:px-8 lg:px-12">
-              <div className="flex items-center gap-5">
+            <div className="grid min-h-[4.75rem] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-8 lg:px-12">
+              <div className="flex items-center gap-3 sm:gap-5">
                 <button
                   type="button"
                   aria-label="Open navigation"
                   aria-expanded={isOpen}
                   onClick={() => setIsOpen(true)}
-                  className={`inline-flex h-10 w-10 items-center justify-center transition ${
+                  className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition sm:h-10 sm:w-10 ${
                     isScrolled
-                      ? "text-[#2a2825] hover:bg-black/5"
+                      ? "bg-black/5 text-[#2a2825] hover:bg-black/10"
                       : isHome
-                        ? "text-white hover:bg-white/5"
+                        ? "bg-white/10 text-white hover:bg-white/15"
                         : "border border-white/10 text-white hover:bg-white/5"
                   }`}
                 >
@@ -172,38 +176,47 @@ export function Navbar() {
                 </div>
               </div>
 
-              <Link href="/" className="flex items-center justify-center gap-3">
+              <Link href="/" className="flex min-w-0 items-center justify-center gap-2 sm:gap-3">
                 <span
                   data-intro-logo-target
-                  className="flex h-10 w-10 items-center justify-center sm:h-12 sm:w-12"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center sm:h-12 sm:w-12"
                 >
                   <Image
                     src="/logo/tilesandmore-logo.png"
                     alt="Tiles and More logo"
                     width={46}
                     height={46}
-                    className="h-10 w-10 object-contain sm:h-12 sm:w-12"
+                    className="h-9 w-9 object-contain sm:h-12 sm:w-12"
                     priority
                   />
                 </span>
-                <BrandWordmark scrolled={isScrolled} />
+                <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                  <BrandWordmark scrolled={isScrolled} />
+                </span>
               </Link>
 
               <div className="flex items-center justify-end gap-1 sm:gap-3">
-                <NavIcon scrolled={isScrolled}>
-                  <LocationIcon />
-                </NavIcon>
-                <NavIcon scrolled={isScrolled}>
-                  <FacebookIcon />
-                </NavIcon>
-                <NavIcon scrolled={isScrolled}>
-                  <InstagramIcon />
-                </NavIcon>
-                <NavIcon scrolled={isScrolled}>
-                  <YoutubeIcon />
-                </NavIcon>
+                <div className="hidden items-center gap-1 sm:flex">
+                  <NavIcon scrolled={isScrolled}>
+                    <LocationIcon />
+                  </NavIcon>
+                  <NavIcon scrolled={isScrolled}>
+                    <FacebookIcon />
+                  </NavIcon>
+                  <NavIcon scrolled={isScrolled}>
+                    <InstagramIcon />
+                  </NavIcon>
+                  <NavIcon scrolled={isScrolled}>
+                    <YoutubeIcon />
+                  </NavIcon>
+                </div>
+                <div className="sm:hidden">
+                  <NavIcon scrolled={isScrolled}>
+                    <LocationIcon />
+                  </NavIcon>
+                </div>
                 <div
-                  className={`flex items-center gap-2 px-2 text-sm uppercase tracking-[0.16em] transition ${
+                  className={`hidden items-center gap-2 px-2 text-sm uppercase tracking-[0.16em] transition sm:flex ${
                     isScrolled ? "rounded-full bg-black/6 px-4 py-3 text-[#2a2825]" : "text-white/90"
                   }`}
                 >
@@ -227,14 +240,14 @@ export function Navbar() {
         className={`fixed left-0 top-0 z-50 flex h-screen w-full max-w-[40rem] flex-col bg-[#f5f3ef] text-[#1d1c1a] transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
         aria-hidden={!isOpen}
       >
-        <div className="flex items-center justify-between px-8 py-7">
+        <div className="flex items-center justify-between border-b border-black/10 px-5 py-5 sm:px-8 sm:py-7">
           <button
             type="button"
             aria-label="Close navigation"
             onClick={() => setIsOpen(false)}
-            className="inline-flex h-12 w-12 items-center justify-center bg-black/5 text-3xl leading-none text-[#2a2825] transition hover:bg-black/10"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-3xl leading-none text-[#2a2825] transition hover:bg-black/10"
           >
-            x
+            <span aria-hidden="true">&times;</span>
           </button>
           <Link
             href="/"
@@ -258,15 +271,15 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-y-auto px-8 pb-8">
-          <nav className="border-b border-black/10 pb-8 pt-4">
+        <div className="flex flex-1 flex-col overflow-y-auto px-5 pb-6 sm:px-8 sm:pb-8">
+          <nav className="border-b border-black/10 pb-6 pt-4 sm:pb-8">
             <div className="space-y-2">
               {mainNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="block py-4 font-serif text-4xl font-medium tracking-tight text-[#272521] transition hover:text-black sm:text-5xl"
+                  className="block rounded-2xl px-1 py-3 font-serif text-[2rem] font-medium tracking-tight text-[#272521] transition hover:bg-black/4 hover:text-black sm:py-4 sm:text-5xl"
                 >
                   {item.label}
                 </Link>
@@ -274,14 +287,44 @@ export function Navbar() {
             </div>
           </nav>
 
-          <div className="grid gap-12 py-8 sm:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-8 py-6 sm:gap-12 sm:py-8 sm:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-4">
+              <div className="flex items-center gap-3 border-b border-black/10 pb-5 sm:hidden">
+                <Link
+                  href={siteConfig.socialLinks.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-[#2d2a25] transition hover:bg-black hover:text-white"
+                >
+                  <FacebookIcon />
+                </Link>
+                <Link
+                  href={siteConfig.socialLinks.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-[#2d2a25] transition hover:bg-black hover:text-white"
+                >
+                  <InstagramIcon />
+                </Link>
+                <Link
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-[#2d2a25] transition hover:bg-black hover:text-white"
+                >
+                  <YoutubeIcon />
+                </Link>
+                <div className="ml-auto flex items-center gap-2 rounded-full bg-black/5 px-4 py-3 text-sm uppercase tracking-[0.16em] text-[#2a2825]">
+                  <GlobeIcon />
+                  <span>EN</span>
+                </div>
+              </div>
               {utilityLinks.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="block text-lg text-[#2c2a26] transition hover:text-black"
+                  className="block text-base text-[#2c2a26] transition hover:text-black sm:text-lg"
                 >
                   {item.label}
                 </Link>
@@ -296,7 +339,7 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="mt-auto border-t border-black/10 pt-6">
+          <div className="mt-auto hidden border-t border-black/10 pt-6 sm:block">
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm uppercase tracking-[0.18em] text-[#6f695f]">Follow us</p>
               <div className="flex gap-3">
