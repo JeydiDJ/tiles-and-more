@@ -4,9 +4,10 @@ type ProductGalleryProps = {
 
 export function ProductGallery({ title }: ProductGalleryProps) {
   return (
-    <div className="surface-card rounded-md p-6">
-      <h3 className="text-lg font-semibold">{title} Gallery</h3>
-      <p className="mt-2 text-sm text-[var(--muted)]">
+    <div className="editorial-band px-6 py-10 sm:px-8 lg:px-10">
+      <p className="page-kicker text-white/70">Gallery</p>
+      <h3 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h3>
+      <p className="mt-4 max-w-lg text-sm leading-6 text-white/72">
         Reserve this component for detail-page images, swatches, and zoom views.
       </p>
     </div>

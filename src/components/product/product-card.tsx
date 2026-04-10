@@ -8,13 +8,13 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <article className="surface-card rounded-md p-5">
+    <article className="editorial-panel border-t-[3px] border-t-[var(--brand)] p-6">
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{product.category}</p>
-      <h3 className="mt-2 text-xl font-semibold">{product.name}</h3>
-      <p className="mt-2 text-sm text-[var(--muted)]">{product.summary}</p>
-      <div className="mt-4 flex items-center justify-between text-sm">
+      <h3 className="mt-3 text-2xl font-semibold tracking-tight">{product.name}</h3>
+      <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{product.summary}</p>
+      <div className="mt-6 flex items-center justify-between border-t border-[var(--border)] pt-4 text-sm">
         <span>{formatCurrency(product.price)}/sqft</span>
-        <Link href={`/products/${product.slug}`} className="font-medium text-[var(--brand-dark)]">
+        <Link href={`/products/${product.slug}`} className="font-medium uppercase tracking-[0.12em] text-[var(--brand)]">
           View surface
         </Link>
       </div>

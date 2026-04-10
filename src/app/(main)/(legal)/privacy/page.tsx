@@ -1,14 +1,17 @@
-import { Container } from "@/components/layout/container";
-
 export default function PrivacyPage() {
   return (
-    <Container className="py-20">
-      <div className="surface-card rounded-[2rem] p-8">
-        <h1 className="text-4xl font-semibold">Privacy Policy</h1>
-        <p className="mt-4 text-[var(--muted)]">
+    <section className="page-section py-20 sm:py-24">
+      <div className="grid gap-0 border-y border-[var(--border)] lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="editorial-band px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
+          <p className="page-kicker text-white/70">Legal</p>
+          <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">Privacy Policy</h1>
+        </div>
+        <div className="editorial-panel px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
+          <p className="text-[var(--muted)]">
           Add your data handling, cookies, and inquiry retention policy here.
-        </p>
+          </p>
+        </div>
       </div>
-    </Container>
+    </section>
   );
 }

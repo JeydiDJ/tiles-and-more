@@ -1,14 +1,17 @@
-import { Container } from "@/components/layout/container";
-
 export default function AboutPage() {
   return (
-    <Container className="py-20">
-      <div className="surface-card rounded-[2rem] p-8">
-        <h1 className="text-4xl font-semibold">About Tiles & More</h1>
-        <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--muted)]">
-          This page is ready for your showroom story, sourcing philosophy, and installation expertise.
-        </p>
+    <section className="page-section py-20 sm:py-24">
+      <div className="grid gap-0 border-y border-[var(--border)] lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="editorial-band px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
+          <p className="page-kicker text-white/70">About</p>
+          <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">Tiles &amp; More</h1>
+        </div>
+        <div className="editorial-panel px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
+          <p className="text-lg leading-8 text-[var(--muted)]">
+            This page is ready for your showroom story, sourcing philosophy, and installation expertise.
+          </p>
+        </div>
       </div>
-    </Container>
+    </section>
   );
 }
