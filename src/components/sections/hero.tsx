@@ -44,21 +44,16 @@ const slides: (VideoSlide | ImageBrandSlide | ContentSlide)[] = [
   {
     id: "roca",
     title: "Roca",
-    image: "/hero-images/roca-hero.jpg",
+    image: "/hero-images/roca-hero-1.jpg",
     logo: "/logo/brand-logos/roca-logo.png",
     caption: "Design-led bathroom collections and architectural solutions.",
   },
   {
-    id: "quartz",
-    category: "Furniture",
-    title: "Quartz Surfaces",
-    subtitle: "Refined countertop selections designed for kitchens and statement spaces.",
-    primaryLabel: "Browse Quartz",
-    primaryHref: "/catalog/quartz",
-    secondaryLabel: "Visit Showroom",
-    secondaryHref: "/contact",
-    background:
-      "bg-[radial-gradient(circle_at_48%_24%,rgba(255,255,255,0.08),transparent_24%),linear-gradient(120deg,#191614_0%,#4a3d33_33%,#b09777_65%,#2a211c_100%)]",
+    id: "sonite",
+    title: "Sonite",
+    image: "/hero-images/sonite-hero.jpg",
+    logo: "/logo/brand-logos/sonite-logo.png",
+    caption: "Premium tile surfaces crafted for elegant residential and commercial interiors.",
   },
   {
     id: "decorative",
@@ -250,7 +245,13 @@ export function Hero() {
                       width={560}
                       height={240}
                       draggable={false}
-                      className="h-auto w-[min(82vw,34rem)] object-contain drop-shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
+                      className={`h-auto object-contain drop-shadow-[0_18px_50px_rgba(0,0,0,0.45)] ${
+                        slide.id === "sonite"
+                          ? "w-[min(90vw,46rem)]"
+                          : slide.id === "roca"
+                            ? "w-[min(88vw,40rem)]"
+                            : "w-[min(82vw,34rem)]"
+                      }`}
                       priority
                     />
                     <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/78 sm:text-base">
