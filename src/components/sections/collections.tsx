@@ -26,7 +26,7 @@ export function CollectionsSection({ collections }: CollectionsSectionProps) {
       <Container className="max-w-none px-6 sm:px-8 lg:px-12">
         <div className="mb-8 sm:mb-10">
           <p className="text-sm uppercase tracking-[0.22em] text-[var(--muted)]">Collections</p>
-          <h2 className="mt-3 font-sans text-4xl font-medium tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
+          <h2 className="mt-3 font-sans text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-6xl">
             Our projects
           </h2>
         </div>

@@ -61,7 +61,7 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
           </div>
         </div>
 
-        <div className="overflow-hidden" ref={emblaRef}>
+        <div className="-mt-4 overflow-x-hidden overflow-y-visible pt-4" ref={emblaRef}>
           <div className="flex gap-0 border-y border-[var(--border)] cursor-grab active:cursor-grabbing">
             <div className="flex w-[22rem] shrink-0 flex-col justify-between border-r border-[var(--border)] bg-[#231f20] px-6 py-8 text-white sm:w-[24rem] sm:px-8 lg:w-[28rem] lg:px-10">
               <div>
@@ -83,7 +83,7 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
                 <Link
                   key={category.id}
                   href={`/catalog/${category.slug}`}
-                  className={`group relative flex h-[32rem] w-[24rem] shrink-0 overflow-hidden border-r border-[rgba(255,255,255,0.12)] text-white sm:w-[28rem] lg:w-[34rem] ${theme}`}
+                  className={`group relative flex h-[32rem] w-[24rem] shrink-0 overflow-hidden border-r border-[rgba(255,255,255,0.12)] text-white shadow-[0_18px_40px_rgba(0,0,0,0.12)] transition duration-300 ease-out hover:-translate-y-3 hover:shadow-[0_28px_60px_rgba(0,0,0,0.24)] sm:w-[28rem] lg:w-[34rem] ${theme}`}
                 >
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.18)_0%,rgba(0,0,0,0.08)_22%,rgba(0,0,0,0.8)_100%)]" />
                   <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.2)_0%,transparent_24%,transparent_100%)]" />
@@ -102,7 +102,7 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
 
                     <div>
                       <p className="text-xs uppercase tracking-[0.2em] text-white/78">Surface Collection</p>
-                      <h3 className="mt-4 max-w-[11ch] text-4xl font-semibold leading-none tracking-tight sm:text-5xl">
+                      <h3 className="mt-4 max-w-[11ch] text-4xl font-semibold leading-none tracking-tight text-white sm:text-5xl">
                         {category.name.replace(" Tiles", "")}
                       </h3>
                       <p className="mt-5 max-w-[24ch] text-sm leading-6 text-white/88">

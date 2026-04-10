@@ -1,9 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 
 const SLIDE_DURATION_MS = 20000;
 
@@ -22,19 +20,7 @@ type ImageBrandSlide = {
   caption: string;
 };
 
-type ContentSlide = {
-  id: string;
-  category: string;
-  title: string;
-  subtitle: string;
-  primaryLabel: string;
-  primaryHref: string;
-  secondaryLabel: string;
-  secondaryHref: string;
-  background: string;
-};
-
-const slides: (VideoSlide | ImageBrandSlide | ContentSlide)[] = [
+const slides: (VideoSlide | ImageBrandSlide)[] = [
   {
     id: "rak",
     title: "RAK Ceramics",
@@ -56,16 +42,11 @@ const slides: (VideoSlide | ImageBrandSlide | ContentSlide)[] = [
     caption: "Premium tile surfaces crafted for elegant residential and commercial interiors.",
   },
   {
-    id: "decorative",
-    category: "Outdoor",
-    title: "Decorative Looks",
-    subtitle: "Feature-ready accents that shape a stronger first impression.",
-    primaryLabel: "View Decorative",
-    primaryHref: "/catalog/decorative",
-    secondaryLabel: "See Applications",
-    secondaryHref: "/gallery",
-    background:
-      "bg-[radial-gradient(circle_at_52%_22%,rgba(255,255,255,0.07),transparent_24%),linear-gradient(120deg,#111111_0%,#2c3133_30%,#6a756c_62%,#1e201f_100%)]",
+    id: "geotiles",
+    title: "Geo Tiles",
+    image: "/hero-images/geotiles-hero.jpg",
+    logo: "/logo/brand-logos/geotiles-logo.png",
+    caption: "Contemporary tile collections with bold geometry and expressive surface detail.",
   },
 ];
 
@@ -189,10 +170,7 @@ export function Hero() {
         style={{ transform: `translateX(calc(-${activeIndex * 100}% + ${dragOffset}px))` }}
       >
         {slides.map((slide) => (
-          <div
-            key={slide.id}
-            className={`relative min-h-screen w-full shrink-0 overflow-hidden ${"background" in slide ? slide.background : ""}`}
-          >
+          <div key={slide.id} className="relative min-h-screen w-full shrink-0 overflow-hidden">
             {"video" in slide ? (
               <>
                 <video
@@ -224,7 +202,7 @@ export function Hero() {
                   </div>
                 </div>
               </>
-            ) : "image" in slide ? (
+            ) : (
               <>
                 <Image
                   src={slide.image}
@@ -248,7 +226,9 @@ export function Hero() {
                       className={`h-auto object-contain drop-shadow-[0_18px_50px_rgba(0,0,0,0.45)] ${
                         slide.id === "sonite"
                           ? "w-[min(90vw,46rem)]"
-                          : slide.id === "roca"
+                          : slide.id === "geotiles"
+                            ? "w-[min(88vw,38rem)]"
+                            : slide.id === "roca"
                             ? "w-[min(88vw,40rem)]"
                             : "w-[min(82vw,34rem)]"
                       }`}
@@ -257,34 +237,6 @@ export function Hero() {
                     <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/78 sm:text-base">
                       {slide.caption}
                     </p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.32)_0%,rgba(0,0,0,0.18)_25%,rgba(0,0,0,0.26)_100%)]" />
-
-                <div className="relative flex min-h-screen items-center justify-center px-6 text-center">
-                  <div className="max-w-5xl">
-                    <p className="text-sm uppercase tracking-[0.32em] text-white/55">{slide.category}</p>
-                    <h1 className="mt-5 font-serif text-6xl font-semibold leading-none tracking-tight sm:text-7xl lg:text-[8rem]">
-                      {slide.title}
-                    </h1>
-                    <p className="mx-auto mt-6 max-w-3xl text-2xl leading-relaxed text-white/92 sm:text-3xl">
-                      {slide.subtitle}
-                    </p>
-                    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                      <Link href={slide.primaryHref}>
-                        <Button className="border border-white/40 bg-black/18 text-white hover:bg-white/10">
-                          {slide.primaryLabel}
-                        </Button>
-                      </Link>
-                      <Link href={slide.secondaryHref}>
-                        <Button variant="secondary" className="border-white bg-white text-black hover:bg-white/85">
-                          {slide.secondaryLabel}
-                        </Button>
-                      </Link>
-                    </div>
                   </div>
                 </div>
               </>

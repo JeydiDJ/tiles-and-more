@@ -6,9 +6,8 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-[#59595b] py-16 text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(237,35,37,0.16),transparent_26%),linear-gradient(180deg,rgba(89,89,91,0.98),rgba(35,31,32,1))]" />
-      <div className="relative w-full px-6 sm:px-8 lg:px-12">
+    <footer className="bg-[#3f3f42] py-16 text-white">
+      <div className="w-full px-6 sm:px-8 lg:px-12">
         <div className="grid gap-12 border-t border-white/14 pt-12 lg:grid-cols-[1.35fr_0.75fr_0.7fr]">
           <div className="max-w-xl">
             <p className="text-sm uppercase tracking-[0.28em] text-white/55">Tiles and showroom surfaces</p>
