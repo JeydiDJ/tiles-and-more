@@ -29,10 +29,10 @@ function NavIcon({
 }) {
   return (
     <span
-      className={`inline-flex h-8 w-8 items-center justify-center text-base transition ${
+      className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center text-base transition ${
         scrolled
-          ? "text-[#2a2825] hover:-translate-y-0.5 hover:text-[#c1272d]"
-          : "text-white/90 hover:-translate-y-0.5 hover:text-[#c1272d]"
+          ? "text-[#231f20] hover:-translate-y-0.5 hover:text-[#ed2325]"
+          : "text-white/90 hover:-translate-y-0.5 hover:text-[#ed2325]"
       }`}
     >
       {children}
@@ -85,6 +85,15 @@ function LocationIcon() {
   );
 }
 
+function ContactIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.55rem] w-[1.55rem] fill-none stroke-current">
+      <rect x="4.5" y="7.5" width="15" height="9" rx="1.5" strokeWidth="1.8" />
+      <path d="m5.5 8.5 6.5 5 6.5-5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function GlobeIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.05rem] w-[1.05rem] fill-none stroke-current">
@@ -101,8 +110,8 @@ function BrandWordmark({ scrolled }: { scrolled: boolean }) {
       className="text-[1.75rem] font-semibold uppercase leading-[0.9] tracking-[0.01em] sm:text-[2rem]"
       style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
-      <span className={scrolled ? "text-[#c1272d]" : "text-white"}>TILES</span>
-      <span className={scrolled ? "text-[#333333]" : "text-white"}> &amp; MORE</span>
+      <span className={scrolled ? "text-[#ed2325]" : "text-white"}>TILES</span>
+      <span className={scrolled ? "text-[#231f20]" : "text-white"}> &amp; MORE</span>
     </span>
   );
 }
@@ -112,6 +121,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isHome = pathname === "/";
+  const showroomMapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteConfig.address)}`;
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -143,14 +153,14 @@ export function Navbar() {
           <div
             className={`transition-all duration-300 ${
               isScrolled
-                ? "rounded-[1.6rem] border border-black/8 bg-[#f5f3ef] text-[#1d1c1a] shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
+                ? "rounded-[1.6rem] border border-black/8 bg-[#f4f4f4] text-[#231f20] shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
                 : isHome
                   ? "bg-transparent text-white"
-                  : "border-b border-white/10 bg-[#171615] text-white"
+                  : "border-b border-white/10 bg-[#231f20] text-white"
             }`}
           >
-            <div className="grid min-h-[4.75rem] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-8 lg:px-12">
-              <div className="flex items-center gap-3 sm:gap-5">
+            <div className="grid min-h-[4.75rem] grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-8 lg:px-12">
+              <div className="flex items-center gap-3 justify-self-start sm:gap-5">
                 <button
                   type="button"
                   aria-label="Open navigation"
@@ -158,17 +168,17 @@ export function Navbar() {
                   onClick={() => setIsOpen(true)}
                   className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition sm:h-10 sm:w-10 ${
                     isScrolled
-                      ? "text-[#2a2825] hover:text-[#c1272d]"
+                      ? "text-[#231f20] hover:text-[#ed2325]"
                       : isHome
-                        ? "text-white hover:text-[#c1272d]"
-                        : "text-white hover:text-[#c1272d]"
+                        ? "text-white hover:text-[#ed2325]"
+                        : "text-white hover:text-[#ed2325]"
                   }`}
                 >
                   <span className="block h-px w-5 bg-current shadow-[0_6px_0_0_currentColor,0_-6px_0_0_currentColor]" />
                 </button>
                 <div
                   className={`hidden items-center gap-3 transition md:flex ${
-                    isScrolled ? "px-4 py-2 text-[#70695f] hover:text-[#c1272d]" : "text-white/70 hover:text-white"
+                    isScrolled ? "px-4 py-2 text-[#59595b] hover:text-[#ed2325]" : "text-white/70 hover:text-white"
                   }`}
                 >
                   <NavIcon scrolled={isScrolled}>
@@ -178,7 +188,7 @@ export function Navbar() {
                 </div>
               </div>
 
-              <Link href="/" className="flex min-w-0 items-center justify-center gap-2 sm:gap-3">
+              <Link href="/" className="flex min-w-0 items-center justify-center gap-2 justify-self-center sm:gap-3">
                 <span
                   data-intro-logo-target
                   className="flex h-9 w-9 shrink-0 items-center justify-center sm:h-12 sm:w-12"
@@ -197,34 +207,23 @@ export function Navbar() {
                 </span>
               </Link>
 
-              <div className="flex items-center justify-end gap-1 sm:gap-3">
-                <div className="hidden items-center gap-1 sm:flex">
-                  <NavIcon scrolled={isScrolled}>
-                    <LocationIcon />
-                  </NavIcon>
-                  <NavIcon scrolled={isScrolled}>
-                    <FacebookIcon />
-                  </NavIcon>
-                  <NavIcon scrolled={isScrolled}>
-                    <InstagramIcon />
-                  </NavIcon>
-                  <NavIcon scrolled={isScrolled}>
-                    <YoutubeIcon />
-                  </NavIcon>
-                </div>
-                <div className="sm:hidden">
-                  <NavIcon scrolled={isScrolled}>
-                    <LocationIcon />
-                  </NavIcon>
-                </div>
-                <div
-                  className={`hidden items-center gap-2 px-2 text-sm uppercase tracking-[0.16em] transition sm:flex ${
-                    isScrolled ? "px-4 py-3 text-[#2a2825] hover:text-[#c1272d]" : "text-white/90 hover:text-[#c1272d]"
-                  }`}
+              <div className="flex items-center justify-end gap-1 justify-self-end sm:gap-3">
+                <Link
+                  href={showroomMapHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Open showroom location"
+                  className="inline-flex shrink-0"
                 >
-                  <GlobeIcon />
-                  <span>EN</span>
-                </div>
+                  <NavIcon scrolled={isScrolled}>
+                    <LocationIcon />
+                  </NavIcon>
+                </Link>
+                <Link href="/contact" aria-label="Open contact page" className="inline-flex shrink-0">
+                  <NavIcon scrolled={isScrolled}>
+                    <ContactIcon />
+                  </NavIcon>
+                </Link>
               </div>
             </div>
           </div>
@@ -263,12 +262,12 @@ export function Navbar() {
               height={42}
               className="h-9 w-9 object-contain"
             />
-            <span
-              className="text-2xl font-semibold uppercase leading-[0.9] tracking-[0.01em] text-[#1d1c1a]"
-              style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
-            >
-              <span className="text-[#c1272d]">TILES</span>
-              <span className="text-[#333333]"> &amp; MORE</span>
+              <span
+                className="text-2xl font-semibold uppercase leading-[0.9] tracking-[0.01em] text-[#1d1c1a]"
+                style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+              >
+              <span className="text-[#ed2325]">TILES</span>
+              <span className="text-[#231f20]"> &amp; MORE</span>
             </span>
           </Link>
         </div>
@@ -294,8 +293,8 @@ export function Navbar() {
                   <span
                     className={`font-serif text-[2rem] font-medium leading-none tracking-tight transition duration-300 sm:text-[2.7rem] ${
                       pathname === item.href
-                        ? "text-[#c1272d]"
-                        : "group-hover:text-[#c1272d]"
+                        ? "text-[#ed2325]"
+                        : "group-hover:text-[#ed2325]"
                     }`}
                   >
                     {item.label}
@@ -303,8 +302,8 @@ export function Navbar() {
                   <span
                     className={`text-[0.72rem] uppercase tracking-[0.24em] transition ${
                       pathname === item.href
-                        ? "text-[#c1272d]"
-                        : "text-[#8a837a] group-hover:-translate-x-1 group-hover:text-[#c1272d]"
+                        ? "text-[#ed2325]"
+                        : "text-[#59595b] group-hover:-translate-x-1 group-hover:text-[#ed2325]"
                     }`}
                   >
                     {String(index + 1).padStart(2, "0")}
@@ -323,7 +322,7 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsOpen(false)}
-                    className="block text-sm text-[#3a3733] transition hover:text-[#9f6a3d] sm:text-[0.95rem]"
+                    className="block text-sm text-[#231f20] transition hover:text-[#ed2325] sm:text-[0.95rem]"
                   >
                     {item.label}
                   </Link>

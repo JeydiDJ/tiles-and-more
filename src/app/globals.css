@@ -2,14 +2,14 @@
 @import "../styles/animations.css";
 
 :root {
-  --background: #f6f1e8;
-  --surface: #fffaf2;
-  --foreground: #35261d;
-  --muted: #7b6759;
-  --border: #decdbb;
-  --brand: #9f6a3d;
-  --brand-dark: #704626;
-  --accent: #d7b48c;
+  --background: #ffffff;
+  --surface: #f8f8f8;
+  --foreground: #231f20;
+  --muted: #59595b;
+  --border: #d7d7d8;
+  --brand: #ed2325;
+  --brand-dark: #231f20;
+  --accent: #59595b;
 }
 
 @theme inline {
@@ -38,8 +38,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(215, 180, 140, 0.35), transparent 32%),
-    linear-gradient(180deg, #fbf6ee 0%, var(--background) 42%, #efe3d2 100%);
+    radial-gradient(circle at top left, rgba(237, 35, 37, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, var(--background) 58%, #f4f4f4 100%);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -58,7 +58,7 @@ img {
 }
 
 ::selection {
-  background: rgba(159, 106, 61, 0.2);
+  background: rgba(237, 35, 37, 0.18);
 }
 
 .page-shell {
@@ -67,9 +67,33 @@ img {
 
 .surface-card {
   border: 1px solid var(--border);
-  background: rgba(255, 250, 242, 0.86);
-  box-shadow: 0 18px 40px rgba(72, 46, 26, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 40px rgba(35, 31, 32, 0.08);
   backdrop-filter: blur(8px);
+}
+
+.page-section {
+  width: 100%;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.editorial-panel {
+  border: 1px solid var(--border);
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(35, 31, 32, 0.06);
+}
+
+.editorial-band {
+  background: #231f20;
+  color: #ffffff;
+}
+
+.page-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--brand);
 }
 
 .hero-slab {
