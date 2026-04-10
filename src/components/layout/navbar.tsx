@@ -173,14 +173,19 @@ export function Navbar() {
               </div>
 
               <Link href="/" className="flex items-center justify-center gap-3">
-                <Image
-                  src="/logo/tilesandmore-logo.png"
-                  alt="Tiles and More logo"
-                  width={46}
-                  height={46}
-                  className="h-10 w-10 object-contain sm:h-12 sm:w-12"
-                  priority
-                />
+                <span
+                  data-intro-logo-target
+                  className="flex h-10 w-10 items-center justify-center sm:h-12 sm:w-12"
+                >
+                  <Image
+                    src="/logo/tilesandmore-logo.png"
+                    alt="Tiles and More logo"
+                    width={46}
+                    height={46}
+                    className="h-10 w-10 object-contain sm:h-12 sm:w-12"
+                    priority
+                  />
+                </span>
                 <BrandWordmark scrolled={isScrolled} />
               </Link>
 
