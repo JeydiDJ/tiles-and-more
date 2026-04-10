@@ -216,12 +216,16 @@ export function Navbar() {
                   className="inline-flex shrink-0"
                 >
                   <NavIcon scrolled={isScrolled}>
+                    <span className="-translate-y-1">
                     <LocationIcon />
+                    </span>
                   </NavIcon>
                 </Link>
                 <Link href="/contact" aria-label="Open contact page" className="inline-flex shrink-0">
                   <NavIcon scrolled={isScrolled}>
+                    <span className="-translate-y-1">
                     <ContactIcon />
+                    </span>
                   </NavIcon>
                 </Link>
               </div>
