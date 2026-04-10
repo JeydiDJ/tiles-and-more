@@ -14,6 +14,14 @@ type VideoSlide = {
   logo: string;
 };
 
+type ImageBrandSlide = {
+  id: string;
+  title: string;
+  image: string;
+  logo: string;
+  caption: string;
+};
+
 type ContentSlide = {
   id: string;
   category: string;
@@ -26,7 +34,7 @@ type ContentSlide = {
   background: string;
 };
 
-const slides: (VideoSlide | ContentSlide)[] = [
+const slides: (VideoSlide | ImageBrandSlide | ContentSlide)[] = [
   {
     id: "rak",
     title: "RAK Ceramics",
@@ -34,16 +42,11 @@ const slides: (VideoSlide | ContentSlide)[] = [
     logo: "/logo/brand-logos/rak-logo.png",
   },
   {
-    id: "stone",
-    category: "Large Sizes",
-    title: "Natural Stone",
-    subtitle: "Architectural finishes with texture, warmth, and material depth.",
-    primaryLabel: "Explore Stone",
-    primaryHref: "/catalog/natural-stone",
-    secondaryLabel: "Project Inspiration",
-    secondaryHref: "/gallery",
-    background:
-      "bg-[radial-gradient(circle_at_55%_28%,rgba(255,255,255,0.06),transparent_22%),linear-gradient(120deg,#151515_0%,#4b4a46_28%,#9a907d_58%,#2a2723_100%)]",
+    id: "roca",
+    title: "Roca",
+    image: "/hero-images/roca-hero.jpg",
+    logo: "/logo/brand-logos/roca-logo.png",
+    caption: "Design-led bathroom collections and architectural solutions.",
   },
   {
     id: "quartz",
@@ -222,6 +225,36 @@ export function Hero() {
                     />
                     <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/72 sm:text-base">
                       Premium surfaces and architectural finishes
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : "image" in slide ? (
+              <>
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  priority
+                  draggable={false}
+                  className="object-cover"
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.24)_0%,rgba(0,0,0,0.18)_38%,rgba(0,0,0,0.4)_100%)]" />
+
+                <div className="relative flex min-h-screen items-center justify-center px-6">
+                  <div className="flex flex-col items-center gap-8">
+                    <Image
+                      src={slide.logo}
+                      alt={`${slide.title} logo`}
+                      width={560}
+                      height={240}
+                      draggable={false}
+                      className="h-auto w-[min(82vw,34rem)] object-contain drop-shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
+                      priority
+                    />
+                    <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/78 sm:text-base">
+                      {slide.caption}
                     </p>
                   </div>
                 </div>

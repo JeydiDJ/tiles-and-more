@@ -30,7 +30,9 @@ function NavIcon({
   return (
     <span
       className={`inline-flex h-8 w-8 items-center justify-center text-base transition ${
-        scrolled ? "text-[#2a2825]" : "text-white/90"
+        scrolled
+          ? "text-[#2a2825] hover:-translate-y-0.5 hover:text-[#c1272d]"
+          : "text-white/90 hover:-translate-y-0.5 hover:text-[#c1272d]"
       }`}
     >
       {children}
@@ -156,17 +158,17 @@ export function Navbar() {
                   onClick={() => setIsOpen(true)}
                   className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition sm:h-10 sm:w-10 ${
                     isScrolled
-                      ? "bg-black/5 text-[#2a2825] hover:bg-black/10"
+                      ? "text-[#2a2825] hover:text-[#c1272d]"
                       : isHome
-                        ? "bg-white/10 text-white hover:bg-white/15"
-                        : "border border-white/10 text-white hover:bg-white/5"
+                        ? "text-white hover:text-[#c1272d]"
+                        : "text-white hover:text-[#c1272d]"
                   }`}
                 >
                   <span className="block h-px w-5 bg-current shadow-[0_6px_0_0_currentColor,0_-6px_0_0_currentColor]" />
                 </button>
                 <div
                   className={`hidden items-center gap-3 transition md:flex ${
-                    isScrolled ? "px-4 py-2 text-[#70695f]" : "text-white/70"
+                    isScrolled ? "px-4 py-2 text-[#70695f] hover:text-[#c1272d]" : "text-white/70 hover:text-white"
                   }`}
                 >
                   <NavIcon scrolled={isScrolled}>
@@ -217,7 +219,7 @@ export function Navbar() {
                 </div>
                 <div
                   className={`hidden items-center gap-2 px-2 text-sm uppercase tracking-[0.16em] transition sm:flex ${
-                    isScrolled ? "rounded-full bg-black/6 px-4 py-3 text-[#2a2825]" : "text-white/90"
+                    isScrolled ? "px-4 py-3 text-[#2a2825] hover:text-[#c1272d]" : "text-white/90 hover:text-[#c1272d]"
                   }`}
                 >
                   <GlobeIcon />
@@ -237,15 +239,15 @@ export function Navbar() {
       />
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-full max-w-[40rem] flex-col bg-[#f5f3ef] text-[#1d1c1a] transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed left-0 top-0 z-50 flex h-screen w-full max-w-[36rem] flex-col overflow-hidden border-r border-black/8 bg-white text-[#1d1c1a] shadow-[0_24px_60px_rgba(0,0,0,0.18)] transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
         aria-hidden={!isOpen}
       >
-        <div className="flex items-center justify-between border-b border-black/10 px-5 py-5 sm:px-8 sm:py-7">
+        <div className="relative flex items-center justify-between border-b border-black/8 px-5 py-5 sm:px-8 sm:py-7">
           <button
             type="button"
             aria-label="Close navigation"
             onClick={() => setIsOpen(false)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-3xl leading-none text-[#2a2825] transition hover:bg-black/10"
+            className="inline-flex h-11 w-11 items-center justify-center text-3xl leading-none text-[#1d1c1a] transition hover:text-black"
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -271,30 +273,69 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-y-auto px-5 pb-6 sm:px-8 sm:pb-8">
-          <nav className="border-b border-black/10 pb-6 pt-4 sm:pb-8">
-            <div className="space-y-2">
-              {mainNav.map((item) => (
+        <div className="relative flex flex-1 flex-col overflow-y-auto px-5 pb-6 sm:px-8 sm:pb-8">
+          <div className="border-b border-black/8 pb-5 pt-5 sm:pb-6 sm:pt-6">
+            <p className="text-[0.72rem] uppercase tracking-[0.28em] text-[#8a837a]">Navigation</p>
+          </div>
+
+          <nav className="border-b border-black/8 pb-6 pt-4 sm:pb-8 sm:pt-6">
+            <div className="space-y-1">
+              {mainNav.map((item, index) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-2xl px-1 py-3 font-serif text-[2rem] font-medium tracking-tight text-[#272521] transition hover:bg-black/4 hover:text-black sm:py-4 sm:text-5xl"
+                  className={`group relative flex items-baseline justify-between gap-4 border-b px-0 py-4 transition duration-300 sm:py-5 ${
+                    pathname === item.href
+                      ? "border-black/12 text-black"
+                      : "border-transparent text-[#2d2a26] hover:border-black/10"
+                  }`}
                 >
-                  {item.label}
+                  <span
+                    className={`font-serif text-[2rem] font-medium leading-none tracking-tight transition duration-300 sm:text-[2.7rem] ${
+                      pathname === item.href
+                        ? "text-[#c1272d]"
+                        : "group-hover:text-[#c1272d]"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                  <span
+                    className={`text-[0.72rem] uppercase tracking-[0.24em] transition ${
+                      pathname === item.href
+                        ? "text-[#c1272d]"
+                        : "text-[#8a837a] group-hover:-translate-x-1 group-hover:text-[#c1272d]"
+                    }`}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
                 </Link>
               ))}
             </div>
           </nav>
 
-          <div className="grid gap-8 py-6 sm:gap-12 sm:py-8 sm:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 border-b border-black/10 pb-5 sm:hidden">
+          <div className="grid gap-8 py-6 sm:grid-cols-[1fr_0.95fr] sm:gap-10 sm:py-8">
+            <div>
+              <p className="text-[0.72rem] uppercase tracking-[0.28em] text-[#8a837a]">Quick Access</p>
+              <div className="mt-4 space-y-3">
+                {utilityLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="block text-sm text-[#3a3733] transition hover:text-[#9f6a3d] sm:text-[0.95rem]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-center gap-3 border-t border-black/8 pt-5 sm:hidden">
                 <Link
                   href={siteConfig.socialLinks.facebook}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-[#2d2a25] transition hover:bg-black hover:text-white"
+                  className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-[#2d2a25] transition hover:border-black hover:text-black"
                 >
                   <FacebookIcon />
                 </Link>
@@ -302,7 +343,7 @@ export function Navbar() {
                   href={siteConfig.socialLinks.instagram}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-[#2d2a25] transition hover:bg-black hover:text-white"
+                  className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-[#2d2a25] transition hover:border-black hover:text-black"
                 >
                   <InstagramIcon />
                 </Link>
@@ -310,44 +351,36 @@ export function Navbar() {
                   href="https://youtube.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-[#2d2a25] transition hover:bg-black hover:text-white"
+                  className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-[#2d2a25] transition hover:border-black hover:text-black"
                 >
                   <YoutubeIcon />
                 </Link>
-                <div className="ml-auto flex items-center gap-2 rounded-full bg-black/5 px-4 py-3 text-sm uppercase tracking-[0.16em] text-[#2a2825]">
+                <div className="ml-auto flex items-center gap-2 border border-black/10 px-4 py-2 text-sm uppercase tracking-[0.16em] text-[#5f5a53]">
                   <GlobeIcon />
                   <span>EN</span>
                 </div>
               </div>
-              {utilityLinks.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="block text-base text-[#2c2a26] transition hover:text-black sm:text-lg"
-                >
-                  {item.label}
-                </Link>
-              ))}
             </div>
 
-            <div className="space-y-3 text-sm text-[#5f5a53]">
-              <p className="uppercase tracking-[0.18em]">Showroom</p>
-              <p>{siteConfig.address}</p>
-              <p>{siteConfig.phone}</p>
-              <p>{siteConfig.email}</p>
+            <div className="text-sm">
+              <p className="text-[0.72rem] uppercase tracking-[0.28em] text-[#8a837a]">Showroom</p>
+              <div className="mt-4 space-y-3 text-[0.95rem] leading-7 text-[#5f5a53]">
+                <p>{siteConfig.address}</p>
+                <p>{siteConfig.phone}</p>
+                <p>{siteConfig.email}</p>
+              </div>
             </div>
           </div>
 
-          <div className="mt-auto hidden border-t border-black/10 pt-6 sm:block">
+          <div className="mt-auto hidden border-t border-black/8 pt-6 sm:block">
             <div className="flex items-center justify-between gap-4">
-              <p className="text-sm uppercase tracking-[0.18em] text-[#6f695f]">Follow us</p>
+              <p className="text-sm uppercase tracking-[0.18em] text-[#8a837a]">Follow us</p>
               <div className="flex gap-3">
                 {socialLinks.map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-xs font-semibold uppercase tracking-[0.16em] text-[#2d2a25] transition hover:bg-black hover:text-white"
+                    className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-xs font-semibold uppercase tracking-[0.16em] text-[#2d2a25] transition hover:border-black hover:text-black"
                     target="_blank"
                     rel="noreferrer"
                   >
