@@ -1,5 +1,5 @@
 import { collections } from "@/data/collections";
-import { CollectionsSection } from "@/components/sections/collections";
+import { FeaturedCollectionsGrid } from "@/components/sections/featured-collections-grid";
 
 export default function CollectionsPage() {
   return (
@@ -15,7 +15,7 @@ export default function CollectionsPage() {
           </div>
         </div>
       </section>
-      <CollectionsSection collections={collections} />
+      <FeaturedCollectionsGrid collections={collections} />
     </>
   );
 }
