@@ -23,14 +23,16 @@ const socialLinks = [
 function NavIcon({
   children,
   scrolled,
+  light,
 }: {
   children: React.ReactNode;
   scrolled: boolean;
+  light?: boolean;
 }) {
   return (
     <span
       className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center text-base transition ${
-        scrolled
+        scrolled || light
           ? "text-[#231f20] hover:-translate-y-0.5 hover:text-[#ed2325]"
           : "text-white/90 hover:-translate-y-0.5 hover:text-[#ed2325]"
       }`}
@@ -104,14 +106,22 @@ function GlobeIcon() {
   );
 }
 
-function BrandWordmark({ scrolled }: { scrolled: boolean }) {
+function BrandWordmark({
+  scrolled,
+  light,
+}: {
+  scrolled: boolean;
+  light?: boolean;
+}) {
+  const useDarkText = scrolled || light;
+
   return (
     <span
       className="text-[1.75rem] font-semibold uppercase leading-[0.9] tracking-[0.01em] sm:text-[2rem]"
       style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
-      <span className={scrolled ? "text-[#ed2325]" : "text-white"}>TILES</span>
-      <span className={scrolled ? "text-[#231f20]" : "text-white"}> &amp; MORE</span>
+      <span className={useDarkText ? "text-[#ed2325]" : "text-white"}>TILES</span>
+      <span className={useDarkText ? "text-[#231f20]" : "text-white"}> &amp; MORE</span>
     </span>
   );
 }
@@ -121,6 +131,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isHome = pathname === "/";
+  const useLightChrome = isScrolled || !isHome;
   const showroomMapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteConfig.address)}`;
 
   useEffect(() => {
@@ -143,6 +154,8 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    setIsScrolled(false);
     setIsOpen(false);
   }, [pathname]);
 
@@ -156,7 +169,7 @@ export function Navbar() {
                 ? "rounded-[1.6rem] border border-black/8 bg-[#f4f4f4] text-[#231f20] shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
                 : isHome
                   ? "bg-transparent text-white"
-                  : "border-b border-white/10 bg-[#231f20] text-white"
+                  : "border-b border-black/8 bg-white text-[#231f20] shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
             }`}
           >
             <div className="grid min-h-[4.75rem] grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-8 lg:px-12">
@@ -167,21 +180,19 @@ export function Navbar() {
                   aria-expanded={isOpen}
                   onClick={() => setIsOpen(true)}
                   className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition sm:h-10 sm:w-10 ${
-                    isScrolled
+                    useLightChrome
                       ? "text-[#231f20] hover:text-[#ed2325]"
-                      : isHome
-                        ? "text-white hover:text-[#ed2325]"
-                        : "text-white hover:text-[#ed2325]"
+                      : "text-white hover:text-[#ed2325]"
                   }`}
                 >
                   <span className="block h-px w-5 bg-current shadow-[0_6px_0_0_currentColor,0_-6px_0_0_currentColor]" />
                 </button>
                 <div
                   className={`hidden items-center gap-3 transition md:flex ${
-                    isScrolled ? "px-4 py-2 text-[#59595b] hover:text-[#ed2325]" : "text-white/70 hover:text-white"
+                    useLightChrome ? "px-4 py-2 text-[#59595b] hover:text-[#ed2325]" : "text-white/70 hover:text-white"
                   }`}
                 >
-                  <NavIcon scrolled={isScrolled}>
+                  <NavIcon scrolled={isScrolled} light={!isHome}>
                     <SearchIcon />
                   </NavIcon>
                   <span className="text-sm font-medium">Product search</span>
@@ -203,7 +214,7 @@ export function Navbar() {
                   />
                 </span>
                 <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
-                  <BrandWordmark scrolled={isScrolled} />
+                  <BrandWordmark scrolled={isScrolled} light={!isHome} />
                 </span>
               </Link>
 
@@ -215,14 +226,14 @@ export function Navbar() {
                   aria-label="Open showroom location"
                   className="inline-flex shrink-0"
                 >
-                  <NavIcon scrolled={isScrolled}>
+                  <NavIcon scrolled={isScrolled} light={!isHome}>
                     <span className="-translate-y-1">
                     <LocationIcon />
                     </span>
                   </NavIcon>
                 </Link>
                 <Link href="/contact" aria-label="Open contact page" className="inline-flex shrink-0">
-                  <NavIcon scrolled={isScrolled}>
+                  <NavIcon scrolled={isScrolled} light={!isHome}>
                     <span className="-translate-y-1">
                     <ContactIcon />
                     </span>

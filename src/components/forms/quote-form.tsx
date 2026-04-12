@@ -7,9 +7,9 @@ export function QuoteForm() {
   return (
     <form className="grid gap-0 border-y border-[var(--border)] lg:grid-cols-[0.8fr_1.2fr]">
       <div className="editorial-band px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
-        <p className="page-kicker text-white/70">Quote</p>
+        <p className="page-kicker">Quote</p>
         <h2 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Request a Quote</h2>
-        <p className="mt-5 max-w-sm text-white/74">
+        <p className="mt-5 max-w-sm text-[var(--muted)]">
           Share project type, approximate quantity, and timeline so we can prepare a tailored recommendation.
         </p>
       </div>

@@ -12,9 +12,9 @@ export default async function CatalogPage() {
       <div className="border-y border-[var(--border)]">
         <div className="grid gap-0 lg:grid-cols-[320px_1fr]">
           <div className="editorial-band px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
-            <p className="page-kicker text-white/70">Catalog</p>
+            <p className="page-kicker">Catalog</p>
             <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">Surface Library</h1>
-            <p className="mt-6 max-w-sm text-white/74">
+            <p className="mt-6 max-w-sm text-[var(--muted)]">
               Explore product families, formats, and finish options in a cleaner specification-led layout.
             </p>
           </div>

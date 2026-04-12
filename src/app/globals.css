@@ -85,8 +85,8 @@ img {
 }
 
 .editorial-band {
-  background: #231f20;
-  color: #ffffff;
+  background: #ffffff;
+  color: var(--foreground);
 }
 
 .page-kicker {
