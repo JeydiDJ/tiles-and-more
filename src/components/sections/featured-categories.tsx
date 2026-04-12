@@ -9,17 +9,17 @@ type FeaturedCategoriesProps = {
 };
 
 const featuredThemes: Record<string, string> = {
-  porcelain:
+  tiles:
     "bg-[linear-gradient(135deg,#1f1b1c_0%,#3d393a_46%,#8f8e90_100%)]",
-  quartz:
+  "quartz-slabs":
     "bg-[linear-gradient(135deg,#2a2627_0%,#59595b_42%,#d9d9da_100%)]",
-  "natural-stone":
+  "decorative-surfaces":
     "bg-[linear-gradient(135deg,#231f20_0%,#4d4a4b_40%,#aaa8a9_100%)]",
-  decorative:
+  "specialty-flooring":
     "bg-[radial-gradient(circle_at_18%_22%,rgba(237,35,37,0.28),transparent_20%),linear-gradient(135deg,#231f20_0%,#474344_45%,#8e8b8c_100%)]",
-  "spc-lvt-flooring":
+  sanitary:
     "bg-[linear-gradient(135deg,#1d1a1b_0%,#3d3b3c_38%,#7d7a7b_100%)]",
-  "sanitary-furniture":
+  "lifestyle-accessories":
     "bg-[linear-gradient(135deg,#252122_0%,#5a5758_44%,#b4b1b2_100%)]",
 };
 
@@ -40,8 +40,8 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
               Signature surfaces for refined residential and commercial spaces.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg">
-              Explore porcelain, stone-inspired finishes, and statement ranges selected for showrooms, kitchens,
-              baths, and architectural interiors.
+              Explore tiles, quartz slabs, decorative surfaces, specialty flooring, sanitary lines, and lifestyle
+              accessories curated for residential and commercial interiors.
             </p>
           </div>
 
@@ -50,7 +50,7 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
               Drag or swipe to browse
             </p>
             <Link
-              href="/collections"
+              href="/catalog"
               className="group inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.16em] text-[var(--foreground)] transition hover:text-[var(--brand)]"
             >
               <span>View all collections</span>
@@ -77,7 +77,7 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
             </div>
 
             {categories.map((category, index) => {
-              const theme = featuredThemes[category.slug] ?? featuredThemes.porcelain;
+              const theme = featuredThemes[category.slug] ?? featuredThemes.tiles;
 
               return (
                 <Link

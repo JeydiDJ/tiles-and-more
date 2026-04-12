@@ -6,38 +6,66 @@ type CategoryCardProps = {
 };
 
 const categoryThemes: Record<string, string> = {
-  porcelain:
-    "bg-[radial-gradient(circle_at_72%_30%,rgba(255,255,255,0.18),transparent_24%),linear-gradient(145deg,#6e6a6b_0%,#9c9a9b_36%,#2e2a2b_100%)]",
-  quartz:
-    "bg-[radial-gradient(circle_at_50%_24%,rgba(255,255,255,0.14),transparent_22%),linear-gradient(145deg,#8b8889_0%,#b5b3b3_52%,#403c3d_100%)]",
-  "natural-stone":
-    "bg-[radial-gradient(circle_at_62%_34%,rgba(255,255,255,0.16),transparent_22%),linear-gradient(145deg,#9f9ea0_0%,#c4c3c4_46%,#575355_100%)]",
-  decorative:
-    "bg-[radial-gradient(circle_at_58%_28%,rgba(237,35,37,0.18),transparent_24%),linear-gradient(145deg,#666365_0%,#8f8b8c_48%,#262324_100%)]",
-  "spc-lvt-flooring":
-    "bg-[radial-gradient(circle_at_74%_30%,rgba(255,255,255,0.12),transparent_22%),linear-gradient(145deg,#7a7879_0%,#aaa7a8_52%,#363334_100%)]",
-  "sanitary-furniture":
-    "bg-[radial-gradient(circle_at_80%_22%,rgba(255,255,255,0.15),transparent_20%),linear-gradient(145deg,#9f9c9d_0%,#c1bfc0_50%,#4b4849_100%)]",
+  tiles:
+    "bg-[linear-gradient(135deg,#1f1b1c_0%,#3d393a_46%,#8f8e90_100%)]",
+  "quartz-slabs":
+    "bg-[linear-gradient(135deg,#2a2627_0%,#59595b_42%,#d9d9da_100%)]",
+  "decorative-surfaces":
+    "bg-[linear-gradient(135deg,#231f20_0%,#4d4a4b_40%,#aaa8a9_100%)]",
+  "specialty-flooring":
+    "bg-[radial-gradient(circle_at_18%_22%,rgba(237,35,37,0.28),transparent_20%),linear-gradient(135deg,#231f20_0%,#474344_45%,#8e8b8c_100%)]",
+  sanitary:
+    "bg-[linear-gradient(135deg,#1d1a1b_0%,#3d3b3c_38%,#7d7a7b_100%)]",
+  "lifestyle-accessories":
+    "bg-[linear-gradient(135deg,#252122_0%,#5a5758_44%,#b4b1b2_100%)]",
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const background = categoryThemes[category.slug] ?? categoryThemes.porcelain;
+  const background = categoryThemes[category.slug] ?? categoryThemes.tiles;
 
   return (
-    <Link href={`/catalog/${category.slug}`} className={`group relative flex h-[30rem] w-full overflow-hidden ${background}`}>
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,transparent_46%,rgba(0,0,0,0.82)_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_100%)] bg-[length:9rem_100%] opacity-20" />
-      <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-4 p-6 text-white sm:p-7">
-        <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-white/60">Collection</p>
-          <h3 className="mt-2 font-serif text-3xl font-semibold leading-none tracking-tight">
-            {category.name.replace(" Tiles", "")}
-          </h3>
+    <Link
+      href={`/catalog/${category.slug}`}
+      className="group block"
+    >
+      <article className="grid min-h-[20rem] overflow-hidden border border-[var(--border)] bg-white shadow-[0_18px_40px_rgba(0,0,0,0.08)] transition duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_28px_60px_rgba(0,0,0,0.14)] sm:grid-cols-[0.78fr_1.22fr]">
+        <div className={`relative overflow-hidden text-white ${background}`}>
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.12)_36%,rgba(0,0,0,0.68)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_100%)] bg-[length:6.5rem_100%] opacity-20" />
+          <div className="absolute right-[10%] top-[14%] h-[38%] w-[34%] border border-white/18 bg-white/10 backdrop-blur-[1px]" />
+          <div className="absolute bottom-[16%] left-[14%] h-px w-[48%] bg-white/30" />
+
+          <div className="relative flex h-full flex-col justify-between px-6 py-7 sm:px-7 sm:py-8">
+            <p className="text-xs uppercase tracking-[0.22em] text-white/72">Category</p>
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-white/72">Catalog Range</p>
+              <h3 className="mt-4 max-w-[8ch] text-3xl font-semibold leading-none tracking-tight sm:text-4xl">
+                {category.name.replace(" Tiles", "")}
+              </h3>
+            </div>
+          </div>
         </div>
-        <span className="text-sm font-medium uppercase tracking-[0.18em] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-          View
-        </span>
-      </div>
+
+        <div className="flex flex-col justify-between bg-white px-6 py-7 sm:px-8 sm:py-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">Surface Collection</p>
+            <h3 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] sm:text-4xl">
+              {category.name}
+            </h3>
+            <p className="mt-5 max-w-[34ch] text-base leading-7 text-[var(--muted)]">
+              {category.description}
+            </p>
+          </div>
+
+          <div className="mt-8 flex items-center justify-between border-t border-[var(--border)] pt-5">
+            <span className="text-sm uppercase tracking-[0.18em] text-[var(--foreground)]">View catalog</span>
+            <span className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.18em] text-[var(--brand)]">
+              <span className="transition-transform duration-300 group-hover:translate-x-1">Open</span>
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </span>
+          </div>
+        </div>
+      </article>
     </Link>
   );
 }
