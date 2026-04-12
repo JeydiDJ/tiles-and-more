@@ -7,13 +7,13 @@ export default async function CatalogPage() {
   const [categories, products] = await Promise.all([getCategories(), getProducts()]);
 
   return (
-    <section className="page-section py-20 sm:py-24">
+    <section className="pb-20 sm:pb-24">
       <CatalogSearch products={products} />
 
-      <div className="mt-14 border-t border-[var(--border)] pt-10">
-        <div className="mb-8 flex items-end justify-between gap-6">
+      <div className="page-section mt-14 border-t border-[var(--border)] pt-10">
+        <div className="mb-8 flex items-end justify-between gap-6 px-0">
           <div>
-            <p className="page-kicker">Collections</p>
+            <p className="page-kicker">Categories</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Browse by Category</h2>
           </div>
         </div>

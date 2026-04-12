@@ -131,7 +131,9 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isHome = pathname === "/";
-  const useLightChrome = isScrolled || !isHome;
+  const isCatalogPage = pathname === "/catalog";
+  const isTransparentHeroPage = pathname === "/" || pathname === "/catalog";
+  const useLightChrome = isScrolled || !isTransparentHeroPage;
   const showroomMapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteConfig.address)}`;
 
   useEffect(() => {
@@ -167,7 +169,7 @@ export function Navbar() {
             className={`transition-all duration-300 ${
               isScrolled
                 ? "rounded-[1.6rem] border border-black/8 bg-[#f4f4f4] text-[#231f20] shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
-                : isHome
+                : isTransparentHeroPage
                   ? "bg-transparent text-white"
                   : "border-b border-black/8 bg-white text-[#231f20] shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
             }`}
@@ -187,16 +189,18 @@ export function Navbar() {
                 >
                   <span className="block h-px w-5 bg-current shadow-[0_6px_0_0_currentColor,0_-6px_0_0_currentColor]" />
                 </button>
-                <div
-                  className={`hidden items-center gap-3 transition md:flex ${
-                    useLightChrome ? "px-4 py-2 text-[#59595b] hover:text-[#ed2325]" : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  <NavIcon scrolled={isScrolled} light={!isHome}>
-                    <SearchIcon />
-                  </NavIcon>
-                  <span className="text-sm font-medium">Product search</span>
-                </div>
+                {!isCatalogPage ? (
+                  <div
+                    className={`hidden items-center gap-3 transition md:flex ${
+                      useLightChrome ? "px-4 py-2 text-[#59595b] hover:text-[#ed2325]" : "text-white/70 hover:text-white"
+                    }`}
+                  >
+                    <NavIcon scrolled={isScrolled} light={!isTransparentHeroPage}>
+                      <SearchIcon />
+                    </NavIcon>
+                    <span className="text-sm font-medium">Product search</span>
+                  </div>
+                ) : null}
               </div>
 
               <Link href="/" className="flex min-w-0 items-center justify-center gap-2 justify-self-center sm:gap-3">
@@ -214,7 +218,7 @@ export function Navbar() {
                   />
                 </span>
                 <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
-                  <BrandWordmark scrolled={isScrolled} light={!isHome} />
+                  <BrandWordmark scrolled={isScrolled} light={!isTransparentHeroPage} />
                 </span>
               </Link>
 
@@ -226,14 +230,14 @@ export function Navbar() {
                   aria-label="Open showroom location"
                   className="inline-flex shrink-0"
                 >
-                  <NavIcon scrolled={isScrolled} light={!isHome}>
+                  <NavIcon scrolled={isScrolled} light={!isTransparentHeroPage}>
                     <span className="-translate-y-1">
                     <LocationIcon />
                     </span>
                   </NavIcon>
                 </Link>
                 <Link href="/contact" aria-label="Open contact page" className="inline-flex shrink-0">
-                  <NavIcon scrolled={isScrolled} light={!isHome}>
+                  <NavIcon scrolled={isScrolled} light={!isTransparentHeroPage}>
                     <span className="-translate-y-1">
                     <ContactIcon />
                     </span>
@@ -245,7 +249,7 @@ export function Navbar() {
         </div>
       </header>
 
-      {!isHome ? <div aria-hidden="true" className="h-[5.5rem]" /> : null}
+      {!isTransparentHeroPage ? <div aria-hidden="true" className="h-[5.5rem]" /> : null}
 
       <div
         className={`fixed inset-0 z-40 bg-black/70 transition ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}

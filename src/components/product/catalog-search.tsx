@@ -41,23 +41,46 @@ export function CatalogSearch({ products }: CatalogSearchProps) {
 
   return (
     <div className="grid gap-8">
-      <div className="overflow-hidden border border-[var(--border)] bg-[linear-gradient(145deg,#f7f4ef_0%,#ffffff_52%,#efebe5_100%)] shadow-[0_20px_50px_rgba(35,31,32,0.08)]">
-        <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="border-b border-[var(--border)] px-6 py-10 sm:px-8 lg:border-b-0 lg:border-r lg:px-10 lg:py-12">
-            <p className="page-kicker">Catalog Search</p>
-            <h1 className="mt-4 text-4xl font-semibold leading-none tracking-tight sm:text-5xl">
-              Find surfaces faster.
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)] sm:text-lg">
-              Search by product name, category, material, finish, collection, or size.
-            </p>
-          </div>
+      <div className="relative overflow-hidden border-y border-[var(--border)] bg-[#1d1a1b] text-white">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/hero-images/catalog-hero.png')" }}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,16,16,0.26)_0%,rgba(18,16,16,0.2)_30%,rgba(18,16,16,0.5)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_24%),radial-gradient(circle_at_80%_22%,rgba(255,255,255,0.1),transparent_30%)]" />
+        <div className="absolute right-[-4%] top-[12%] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center">
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="h-8 w-8 animate-bounce text-white/80"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
 
-          <div className="px-6 py-10 sm:px-8 lg:px-10 lg:py-12">
-            <label htmlFor="catalog-search" className="text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+        <div className="relative flex min-h-screen items-center px-6 py-16 text-center sm:px-8 sm:py-20 lg:px-12 lg:py-24">
+          <div className="w-full">
+          <p className="text-xs uppercase tracking-[0.28em] text-white/72">Catalog</p>
+          <h1 className="mx-auto mt-4 max-w-[12ch] text-5xl font-semibold leading-none tracking-tight text-white sm:text-6xl lg:text-[5.2rem]">
+            Find surfaces faster.
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
+            Search by product name, category, material, finish, collection, or size.
+          </p>
+
+          <div className="mx-auto mt-10 max-w-3xl">
+            <label htmlFor="catalog-search" className="sr-only">
               Search Products
             </label>
-            <div className="mt-4 flex items-center gap-4 border border-[var(--border)] bg-white px-5 py-4 shadow-[0_16px_34px_rgba(35,31,32,0.06)] transition focus-within:border-[var(--brand)]">
+            <div className="flex items-center gap-4 border border-white/22 bg-white/92 px-5 py-4 shadow-[0_20px_40px_rgba(0,0,0,0.16)] transition focus-within:border-[var(--brand)] sm:px-6 sm:py-5">
               <span className="text-[var(--muted)]">
                 <SearchIcon />
               </span>
@@ -67,27 +90,23 @@ export function CatalogSearch({ products }: CatalogSearchProps) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search surfaces, finishes, categories, or materials"
-                className="w-full bg-transparent text-base text-[var(--foreground)] outline-none placeholder:text-[#8f8b85]"
+                className="w-full bg-transparent text-base text-[var(--foreground)] outline-none placeholder:text-[#8f8b85] sm:text-lg"
               />
             </div>
-            <p className="mt-4 text-sm text-[var(--muted)]">
-              {filteredProducts.length} {filteredProducts.length === 1 ? "result" : "results"} shown
+
+            <p className="mt-4 text-sm text-white/70">
+              {query.trim()
+                ? `${filteredProducts.length} ${filteredProducts.length === 1 ? "result" : "results"} for "${query.trim()}"`
+                : products.length > 0
+                  ? `${products.length} ${products.length === 1 ? "product" : "products"} available`
+                  : "Catalog inventory will appear here once products are added."}
             </p>
+          </div>
           </div>
         </div>
       </div>
 
-      {filteredProducts.length > 0 ? (
-        <ProductGrid products={filteredProducts} />
-      ) : (
-        <div className="border border-[var(--border)] bg-white px-6 py-12 text-center shadow-[0_18px_40px_rgba(35,31,32,0.06)] sm:px-8">
-          <p className="page-kicker">No Matches</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">No products found for that search.</h2>
-          <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-            Try a product name, finish, category, collection, or material keyword.
-          </p>
-        </div>
-      )}
+      {filteredProducts.length > 0 ? <ProductGrid products={filteredProducts} /> : null}
     </div>
   );
 }
