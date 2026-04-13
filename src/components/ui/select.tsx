@@ -6,7 +6,7 @@ export function Select({ className, children, ...props }: SelectProps) {
   return (
     <select
       className={cn(
-        "w-full border border-[var(--border)] bg-white px-4 py-3 outline-none transition focus:border-[var(--brand)]",
+        "w-full appearance-none rounded-sm border border-[var(--border)] bg-white px-4 py-3 text-[15px] text-[var(--foreground)] outline-none shadow-[0_1px_2px_rgba(35,31,32,0.03)] transition hover:border-[#bdbabd] focus:border-[var(--brand)] focus:ring-4 focus:ring-[rgba(237,35,37,0.08)] disabled:cursor-not-allowed disabled:bg-[#f3f3f3] disabled:text-[#8f8b85]",
         className,
       )}
       {...props}

@@ -1,3 +1,5 @@
+import { getAdminRoute } from "@/lib/admin-path";
+
 export const mainNav = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -14,10 +16,10 @@ export const legalNav = [
 ];
 
 export const adminNav = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/categories", label: "Categories" },
-  { href: "/admin/collections", label: "Collections" },
-  { href: "/admin/gallery", label: "Gallery" },
-  { href: "/admin/inquiries", label: "Inquiries" },
+  { href: getAdminRoute(), label: "Dashboard" },
+  { href: getAdminRoute("/products"), label: "Products" },
+  { href: getAdminRoute("/categories"), label: "Categories" },
+  { href: getAdminRoute("/collections"), label: "Collections" },
+  { href: getAdminRoute("/gallery"), label: "Gallery" },
+  { href: getAdminRoute("/inquiries"), label: "Inquiries" },
 ];

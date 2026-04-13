@@ -27,11 +27,13 @@ export function CatalogSearch({ products }: CatalogSearchProps) {
         [
           product.name,
           product.category,
-          product.collection,
+          product.brandName,
+          product.productFamily,
           product.material,
           product.finish,
-          product.size,
+          product.productCode,
           product.summary,
+          product.applications.join(" "),
         ]
           .join(" ")
           .toLowerCase()
@@ -73,7 +75,7 @@ export function CatalogSearch({ products }: CatalogSearchProps) {
             Find surfaces faster.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
-            Search by product name, category, material, finish, collection, or size.
+            Search by product name, code, brand, family, category, material, or finish.
           </p>
 
           <div className="mx-auto mt-10 max-w-3xl">
@@ -89,7 +91,7 @@ export function CatalogSearch({ products }: CatalogSearchProps) {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search surfaces, finishes, categories, or materials"
+                placeholder="Search products, brands, categories, or materials"
                 className="w-full bg-transparent text-base text-[var(--foreground)] outline-none placeholder:text-[#8f8b85] sm:text-lg"
               />
             </div>

@@ -1,10 +1,8 @@
 export function ImageUpload() {
   return (
-    <div className="surface-card rounded-md p-6">
-      <h3 className="text-lg font-semibold">Image Upload</h3>
-      <p className="mt-2 text-sm text-[var(--muted)]">
-        Placeholder for gallery, product, and showroom asset uploads.
-      </p>
+    <div className="border-b border-[var(--border)] pb-5">
+      <h2 className="text-xl font-semibold">Image Upload</h2>
+      <p className="mt-2 text-sm text-[var(--muted)]">Upload flow will be added next.</p>
     </div>
   );
 }
