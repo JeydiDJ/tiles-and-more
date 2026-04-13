@@ -7,7 +7,7 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <article className="editorial-panel border-t-[3px] border-t-[var(--brand)] p-6">
+    <article className="editorial-panel border-t-[3px] border-t-[var(--brand)] p-6 text-[var(--foreground)]">
       <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{product.category}</p>
       <h3 className="mt-3 text-2xl font-semibold tracking-tight">{product.name}</h3>
       <p className="mt-2 text-sm uppercase tracking-[0.14em] text-[var(--brand-dark)]">{product.brandName}</p>

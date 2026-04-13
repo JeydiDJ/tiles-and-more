@@ -1,11 +1,13 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ProductFormOptions } from "@/types/product";
 import { createProductAction, type ProductFormState } from "@/app/(admin)/admin/products/actions";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { getAdminRoute } from "@/lib/admin-path";
 
 type ProductFormProps = {
   options: ProductFormOptions;
@@ -14,6 +16,7 @@ type ProductFormProps = {
 
 const initialState: ProductFormState = {
   error: null,
+  productId: null,
 };
 
 function Field({
@@ -49,6 +52,7 @@ function FormSection({
 }
 
 export function ProductForm({ options, mode = "create" }: ProductFormProps) {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(createProductAction, initialState);
   const isEditMode = mode === "edit";
   const [selectedBrandId, setSelectedBrandId] = useState("");
@@ -72,6 +76,13 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
       setSelectedFamilyId("");
     }
   }, [filteredFamilies, selectedFamilyId]);
+
+  useEffect(() => {
+    if (state.productId) {
+      router.push(getAdminRoute(`/products/${state.productId}`));
+      router.refresh();
+    }
+  }, [router, state.productId]);
 
   return (
     <form action={isEditMode ? undefined : formAction} className="border-t border-[var(--border)] pt-6">

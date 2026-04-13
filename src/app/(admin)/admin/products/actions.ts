@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createProduct, createProductMedia, deleteProduct, updateProductImageUrl } from "@/services/product.service";
 import { uploadProductImage } from "@/services/storage.service";
 import { getAdminRoute } from "@/lib/admin-path";
@@ -12,6 +11,7 @@ import { slugify } from "@/lib/utils";
 
 export type ProductFormState = {
   error: string | null;
+  productId?: string | null;
 };
 
 export type ProductDeleteState = {
@@ -25,7 +25,7 @@ function normalizeOptional(value: FormDataEntryValue | null) {
 
 export async function createProductAction(_: ProductFormState, formData: FormData): Promise<ProductFormState> {
   if (!hasSupabaseEnv()) {
-    return { error: "Supabase env vars are missing. Add them before creating products." };
+    return { error: "Supabase env vars are missing. Add them before creating products.", productId: null };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -34,7 +34,7 @@ export async function createProductAction(_: ProductFormState, formData: FormDat
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "You must be signed in to create products." };
+    return { error: "You must be signed in to create products.", productId: null };
   }
 
   const name = String(formData.get("name") ?? "").trim();
@@ -47,7 +47,7 @@ export async function createProductAction(_: ProductFormState, formData: FormDat
   const sampleImages = formData.getAll("sampleImages");
 
   if (!name || !productCode || !brandId || !categoryId || !productFamilyId) {
-    return { error: "Name, product code, brand, category, and product family are required." };
+    return { error: "Name, product code, brand, category, and product family are required.", productId: null };
   }
 
   let createdProduct;
@@ -109,13 +109,17 @@ export async function createProductAction(_: ProductFormState, formData: FormDat
     await createProductMedia(mediaRows);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to create product.";
-    return { error: message };
+    return { error: message, productId: null };
   }
 
   revalidatePath("/catalog");
   revalidatePath(getAdminRoute("/products"));
   revalidatePath(`/products/${slugInput || slugify(name)}`);
-  redirect(getAdminRoute(`/products/${createdProduct.id}`));
+
+  return {
+    error: null,
+    productId: createdProduct.id,
+  };
 }
 
 export async function deleteProductAction(_: ProductDeleteState, formData: FormData): Promise<ProductDeleteState> {
