@@ -19,12 +19,12 @@ export function ProjectsSection() {
           </p>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 lg:auto-rows-fr lg:grid-cols-3">
           {projects.map((project, index) => (
             <Link
               key={project.id}
               href={`/projects#${project.id}`}
-              className="group flex min-h-[34rem] flex-col overflow-hidden border border-[var(--border)] bg-[linear-gradient(180deg,#f5f1ea_0%,#ece4d8_100%)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(61,43,28,0.12)] lg:min-h-[36rem]"
+              className="group flex h-full min-h-[34rem] flex-col overflow-hidden border border-[var(--border)] bg-[linear-gradient(180deg,#f5f1ea_0%,#ece4d8_100%)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(61,43,28,0.12)] lg:min-h-[36rem]"
             >
               <div className="p-5 sm:p-6">
                 <div className="relative flex h-[20rem] items-center justify-center border border-[var(--border)] bg-[repeating-linear-gradient(45deg,rgba(124,94,59,0.06)_0_16px,rgba(255,255,255,0.75)_16px_32px)] lg:h-[22rem]">

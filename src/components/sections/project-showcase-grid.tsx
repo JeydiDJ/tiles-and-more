@@ -36,7 +36,7 @@ export function ProjectShowcaseGrid() {
           </p>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid gap-5 lg:auto-rows-fr lg:grid-cols-2">
           {gallery.map((project, index) => {
             const tags = projectTags[index % projectTags.length];
             const location = projectLocations[index % projectLocations.length];
@@ -45,7 +45,7 @@ export function ProjectShowcaseGrid() {
               <article
                 key={project.id}
                 id={project.id}
-                className="group flex min-h-[32rem] flex-col overflow-hidden border border-[var(--border)] bg-[#f7f3ec] shadow-[0_18px_40px_rgba(0,0,0,0.08)] transition duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_28px_60px_rgba(61,43,28,0.12)]"
+                className="group flex h-full min-h-[32rem] flex-col overflow-hidden border border-[var(--border)] bg-[#f7f3ec] shadow-[0_18px_40px_rgba(0,0,0,0.08)] transition duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_28px_60px_rgba(61,43,28,0.12)]"
               >
                 <div className="border-b border-[var(--border)] p-6 sm:p-8 lg:p-10">
                   <div className="flex items-start justify-between gap-6">
