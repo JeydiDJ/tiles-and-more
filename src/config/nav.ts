@@ -4,7 +4,7 @@ export const mainNav = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/catalog", label: "Catalog" },
-  { href: "/collections", label: "Collections" },
+  { href: "/projects", label: "Projects" },
   { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
   { href: "/quote", label: "Request Quote" },

@@ -310,9 +310,7 @@ export function Navbar() {
         </div>
 
         <div className="relative flex flex-1 flex-col overflow-y-auto px-5 pb-6 sm:px-8 sm:pb-8">
-          <div className="border-b border-black/8 pb-5 pt-5 sm:pb-6 sm:pt-6">
-            <p className="text-[0.72rem] uppercase tracking-[0.28em] text-[#8a837a]">Navigation</p>
-          </div>
+         
 
           <nav className="border-b border-black/8 pb-6 pt-4 sm:pb-8 sm:pt-6">
             <div className="space-y-1">
