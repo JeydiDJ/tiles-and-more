@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { mainNav } from "@/config/nav";
 import { siteConfig } from "@/config/site";
@@ -127,10 +127,11 @@ function BrandWordmark({
 }
 
 export function Navbar() {
+  const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const isHome = pathname === "/";
+  const [searchQuery, setSearchQuery] = useState("");
   const isCatalogPage = pathname === "/catalog";
   const isTransparentHeroPage = pathname === "/" || pathname === "/catalog";
   const useLightChrome = isScrolled || !isTransparentHeroPage;
@@ -161,6 +162,11 @@ export function Navbar() {
     setIsOpen(false);
   }, [pathname]);
 
+  function submitSearch() {
+    const normalized = searchQuery.trim();
+    router.push(normalized ? `/catalog?q=${encodeURIComponent(normalized)}` : "/catalog");
+  }
+
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-30 w-full">
@@ -189,18 +195,30 @@ export function Navbar() {
                 >
                   <span className="block h-px w-5 bg-current shadow-[0_6px_0_0_currentColor,0_-6px_0_0_currentColor]" />
                 </button>
-                {!isCatalogPage ? (
-                  <div
-                    className={`hidden items-center gap-3 transition md:flex ${
-                      useLightChrome ? "px-4 py-2 text-[#59595b] hover:text-[#ed2325]" : "text-white/70 hover:text-white"
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    submitSearch();
+                  }}
+                  className={`hidden md:flex md:min-w-[18rem] md:max-w-[26rem] md:flex-1 md:items-center md:gap-3 md:px-4 md:py-2 ${
+                    useLightChrome
+                      ? "text-[#231f20]"
+                      : "text-white"
+                  }`}
+                >
+                  <span className={useLightChrome ? "text-[#59595b]" : "text-white/76"}>
+                    <SearchIcon />
+                  </span>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search products"
+                    className={`w-full bg-transparent text-sm outline-none ${
+                      useLightChrome ? "placeholder:text-[#8f8b85]" : "placeholder:text-white/56"
                     }`}
-                  >
-                    <NavIcon scrolled={isScrolled} light={!isTransparentHeroPage}>
-                      <SearchIcon />
-                    </NavIcon>
-                    <span className="text-sm font-medium">Product search</span>
-                  </div>
-                ) : null}
+                  />
+                </form>
               </div>
 
               <Link href="/" className="flex min-w-0 items-center justify-center gap-2 justify-self-center sm:gap-3">

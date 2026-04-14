@@ -33,31 +33,33 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
   return (
     <section className="border-t border-[var(--border)] bg-white py-14 text-[var(--foreground)] sm:py-18">
       <div className="px-0">
-        <div className="mb-8 flex flex-col gap-8 px-6 sm:mb-10 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-12">
-          <div className="max-w-3xl">
+        <div className="mb-8 px-6 sm:mb-10 sm:px-8 lg:px-12">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-end lg:gap-14">
+          <div className="max-w-4xl">
             <p className="page-kicker">Featured Collections</p>
             <h2 className="mt-4 text-4xl font-semibold leading-none tracking-tight sm:text-5xl lg:text-[4.25rem]">
               Signature surfaces for refined residential and commercial spaces.
             </h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg">
+            <p className="mt-5 max-w-3xl text-base leading-7 text-[var(--muted)] sm:text-lg">
               Explore tiles, quartz slabs, decorative surfaces, specialty flooring, sanitary lines, and lifestyle
               accessories curated for residential and commercial interiors.
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 self-start lg:items-end">
+          <div className="flex flex-col gap-4 border-t border-[var(--border)] pt-5 lg:ml-auto lg:w-full lg:max-w-xs lg:self-end lg:items-end lg:border-t-0 lg:border-l lg:pl-8 lg:pt-0 lg:text-right">
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">
               Drag or swipe to browse
             </p>
             <Link
               href="/catalog"
-              className="group inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.16em] text-[var(--foreground)] transition hover:text-[var(--brand)]"
+              className="group inline-flex items-center gap-3 text-sm font-medium uppercase tracking-[0.16em] text-[var(--foreground)] transition-colors duration-300 hover:text-[var(--brand)]"
             >
-              <span>View all collections</span>
+              <span className="transition-colors duration-300 group-hover:text-[var(--brand)]">View Catalogs</span>
               <span className="text-base leading-none transition-transform duration-300 group-hover:translate-x-1">
                 →
               </span>
             </Link>
+          </div>
           </div>
         </div>
 

@@ -1,11 +1,12 @@
 "use client";
 
-import { useDeferredValue, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import type { Product } from "@/types/product";
 import { ProductGrid } from "@/components/product/product-grid";
 
 type CatalogSearchProps = {
   products: Product[];
+  initialQuery?: string;
 };
 
 function SearchIcon() {
@@ -17,11 +18,15 @@ function SearchIcon() {
   );
 }
 
-export function CatalogSearch({ products }: CatalogSearchProps) {
-  const [query, setQuery] = useState("");
+export function CatalogSearch({ products, initialQuery = "" }: CatalogSearchProps) {
+  const [query, setQuery] = useState(initialQuery);
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const isSearching = normalizedQuery.length > 0;
+
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const filteredProducts = normalizedQuery
     ? products.filter((product) =>
