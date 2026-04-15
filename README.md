@@ -50,7 +50,18 @@ Current env file:
 
 ```env
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
+NEXT_PUBLIC_EMAILJS_CONTACT_TEMPLATE_ID=your_contact_template_id
+NEXT_PUBLIC_EMAILJS_QUOTE_TEMPLATE_ID=your_quote_template_id
 ```
+
+EmailJS template variables expected by the forms:
+
+- Contact template:
+  `form_type`, `name`, `email`, `phone`, `message`
+- Quote template:
+  `form_type`, `full_name`, `email`, `phone`, `project_name`, `project_type`, `square_footage`, `message`
 
 `src/lib/db.ts` is still a placeholder and does not yet return a live Supabase client.
 
