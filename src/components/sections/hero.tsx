@@ -35,18 +35,18 @@ const slides: (VideoSlide | ImageBrandSlide)[] = [
     caption: "Design-led bathroom collections and architectural solutions.",
   },
   {
-    id: "sonite",
-    title: "Sonite",
-    image: "/hero-images/sonite-hero.jpg",
-    logo: "/logo/brand-logos/sonite-logo.png",
-    caption: "Premium tile surfaces crafted for elegant residential and commercial interiors.",
-  },
-  {
     id: "geotiles",
     title: "Geo Tiles",
     image: "/hero-images/geotiles-hero.jpg",
     logo: "/logo/brand-logos/geotiles-logo.png",
     caption: "Contemporary tile collections with bold geometry and expressive surface detail.",
+  },
+  {
+    id: "sonite",
+    title: "Sonite",
+    image: "/hero-images/sonite-hero.jpg",
+    logo: "/logo/brand-logos/sonite-logo.png",
+    caption: "Premium tile surfaces crafted for elegant residential and commercial interiors.",
   },
 ];
 

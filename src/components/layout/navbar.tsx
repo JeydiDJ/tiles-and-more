@@ -109,15 +109,19 @@ function GlobeIcon() {
 function BrandWordmark({
   scrolled,
   light,
+  compact,
 }: {
   scrolled: boolean;
   light?: boolean;
+  compact?: boolean;
 }) {
   const useDarkText = scrolled || light;
 
   return (
     <span
-      className="text-[1.75rem] font-semibold uppercase leading-[0.9] tracking-[0.01em] sm:text-[2rem]"
+      className={`font-semibold uppercase leading-[0.9] tracking-[0.01em] ${
+        compact ? "text-[1.28rem] sm:text-[2rem]" : "text-[1.75rem] sm:text-[2rem]"
+      }`}
       style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
       <span className={useDarkText ? "text-[#ed2325]" : "text-white"}>TILES</span>
@@ -180,7 +184,7 @@ export function Navbar() {
                   : "border-b border-black/8 bg-white text-[#231f20] shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
             }`}
           >
-            <div className="grid min-h-[4.75rem] grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:min-h-[5.5rem] sm:gap-4 sm:px-8 lg:px-12">
+            <div className="grid min-h-[4.75rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 sm:min-h-[5.5rem] sm:grid-cols-[1fr_auto_1fr] sm:gap-4 sm:px-8 lg:px-12">
               <div className="flex items-center gap-3 justify-self-start sm:gap-5">
                 <button
                   type="button"
@@ -224,19 +228,19 @@ export function Navbar() {
               <Link href="/" className="flex min-w-0 items-center justify-center gap-2 justify-self-center sm:gap-3">
                 <span
                   data-intro-logo-target
-                  className="flex h-9 w-9 shrink-0 items-center justify-center sm:h-12 sm:w-12"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center sm:h-12 sm:w-12"
                 >
                   <Image
                     src="/logo/tilesandmore-logo.png"
                     alt="Tiles and More logo"
                     width={46}
                     height={46}
-                    className="h-9 w-9 object-contain sm:h-12 sm:w-12"
+                    className="h-8 w-8 object-contain sm:h-12 sm:w-12"
                     priority
                   />
                 </span>
                 <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
-                  <BrandWordmark scrolled={isScrolled} light={!isTransparentHeroPage} />
+                  <BrandWordmark scrolled={isScrolled} light={!isTransparentHeroPage} compact />
                 </span>
               </Link>
 
@@ -246,7 +250,7 @@ export function Navbar() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Open showroom location"
-                  className="inline-flex shrink-0"
+                  className="hidden shrink-0 sm:inline-flex"
                 >
                   <NavIcon scrolled={isScrolled} light={!isTransparentHeroPage}>
                     <span className="-translate-y-1">
@@ -363,6 +367,17 @@ export function Navbar() {
                   </Link>
                 ))}
               </div>
+
+              <Link
+                href={showroomMapHref}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setIsOpen(false)}
+                className="mt-5 inline-flex items-center gap-3 text-sm text-[#231f20] transition hover:text-[#ed2325] sm:hidden"
+              >
+                <LocationIcon />
+                <span>Open Showroom Map</span>
+              </Link>
 
               <div className="mt-6 flex items-center gap-3 border-t border-black/8 pt-5 sm:hidden">
                 <Link
