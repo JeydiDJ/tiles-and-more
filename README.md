@@ -1,6 +1,6 @@
-# Tiles & More
+# TILES & MORE
 
-Tiles & More is a production Next.js showroom and catalog website for tile, surface, flooring, and sanitary products. It is already deployed through Vercel and serves as both a public-facing brand site and a lightweight private admin workspace for managing catalog content.
+TILES & MORE is a production Next.js showroom and catalog website for tile, surface, flooring, and sanitary products. It is already deployed through Vercel and serves as both a public-facing brand site and a lightweight private admin workspace for managing catalog content.
 
 Live site: [https://tiles-and-more.vercel.app/](https://tiles-and-more.vercel.app/)
 
