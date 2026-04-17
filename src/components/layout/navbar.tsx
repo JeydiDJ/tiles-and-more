@@ -14,10 +14,10 @@ const utilityLinks = [
 ];
 
 const socialLinks = [
-  { href: siteConfig.socialLinks.instagram, label: "Instagram", short: "IG" },
-  { href: siteConfig.socialLinks.facebook, label: "Facebook", short: "FB" },
-  { href: "https://pinterest.com", label: "Pinterest", short: "PI" },
-  { href: "https://linkedin.com", label: "LinkedIn", short: "IN" },
+  { href: siteConfig.socialLinks.instagram, label: "Instagram", icon: InstagramIcon },
+  { href: siteConfig.socialLinks.facebook, label: "Facebook", icon: FacebookIcon },
+  { href: "https://pinterest.com", label: "Pinterest", icon: PinterestIcon },
+  { href: "https://linkedin.com", label: "LinkedIn", icon: LinkedInIcon },
 ];
 
 function NavIcon({
@@ -74,6 +74,30 @@ function YoutubeIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.5rem] w-[1.5rem] fill-none stroke-current">
       <path d="M20 8.7c-.1-1-.9-1.8-1.9-1.9C16.5 6.5 14.5 6.5 12 6.5s-4.5 0-6.1.3c-1 .1-1.8.9-1.9 1.9-.2 1-.2 1.9-.2 3.3s0 2.3.2 3.3c.1 1 .9 1.8 1.9 1.9 1.6.3 3.6.3 6.1.3s4.5 0 6.1-.3c1-.1 1.8-.9 1.9-1.9.2-1 .2-1.9.2-3.3s0-2.3-.2-3.3Z" strokeWidth="1.8" />
       <path d="m10 9.5 5 2.5-5 2.5v-5Z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function PinterestIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.35rem] w-[1.35rem] fill-none stroke-current">
+      <path
+        d="M12 4.5c-4 0-6.5 2.8-6.5 6.1 0 2.3 1.2 4 3 4.7.3.1.4 0 .5-.2l.5-1.8c.1-.2 0-.3-.2-.5-.5-.6-.9-1.5-.9-2.5 0-2.4 1.8-4.7 5-4.7 2.7 0 4.2 1.7 4.2 4 0 3-1.3 5.5-3.3 5.5-1.1 0-1.9-.9-1.6-2 .3-1.3.8-2.7.8-3.6 0-.8-.4-1.5-1.4-1.5-1.1 0-2 1.1-2 2.7 0 1 .3 1.7.3 1.7l-1.2 5.1c-.2.9 0 2.4.1 3.2"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.35rem] w-[1.35rem] fill-none stroke-current">
+      <path d="M7.2 9.3V19" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M12.2 12.7V19" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M12.2 14.3c0-2.1 1.3-3.5 3.3-3.5 1.9 0 3.1 1.2 3.1 3.7V19" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="7.2" cy="6.7" r="1.1" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -429,11 +453,12 @@ export function Navbar() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-xs font-semibold uppercase tracking-[0.16em] text-[#2d2a25] transition hover:border-black hover:text-black"
+                    aria-label={item.label}
+                    className="inline-flex h-10 w-10 items-center justify-center border border-black/10 text-[#2d2a25] transition hover:border-black hover:text-black"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {item.short}
+                    <item.icon />
                   </Link>
                 ))}
               </div>
