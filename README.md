@@ -161,7 +161,7 @@ It includes:
 
 View the full documentation here:
 
-https://github.com/JeydiDJ/tiles-and-more/docs/supabase-erd-documentation.md
+[https://github.com/JeydiDJ/tiles-and-more/docs/supabase-erd-documentation.md](https://github.com/JeydiDJ/tiles-and-more/blob/main/docs/supabase-erd-documentation.md)
 
 
 ### EmailJS
