@@ -2,11 +2,12 @@
 
 import type { FormEvent } from "react";
 import { useState, useTransition } from "react";
+import { FormVisualPanel } from "@/components/forms/form-visual-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
 import { Textarea } from "@/components/ui/textarea";
 import { sendContactEmail } from "@/lib/emailjs";
-import { Loader } from "@/components/ui/loader";
 
 export function ContactForm() {
   const [isPending, startTransition] = useTransition();
@@ -55,7 +56,7 @@ export function ContactForm() {
           message: form.message.trim(),
         });
 
-        setSuccess("Your inquiry has been sent. We’ll get back to you soon.");
+        setSuccess("Your inquiry has been sent. We'll get back to you soon.");
         setForm({
           name: "",
           email: "",
@@ -73,45 +74,60 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
-      <p className="page-kicker">Contact</p>
-      <h2 className="mt-3 text-4xl font-semibold tracking-tight">Start Your Inquiry</h2>
-      <div className="mt-5 grid gap-4">
-        <Input
-          value={form.name}
-          onChange={(event) => updateField("name", event.target.value)}
-          placeholder="Full name"
-          autoComplete="name"
-        />
-        <Input
-          type="email"
-          value={form.email}
-          onChange={(event) => updateField("email", event.target.value)}
-          placeholder="Email address"
-          autoComplete="email"
-        />
-        <Input
-          type="tel"
-          value={form.phone}
-          onChange={(event) => updateField("phone", event.target.value)}
-          placeholder="Phone number"
-          autoComplete="tel"
-        />
-        <Textarea
-          value={form.message}
-          onChange={(event) => updateField("message", event.target.value)}
-          placeholder="Tell us about your project"
-        />
-        {error ? <p className="text-sm text-[#b42318]">{error}</p> : null}
-        {success ? <p className="text-sm text-[#1f7a3d]">{success}</p> : null}
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="mt-2 inline-flex w-full gap-2 bg-[var(--brand)] px-6 py-4 hover:bg-[#c61d1f] sm:w-auto"
-        >
-          {isPending ? <Loader /> : null}
-          {isPending ? "Sending..." : "Send Inquiry"}
-        </Button>
+    <form
+      onSubmit={handleSubmit}
+      className="grid overflow-hidden border border-[var(--border)] bg-white shadow-[0_24px_60px_rgba(35,31,32,0.12)] lg:grid-cols-[0.95fr_1.05fr]"
+    >
+      <FormVisualPanel
+        kicker="Contact"
+        title="Start Your Inquiry"
+        description="Use this space for a showroom image, a recent installation, or a branded visual while the form stays focused on the right."
+        imagePath="/hero-images/roca-hero-1.jpg"
+      />
+      <div className="bg-white px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
+        <p className="page-kicker">Contact</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Talk to the team</h2>
+        <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-base">
+          Send a quick note about your space, timeline, or product questions and we&apos;ll point you in the right
+          direction.
+        </p>
+        <div className="mt-6 grid gap-4">
+          <Input
+            value={form.name}
+            onChange={(event) => updateField("name", event.target.value)}
+            placeholder="Full name"
+            autoComplete="name"
+          />
+          <Input
+            type="email"
+            value={form.email}
+            onChange={(event) => updateField("email", event.target.value)}
+            placeholder="Email address"
+            autoComplete="email"
+          />
+          <Input
+            type="tel"
+            value={form.phone}
+            onChange={(event) => updateField("phone", event.target.value)}
+            placeholder="Phone number"
+            autoComplete="tel"
+          />
+          <Textarea
+            value={form.message}
+            onChange={(event) => updateField("message", event.target.value)}
+            placeholder="Tell us about your project"
+          />
+          {error ? <p className="text-sm text-[#b42318]">{error}</p> : null}
+          {success ? <p className="text-sm text-[#1f7a3d]">{success}</p> : null}
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="mt-2 inline-flex w-full gap-2 bg-[var(--brand)] px-6 py-4 hover:bg-[#c61d1f] sm:w-auto"
+          >
+            {isPending ? <Loader /> : null}
+            {isPending ? "Sending..." : "Send Inquiry"}
+          </Button>
+        </div>
       </div>
     </form>
   );

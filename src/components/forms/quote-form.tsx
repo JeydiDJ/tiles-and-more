@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useState, useTransition } from "react";
+import { FormVisualPanel } from "@/components/forms/form-visual-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
@@ -63,7 +64,7 @@ export function QuoteForm() {
           message: form.message.trim(),
         });
 
-        setSuccess("Your quote request has been sent. We’ll follow up with you soon.");
+        setSuccess("Your quote request has been sent. We'll follow up with you soon.");
         setForm({
           fullName: "",
           email: "",
@@ -84,16 +85,23 @@ export function QuoteForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-0 border-y border-[var(--border)] lg:grid-cols-[0.8fr_1.2fr]">
-      <div className="editorial-band px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
-        <p className="page-kicker">Quote</p>
-        <h2 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Request a Quote</h2>
-        <p className="mt-5 max-w-sm text-[var(--muted)]">
-          Share project type, approximate quantity, and timeline so we can prepare a tailored recommendation.
-        </p>
-      </div>
+    <form
+      onSubmit={handleSubmit}
+      className="grid overflow-hidden border border-[var(--border)] bg-white shadow-[0_24px_60px_rgba(35,31,32,0.12)] lg:grid-cols-[0.95fr_1.05fr]"
+    >
+      <FormVisualPanel
+        kicker="Quote"
+        title="Request a Quote"
+        description="Share project type, approximate quantity, and timeline so we can prepare a tailored recommendation."
+        imagePath="/hero-images/catalog-hero.png"
+      />
       <div className="bg-white px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
-        <div className="grid gap-4">
+        <p className="page-kicker">Project Details</p>
+        <h3 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Tell us what you need</h3>
+        <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-base">
+          Include quantities, finish preferences, and delivery timing so we can respond with a sharper estimate.
+        </p>
+        <div className="mt-6 grid gap-4">
           <Input
             value={form.fullName}
             onChange={(event) => updateField("fullName", event.target.value)}
