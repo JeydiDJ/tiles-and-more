@@ -264,7 +264,7 @@ export function ProductForm({ options, mode = "create", initialProduct = null }:
             <button
               type="button"
               onClick={() => router.push(getAdminRoute("/products"))}
-              className="inline-flex min-w-28 items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
+              className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
             >
               Cancel
             </button>

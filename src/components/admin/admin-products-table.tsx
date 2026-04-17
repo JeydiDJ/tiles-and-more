@@ -149,7 +149,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
             <button
               type="button"
               onClick={() => setIsBulkModalOpen(true)}
-              className="text-sm font-medium text-[#b42318] transition hover:text-[#7a1b14]"
+              className="cursor-pointer text-sm font-medium text-[#b42318] transition hover:text-[#7a1b14]"
             >
               Delete selected ({selectedIds.length})
             </button>
@@ -161,7 +161,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
               setBrand("all");
               setCategory("all");
             }}
-            className="text-sm font-medium text-[var(--brand)] transition hover:text-[var(--brand-dark)]"
+            className="cursor-pointer text-sm font-medium text-[var(--brand)] transition hover:text-[var(--brand-dark)]"
           >
             Clear filters
           </button>
@@ -176,7 +176,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                 type="checkbox"
                 checked={allFilteredSelected}
                 onChange={toggleSelectAllFiltered}
-                className="h-4 w-4 accent-[var(--brand)]"
+                className="h-4 w-4 cursor-pointer accent-[var(--brand)]"
               />
             </label>
             <span>Product</span>
@@ -198,7 +198,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                     type="checkbox"
                     checked={selectedIds.includes(product.id)}
                     onChange={() => toggleSelected(product.id)}
-                    className="h-4 w-4 accent-[var(--brand)]"
+                    className="h-4 w-4 cursor-pointer accent-[var(--brand)]"
                     aria-label={`Select ${product.name}`}
                   />
                 </label>
@@ -265,14 +265,14 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
               type="button"
               onClick={() => setIsBulkModalOpen(false)}
               disabled={isBulkPending}
-              className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isBulkPending}
-              className="inline-flex items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex cursor-pointer items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isBulkPending ? "Deleting..." : "Delete Selected"}
             </button>

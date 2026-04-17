@@ -22,7 +22,7 @@ export function DeleteProductButton({ productId, productName }: DeleteProductBut
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium uppercase tracking-[0.16em] text-[#b42318] transition hover:text-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer text-xs font-medium uppercase tracking-[0.16em] text-[#b42318] transition hover:text-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
       >
         Delete
       </button>
@@ -44,14 +44,14 @@ export function DeleteProductButton({ productId, productName }: DeleteProductBut
               type="button"
               onClick={() => setOpen(false)}
               disabled={isPending}
-              className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex cursor-pointer items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPending ? "Deleting..." : "Delete Product"}
             </button>
