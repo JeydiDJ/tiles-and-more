@@ -139,7 +139,7 @@ export function Navbar() {
   const isCatalogPage = pathname === "/catalog";
   const isTransparentHeroPage = pathname === "/" || pathname === "/catalog";
   const useLightChrome = isScrolled || !isTransparentHeroPage;
-  const showroomMapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteConfig.address)}`;
+  const showroomMapHref = siteConfig.showroomMapUrl;
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";

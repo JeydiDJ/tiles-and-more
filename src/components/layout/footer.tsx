@@ -11,7 +11,7 @@ export function Footer() {
         <div className="grid gap-12 border-t border-white/14 pt-12 lg:grid-cols-[1.35fr_0.75fr_0.7fr]">
           <div className="max-w-xl">
             <p className="text-sm uppercase tracking-[0.28em] text-white/55">Tiles and showroom surfaces</p>
-            <h2 className="mt-4 font-serif text-4xl font-semibold leading-tight sm:text-5xl">
+            <h2 className="mt-4 font-serif text-4xl font-semibold leading-tight uppercase sm:text-5xl">
               {siteConfig.name}
             </h2>
             <p className="mt-5 text-base leading-7 text-white/72">{siteConfig.description}</p>
@@ -45,9 +45,26 @@ export function Footer() {
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-white/55">Contact</p>
             <div className="mt-5 space-y-4 text-sm leading-6 text-white/72">
-              <p>{siteConfig.address}</p>
-              <p>{siteConfig.phone}</p>
-              <p>{siteConfig.email}</p>
+              <p>
+                <Link
+                  href={siteConfig.showroomMapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition hover:text-white"
+                >
+                  {siteConfig.address}
+                </Link>
+              </p>
+              <p>
+                <Link href={`tel:${siteConfig.phone}`} className="transition hover:text-white">
+                  {siteConfig.phone}
+                </Link>
+              </p>
+              <p>
+                <Link href={`mailto:${siteConfig.email}`} className="transition hover:text-white">
+                  {siteConfig.email}
+                </Link>
+              </p>
             </div>
             <div className="mt-8 border-t border-white/14 pt-6">
               <p className="text-xs uppercase tracking-[0.24em] text-white/55">Legal</p>
@@ -63,7 +80,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-white/14 pt-6 text-xs uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center sm:justify-between">
-          <p>{year} {siteConfig.name}</p>
+          <p>{year} {siteConfig.name.toUpperCase()}</p>
           <p>Curated materials for residential and commercial spaces</p>
         </div>
       </div>
