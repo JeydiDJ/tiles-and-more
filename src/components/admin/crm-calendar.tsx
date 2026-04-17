@@ -4,21 +4,21 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { getAdminRoute } from "@/lib/admin-path";
 import { cn } from "@/lib/utils";
-import type { ProjectLead } from "@/types/project-lead";
+import type { CrmOpportunity } from "@/types/crm";
 
 type CrmCalendarProps = {
-  leads: ProjectLead[];
+  opportunities: CrmOpportunity[];
   compact?: boolean;
 };
 
 type CalendarEvent = {
   id: string;
-  leadId: string;
+  opportunityId: string;
   title: string;
   detail: string;
   dateKey: string;
   timestamp: number;
-  tone: "lead" | "quote" | "progress" | "completed";
+  tone: "lead" | "bid" | "progress" | "completed";
 };
 
 function startOfMonth(date: Date) {
@@ -37,29 +37,18 @@ function toDateKey(date: Date) {
 }
 
 function formatDayLabel(value: string) {
-  return new Intl.DateTimeFormat("en-PH", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
 
 function formatMonthLabel(date: Date) {
-  return new Intl.DateTimeFormat("en-PH", {
-    month: "long",
-    year: "numeric",
-  }).format(date);
-}
-
-function formatStatusLabel(value: string) {
-  return value.replaceAll("_", " ");
+  return new Intl.DateTimeFormat("en-PH", { month: "long", year: "numeric" }).format(date);
 }
 
 function getToneClasses(tone: CalendarEvent["tone"]) {
   switch (tone) {
     case "completed":
       return "bg-[#ebf8ee] text-[#1d7a43]";
-    case "quote":
+    case "bid":
       return "bg-[#fff6e7] text-[#9a5b12]";
     case "progress":
       return "bg-[#eef4ff] text-[#2859b8]";
@@ -68,51 +57,51 @@ function getToneClasses(tone: CalendarEvent["tone"]) {
   }
 }
 
-function buildEvents(leads: ProjectLead[]) {
+function buildEvents(opportunities: CrmOpportunity[]) {
   const events: CalendarEvent[] = [];
 
-  for (const lead of leads) {
-    const createdDate = new Date(lead.createdAt);
-    const updatedDate = new Date(lead.updatedAt);
+  for (const opportunity of opportunities) {
+    const createdDate = new Date(opportunity.createdAt);
+    const updatedDate = new Date(opportunity.updatedAt);
     const createdKey = toDateKey(createdDate);
     const updatedKey = toDateKey(updatedDate);
 
     events.push({
-      id: `${lead.id}-created`,
-      leadId: lead.id,
-      title: lead.projectName,
-      detail: `Lead opened for ${lead.clientName}`,
+      id: `${opportunity.id}-created`,
+      opportunityId: opportunity.id,
+      title: opportunity.name,
+      detail: `${opportunity.accountName} account opened a new opportunity`,
       dateKey: createdKey,
       timestamp: createdDate.getTime(),
       tone: "lead",
     });
 
-    if (lead.quotationFinished) {
+    if (opportunity.stage === "bidding" || opportunity.stage === "negotiation") {
       events.push({
-        id: `${lead.id}-quotation`,
-        leadId: lead.id,
-        title: lead.projectName,
-        detail: "Quotation finished",
+        id: `${opportunity.id}-bid`,
+        opportunityId: opportunity.id,
+        title: opportunity.name,
+        detail: `${opportunity.stage.replaceAll("_", " ")} stage active`,
         dateKey: updatedKey,
         timestamp: updatedDate.getTime(),
-        tone: "quote",
+        tone: "bid",
       });
-    } else if (lead.status === "completed") {
+    } else if (opportunity.stage === "completed") {
       events.push({
-        id: `${lead.id}-completed`,
-        leadId: lead.id,
-        title: lead.projectName,
-        detail: "Project marked completed",
+        id: `${opportunity.id}-completed`,
+        opportunityId: opportunity.id,
+        title: opportunity.name,
+        detail: "Opportunity marked completed",
         dateKey: updatedKey,
         timestamp: updatedDate.getTime(),
         tone: "completed",
       });
     } else if (createdKey !== updatedKey) {
       events.push({
-        id: `${lead.id}-updated`,
-        leadId: lead.id,
-        title: lead.projectName,
-        detail: `Status updated to ${formatStatusLabel(lead.status)}`,
+        id: `${opportunity.id}-updated`,
+        opportunityId: opportunity.id,
+        title: opportunity.name,
+        detail: `Moved to ${opportunity.stage.replaceAll("_", " ")}`,
         dateKey: updatedKey,
         timestamp: updatedDate.getTime(),
         tone: "progress",
@@ -135,8 +124,8 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-export function CrmCalendar({ leads, compact = false }: CrmCalendarProps) {
-  const events = useMemo(() => buildEvents(leads), [leads]);
+export function CrmCalendar({ opportunities, compact = false }: CrmCalendarProps) {
+  const events = useMemo(() => buildEvents(opportunities), [opportunities]);
   const today = new Date();
   const todayKey = toDateKey(today);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(today));
@@ -166,9 +155,9 @@ export function CrmCalendar({ leads, compact = false }: CrmCalendarProps) {
       <div className="flex flex-col gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#9793a0]">{compact ? "CRM Calendar" : "Calendar Workspace"}</p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[#17141a]">{compact ? "Activity Snapshot" : "Project Activity Calendar"}</h2>
+          <h2 className="mt-2 text-xl font-semibold tracking-tight text-[#17141a]">{compact ? "Opportunity Snapshot" : "Opportunity Activity Calendar"}</h2>
           <p className="mt-1 text-sm text-[#6f6a75]">
-            {compact ? "A quick month view of CRM activity and quotation milestones." : "Track project openings, progress updates, and quotation milestones in calendar form."}
+            {compact ? "A quick month view of account and opportunity movement." : "Track account opportunity openings, bid stages, and opportunity progress in calendar form."}
           </p>
         </div>
 
@@ -189,27 +178,14 @@ export function CrmCalendar({ leads, compact = false }: CrmCalendarProps) {
               <p className="text-lg font-semibold tracking-tight text-[#17141a]">{formatMonthLabel(currentMonth)}</p>
               <p className="text-sm text-[#6f6a75]">{events.filter((event) => event.dateKey.startsWith(toDateKey(monthStart).slice(0, 7))).length} activity items this month</p>
             </div>
-
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
-                className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
-              >
+              <button type="button" onClick={() => setCurrentMonth(addMonths(currentMonth, -1))} className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]">
                 <ChevronIcon direction="left" />
               </button>
-              <button
-                type="button"
-                onClick={() => setCurrentMonth(startOfMonth(today))}
-                className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
-              >
+              <button type="button" onClick={() => setCurrentMonth(startOfMonth(today))} className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]">
                 Today
               </button>
-              <button
-                type="button"
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
-              >
+              <button type="button" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]">
                 <ChevronIcon direction="right" />
               </button>
             </div>
@@ -242,20 +218,15 @@ export function CrmCalendar({ leads, compact = false }: CrmCalendarProps) {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className={cn("text-sm font-medium", isToday && !isSelected && "text-[var(--brand)]")}>{date.getDate()}</span>
-                    {dayEvents.length > 0 ? (
-                      <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-medium", isSelected ? "bg-white/15 text-white" : "bg-[#f1f3f8] text-[#6f6a75]")}>
-                        {dayEvents.length}
-                      </span>
-                    ) : null}
+                    {dayEvents.length > 0 ? <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-medium", isSelected ? "bg-white/15 text-white" : "bg-[#f1f3f8] text-[#6f6a75]")}>{dayEvents.length}</span> : null}
                   </div>
-
                   <div className="mt-3 flex flex-wrap gap-1">
                     {dayEvents.slice(0, compact ? 2 : 3).map((event) => (
                       <span
                         key={event.id}
                         className={cn(
                           "inline-flex h-2.5 w-2.5 rounded-full",
-                          isSelected ? "bg-white" : event.tone === "completed" ? "bg-[#49a56c]" : event.tone === "quote" ? "bg-[#d89a40]" : event.tone === "progress" ? "bg-[#5a86df]" : "bg-[#5cba81]",
+                          isSelected ? "bg-white" : event.tone === "completed" ? "bg-[#49a56c]" : event.tone === "bid" ? "bg-[#d89a40]" : event.tone === "progress" ? "bg-[#5a86df]" : "bg-[#5cba81]",
                         )}
                       />
                     ))}
@@ -269,42 +240,25 @@ export function CrmCalendar({ leads, compact = false }: CrmCalendarProps) {
         <aside className="border-t border-[#edf0f6] bg-[#fbfbfd] px-4 py-4 sm:px-5 xl:border-l xl:border-t-0">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Agenda</p>
           <h3 className="mt-2 text-lg font-semibold tracking-tight text-[#17141a]">{formatDayLabel(selectedDate)}</h3>
-
           {visibleAgenda.length > 0 ? (
             <div className="mt-4 grid gap-3">
               {visibleAgenda.map((event) => (
-                <Link
-                  key={event.id}
-                  href={getAdminRoute(`/crm/${event.leadId}`)}
-                  className="rounded-[1.1rem] border border-[#e7e9f2] bg-white p-3 transition hover:border-[#cfd5e2] hover:bg-[#fcfcfe]"
-                >
+                <Link key={event.id} href={getAdminRoute(`/crm/opportunities/${event.opportunityId}`)} className="rounded-[1.1rem] border border-[#e7e9f2] bg-white p-3 transition hover:border-[#cfd5e2] hover:bg-[#fcfcfe]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-medium text-[#17141a]">{event.title}</p>
                       <p className="mt-1 text-sm leading-6 text-[#6f6a75]">{event.detail}</p>
                     </div>
-                    <span className={cn("inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em]", getToneClasses(event.tone))}>
-                      {event.tone}
-                    </span>
+                    <span className={cn("inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em]", getToneClasses(event.tone))}>{event.tone}</span>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="mt-4 rounded-[1.1rem] border border-dashed border-[#d9dde7] bg-white px-4 py-6 text-sm text-[#6f6a75]">
-              No CRM activity recorded for this date.
-            </div>
+            <div className="mt-4 rounded-[1.1rem] border border-dashed border-[#d9dde7] bg-white px-4 py-6 text-sm text-[#6f6a75]">No CRM activity recorded for this date.</div>
           )}
-
-          {!compact && selectedEvents.length > visibleAgenda.length ? (
-            <p className="mt-3 text-xs text-[#9793a0]">Showing {visibleAgenda.length} of {selectedEvents.length} items for this day.</p>
-          ) : null}
-
           {compact ? (
-            <Link
-              href={getAdminRoute("/calendar")}
-              className="mt-4 inline-flex items-center justify-center rounded-full border border-[#e7e9f2] bg-white px-4 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:text-[var(--brand)]"
-            >
+            <Link href={getAdminRoute("/calendar")} className="mt-4 inline-flex items-center justify-center rounded-full border border-[#e7e9f2] bg-white px-4 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:text-[var(--brand)]">
               Open full calendar
             </Link>
           ) : null}

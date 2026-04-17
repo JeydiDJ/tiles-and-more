@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useActionState, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { deleteProjectLeadAction, type ProjectLeadDeleteState } from "@/app/(admin)/admin/crm/actions";
+import { deleteCrmOpportunityAction, type CrmDeleteState } from "@/app/(admin)/admin/crm/actions";
 import { getAdminRoute } from "@/lib/admin-path";
-import type { ProjectLead } from "@/types/project-lead";
-import { projectLeadStatuses } from "@/types/project-lead";
-import { Select } from "@/components/ui/select";
+import type { CrmAccount, CrmOpportunity } from "@/types/crm";
+import { crmOpportunityStages } from "@/types/crm";
 import { Modal } from "@/components/ui/modal";
+import { Select } from "@/components/ui/select";
 
 function formatCurrency(value: number | null) {
   if (value === null) return "-";
-  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 2 }).format(value);
+  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(value);
 }
 
-function formatStatusLabel(value: string) {
+function formatStageLabel(value: string) {
   return value.replaceAll("_", " ");
 }
 
@@ -26,119 +26,173 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function getStatusTone(status: string) {
-  switch (status) {
+function getStageTone(stage: string) {
+  switch (stage) {
     case "completed":
       return "border-[#cfead7] bg-[#eefaf2] text-[#1f7a3d]";
     case "ongoing":
       return "border-[#d9e6ff] bg-[#eef4ff] text-[#2859b8]";
-    case "quotation_in_progress":
-    case "quotation_sent":
+    case "bidding":
+      return "border-[#ece1ff] bg-[#f6f1ff] text-[#734ab5]";
+    case "negotiation":
       return "border-[#f1dfc2] bg-[#fff7ea] text-[#9a5b12]";
-    case "on_hold":
-      return "border-[#e5d8f8] bg-[#f7f1ff] text-[#7b43be]";
+    case "awarded":
+      return "border-[#d6ebe5] bg-[#effaf7] text-[#1e7b63]";
     case "lost":
       return "border-[#f0d0d0] bg-[#fff1f1] text-[#aa3737]";
+    case "opportunity":
+      return "border-[#dce7ff] bg-[#f2f6ff] text-[#3e64b4]";
     default:
       return "border-[#d8eadb] bg-[#eefaf2] text-[#2d7f54]";
   }
 }
 
-export function CrmTable({ leads }: { leads: ProjectLead[] }) {
-  const [deleteState, deleteAction, isDeleting] = useActionState(deleteProjectLeadAction, { error: null } satisfies ProjectLeadDeleteState);
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4.5 w-4.5 fill-none stroke-current">
+      <circle cx="11" cy="11" r="6.25" strokeWidth="1.8" />
+      <path d="m16 16 4 4" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4.5 w-4.5 fill-none stroke-current">
+      <path d="M12 5v14" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M5 12h14" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function CrmTable({
+  accounts,
+  opportunities,
+}: {
+  accounts: CrmAccount[];
+  opportunities: CrmOpportunity[];
+}) {
+  const [deleteState, deleteAction, isDeleting] = useActionState(deleteCrmOpportunityAction, { error: null } satisfies CrmDeleteState);
+  const [layout, setLayout] = useState<"list" | "board">("board");
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [layout, setLayout] = useState<"list" | "board">("list");
-  const [leadToDelete, setLeadToDelete] = useState<ProjectLead | null>(null);
+  const [stage, setStage] = useState("all");
+  const [accountId, setAccountId] = useState("all");
+  const [opportunityToDelete, setOpportunityToDelete] = useState<CrmOpportunity | null>(null);
   const wasDeleting = useRef(false);
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
 
   useEffect(() => {
     if (wasDeleting.current && !isDeleting && !deleteState.error) {
-      setLeadToDelete(null);
+      setOpportunityToDelete(null);
     }
     wasDeleting.current = isDeleting;
   }, [deleteState.error, isDeleting]);
 
-  const filtered = useMemo(() => {
-    return leads.filter((lead) => {
+  const filteredOpportunities = useMemo(() => {
+    return opportunities.filter((opportunity) => {
       const matchesQuery = normalizedQuery
-        ? [lead.clientName, lead.company ?? "", lead.projectName, lead.location ?? "", lead.phone ?? "", lead.email ?? ""]
+        ? [
+            opportunity.name,
+            opportunity.accountName,
+            opportunity.primaryContactName ?? "",
+            opportunity.location ?? "",
+            opportunity.source,
+          ]
             .join(" ")
             .toLowerCase()
             .includes(normalizedQuery)
         : true;
 
-      const matchesStatus = status === "all" || lead.status === status;
-      return matchesQuery && matchesStatus;
+      const matchesStage = stage === "all" || opportunity.stage === stage;
+      const matchesAccount = accountId === "all" || opportunity.accountId === accountId;
+      return matchesQuery && matchesStage && matchesAccount;
     });
-  }, [leads, normalizedQuery, status]);
+  }, [accountId, normalizedQuery, opportunities, stage]);
 
   const grouped = useMemo(() => {
-    const order = projectLeadStatuses.filter((item) => item === status || status === "all");
-    return order
-      .map((groupStatus) => ({
-        status: groupStatus,
-        items: filtered.filter((lead) => lead.status === groupStatus),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [filtered, status]);
+    return crmOpportunityStages.map((groupStage) => ({
+      stage: groupStage,
+      items: filteredOpportunities.filter((opportunity) => opportunity.stage === groupStage),
+    }));
+  }, [filteredOpportunities]);
+
+  const stageSummary = useMemo(
+    () =>
+      crmOpportunityStages.map((groupStage) => ({
+        stage: groupStage,
+        count: opportunities.filter((opportunity) => opportunity.stage === groupStage).length,
+      })),
+    [opportunities],
+  );
 
   return (
     <div className="grid gap-5">
       <section className="rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
-        <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 lg:grid-cols-[1.3fr_0.7fr_auto] lg:items-end">
+        <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 xl:grid-cols-[1.2fr_0.7fr_0.7fr_auto] xl:items-end">
           <label className="grid gap-2">
             <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Search</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by client, company, project, location, phone, or email"
-              className="w-full rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-4 py-3 text-sm text-[#17141a] outline-none placeholder:text-[#8f8b85]"
-            />
+            <div className="flex items-center gap-3 rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-4 py-3 text-[#7d7882]">
+              <SearchIcon />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by opportunity, account, contact, location, or source"
+                className="w-full bg-transparent text-sm text-[#17141a] outline-none placeholder:text-[#8f8b85]"
+              />
+            </div>
           </label>
+
           <label className="grid gap-2">
-            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">View</span>
-            <Select value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
-              <option value="all">All statuses</option>
-              {projectLeadStatuses.map((item) => (
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Stage</span>
+            <Select value={stage} onChange={(event) => setStage(event.target.value)} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
+              <option value="all">All stages</option>
+              {crmOpportunityStages.map((item) => (
                 <option key={item} value={item}>
-                  {formatStatusLabel(item)}
+                  {formatStageLabel(item)}
                 </option>
               ))}
             </Select>
           </label>
 
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+          <label className="grid gap-2">
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Account</span>
+            <Select value={accountId} onChange={(event) => setAccountId(event.target.value)} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
+              <option value="all">All accounts</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </Select>
+          </label>
+
+          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
             <div className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] p-1">
               <button
                 type="button"
-                onClick={() => setLayout("list")}
-                className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  layout === "list" ? "bg-[#17141a] text-white" : "text-[#6f6a75] hover:text-[#17141a]"
-                }`}
-              >
-                List
-              </button>
-              <button
-                type="button"
                 onClick={() => setLayout("board")}
-                className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  layout === "board" ? "bg-[#17141a] text-white" : "text-[#6f6a75] hover:text-[#17141a]"
-                }`}
+                className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition ${layout === "board" ? "bg-[#17141a] text-white" : "text-[#6f6a75] hover:text-[#17141a]"}`}
               >
                 Board
               </button>
+              <button
+                type="button"
+                onClick={() => setLayout("list")}
+                className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition ${layout === "list" ? "bg-[#17141a] text-white" : "text-[#6f6a75] hover:text-[#17141a]"}`}
+              >
+                List
+              </button>
             </div>
             <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3 py-2 text-xs font-medium text-[#6f6a75]">
-              {filtered.length} visible
+              {filteredOpportunities.length} visible
             </span>
             <button
               type="button"
               onClick={() => {
                 setQuery("");
-                setStatus("all");
+                setStage("all");
+                setAccountId("all");
               }}
               className="cursor-pointer rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
             >
@@ -147,188 +201,229 @@ export function CrmTable({ leads }: { leads: ProjectLead[] }) {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 px-4 py-3 text-xs text-[#6f6a75] sm:px-5">
-          {projectLeadStatuses.map((item) => {
-            const count = leads.filter((lead) => lead.status === item).length;
+        <div className="flex flex-wrap gap-2 px-4 py-3 sm:px-5">
+          {stageSummary.map((item) => (
+            <span
+              key={item.stage}
+              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${getStageTone(item.stage)}`}
+            >
+              {formatStageLabel(item.stage)}
+              <span className="rounded-full bg-white/80 px-1.5 py-0.5 text-[10px] text-current">{item.count}</span>
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+        <div className="flex items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Accounts</p>
+            <p className="mt-1 text-sm text-[#6f6a75]">Use account records as the parent layer for contacts and project opportunities.</p>
+          </div>
+          <Link
+            href={getAdminRoute("/crm/new")}
+            aria-label="New account"
+            title="New account"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_10px_22px_rgba(237,35,37,0.2)] transition hover:-translate-y-0.5 hover:bg-[var(--brand-dark)] hover:shadow-[0_14px_28px_rgba(237,35,37,0.24)]"
+          >
+            <PlusIcon />
+          </Link>
+        </div>
+        <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5 xl:grid-cols-3">
+          {accounts.map((account) => {
+            const count = opportunities.filter((opportunity) => opportunity.accountId === account.id).length;
+            const summaryItems = [account.industry, account.city, account.phone || account.email].filter(Boolean);
             return (
-              <span
-                key={item}
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-medium ${
-                  status === item ? "border-[#17141a] bg-[#17141a] text-white" : "border-[#e7e9f2] bg-[#fafbfe] text-[#6f6a75]"
-                }`}
+              <Link
+                key={account.id}
+                href={getAdminRoute(`/crm/${account.id}`)}
+                className="group rounded-[1.25rem] border border-[#e7e9f2] bg-[linear-gradient(180deg,#fcfcfe_0%,#f7f8fc_100%)] p-5 transition duration-200 hover:-translate-y-1.5 hover:border-[#c9cfde] hover:bg-white hover:shadow-[0_20px_40px_rgba(35,31,32,0.12)]"
               >
-                {formatStatusLabel(item)}
-                <span className={status === item ? "text-white/80" : "text-[#9793a0]"}>{count}</span>
-              </span>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-semibold leading-6 tracking-tight text-[#17141a] transition group-hover:text-[var(--brand)]">
+                      {account.name}
+                    </p>
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-[#9a96a3]">
+                      Account record
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75] shadow-[0_4px_10px_rgba(35,31,32,0.05)]">
+                    {count} opportunit{count === 1 ? "y" : "ies"}
+                  </span>
+                </div>
+
+                <div className="mt-4 rounded-[1rem] border border-white/70 bg-white/80 p-4 backdrop-blur-sm transition group-hover:border-[#e3e7f0] group-hover:bg-white">
+                  <div className="grid gap-3 text-sm text-[#6f6a75]">
+                    <div className="grid gap-1">
+                      <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#9a96a3]">Industry</span>
+                      <span className="leading-6 text-[#3e3944]">{account.industry || "Not set yet"}</span>
+                    </div>
+                    <div className="grid gap-1">
+                      <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#9a96a3]">Location</span>
+                      <span className="leading-6 text-[#3e3944]">{account.city || account.address || "Not set yet"}</span>
+                    </div>
+                    <div className="grid gap-1">
+                      <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#9a96a3]">Primary Contact</span>
+                      <span className="leading-6 text-[#3e3944]">{account.phone || account.email || "Not set yet"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <span className="text-xs text-[#9793a0]">
+                    {summaryItems.length > 0 ? "Ready for follow-up" : "Needs more account details"}
+                  </span>
+                  <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-[var(--brand)] transition group-hover:translate-x-0.5">
+                    Open account
+                    <span aria-hidden="true">→</span>
+                  </span>
+                </div>
+              </Link>
             );
           })}
         </div>
       </section>
 
-      {filtered.length > 0 ? (
-        layout === "list" ? (
-          <div className="grid gap-4">
-            {grouped.map((group) => (
-              <section key={group.status} className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf0f6] bg-[#fafbfe] px-4 py-3.5 sm:px-5">
-                  <div className="flex items-center gap-3">
-                    <span className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${getStatusTone(group.status)}`}>
-                      {formatStatusLabel(group.status)}
-                    </span>
-                    <span className="text-sm font-medium text-[#17141a]">{group.items.length} {group.items.length === 1 ? "record" : "records"}</span>
-                  </div>
-                  <span className="text-xs uppercase tracking-[0.16em] text-[#9793a0]">List view</span>
-                </div>
-
-                <div className="hidden grid-cols-[1.1fr_1.2fr_0.8fr_0.85fr_0.85fr_auto] gap-4 border-b border-[#edf0f6] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
-                  <span>Client</span>
-                  <span>Project</span>
-                  <span>Location</span>
-                  <span>Quotation</span>
-                  <span>Last Update</span>
-                  <span className="text-right">Actions</span>
-                </div>
-
-                <div className="grid gap-0">
-                  {group.items.map((lead) => (
-                    <div
-                      key={lead.id}
-                      className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 transition hover:bg-[#fcfcfe] last:border-b-0 lg:grid-cols-[1.1fr_1.2fr_0.8fr_0.85fr_0.85fr_auto] lg:items-center lg:px-5"
-                    >
-                      <div className="min-w-0">
-                        <Link href={getAdminRoute(`/crm/${lead.id}`)} className="font-medium text-[#17141a] transition hover:text-[var(--brand)]">
-                          {lead.clientName}
-                        </Link>
-                        <p className="mt-1 truncate text-sm text-[#6f6a75]">{lead.company || lead.email || lead.phone || "-"}</p>
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="font-medium text-[#17141a]">{lead.projectName}</p>
-                        <p className="mt-1 truncate text-sm text-[#6f6a75]">{lead.phone || lead.email || "No direct contact logged"}</p>
-                      </div>
-
-                      <div className="text-sm text-[#6f6a75]">{lead.location || "-"}</div>
-
-                      <div className="grid gap-1 text-sm">
-                        <span className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-[11px] font-medium ${lead.quotationFinished ? "border-[#cfead7] bg-[#eefaf2] text-[#1f7a3d]" : "border-[#e6decd] bg-[#faf5ea] text-[#876536]"}`}>
-                          {lead.quotationFinished ? "Finished" : "Pending"}
-                        </span>
-                        <span className="font-medium text-[#17141a]">{formatCurrency(lead.estimatedCost)}</span>
-                      </div>
-
-                      <div className="text-sm text-[#6f6a75]">{formatDate(lead.updatedAt)}</div>
-
-                      <div className="flex items-center justify-between gap-3 lg:justify-end">
-                        <Link
-                          href={getAdminRoute(`/crm/${lead.id}`)}
-                          className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-4 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:bg-white hover:text-[var(--brand)]"
-                        >
-                          Open
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => setLeadToDelete(lead)}
-                          className="cursor-pointer text-xs font-medium uppercase tracking-[0.16em] text-[#b42318] transition hover:text-[#7a1b14]"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        ) : (
+      {filteredOpportunities.length > 0 ? (
+        layout === "board" ? (
           <div className="overflow-x-auto pb-2">
-            <div className="grid min-w-[1120px] grid-cols-4 gap-4 xl:grid-cols-4">
+            <div className="grid min-w-[1840px] grid-cols-8 gap-5">
               {grouped.map((group) => (
-                <section key={group.status} className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
-                  <div className={`border-b px-4 py-4 ${getStatusTone(group.status)}`}>
+                <section key={group.stage} className="min-w-[220px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+                  <div className={`border-b px-4 py-4 ${getStageTone(group.stage)}`}>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm font-semibold uppercase tracking-[0.14em]">{formatStatusLabel(group.status)}</span>
-                      <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-current">
-                        {group.items.length}
-                      </span>
+                      <span className="text-sm font-semibold uppercase tracking-[0.14em]">{formatStageLabel(group.stage)}</span>
+                      <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-current">{group.items.length}</span>
                     </div>
                   </div>
-
                   <div className="grid gap-3 bg-[#fbfbfd] p-3">
-                    {group.items.map((lead) => (
-                      <article key={lead.id} className="rounded-[1.2rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_8px_18px_rgba(35,31,32,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(35,31,32,0.08)]">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <Link href={getAdminRoute(`/crm/${lead.id}`)} className="font-medium text-[#17141a] transition hover:text-[var(--brand)]">
-                              {lead.projectName}
-                            </Link>
-                            <p className="mt-1 truncate text-sm text-[#6f6a75]">{lead.clientName}</p>
+                    {group.items.length > 0 ? (
+                      group.items.map((opportunity) => (
+                        <article key={opportunity.id} className="rounded-[1.15rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_8px_18px_rgba(35,31,32,0.04)] transition hover:-translate-y-0.5 hover:border-[#d0d6e3] hover:shadow-[0_14px_28px_rgba(35,31,32,0.08)]">
+                          <div className={`mb-3 h-1.5 rounded-full ${getStageTone(opportunity.stage).includes("bg-[#") ? "" : ""}`} />
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <Link href={getAdminRoute(`/crm/opportunities/${opportunity.id}`)} className="line-clamp-2 text-[15px] font-medium leading-6 text-[#17141a] transition hover:text-[var(--brand)]">
+                                {opportunity.name}
+                              </Link>
+                              <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#6f6a75]">{opportunity.accountName}</p>
+                            </div>
+                            <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${getStageTone(opportunity.stage)}`}>
+                              {formatStageLabel(opportunity.stage)}
+                            </span>
                           </div>
-                          <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${getStatusTone(lead.status)}`}>
-                            {formatStatusLabel(lead.status)}
-                          </span>
-                        </div>
-
-                        <div className="mt-4 grid gap-2 text-sm text-[#6f6a75]">
-                          <p>{lead.location || "No location set"}</p>
-                          <p>{lead.company || lead.phone || lead.email || "No contact detail set"}</p>
-                          <p className="font-medium text-[#17141a]">{formatCurrency(lead.estimatedCost)}</p>
-                        </div>
-
-                        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf0f6] pt-3">
-                          <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${lead.quotationFinished ? "border-[#cfead7] bg-[#eefaf2] text-[#1f7a3d]" : "border-[#e6decd] bg-[#faf5ea] text-[#876536]"}`}>
-                            {lead.quotationFinished ? "Quote finished" : "Quote pending"}
-                          </span>
-                          <span className="text-xs text-[#9793a0]">{formatDate(lead.updatedAt)}</span>
-                        </div>
-
-                        <div className="mt-4 flex items-center gap-2">
-                          <Link
-                            href={getAdminRoute(`/crm/${lead.id}`)}
-                            className="inline-flex flex-1 items-center justify-center rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:bg-white hover:text-[var(--brand)]"
-                          >
-                            Open / Edit
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => setLeadToDelete(lead)}
-                            className="cursor-pointer rounded-xl px-3 py-2 text-xs font-medium text-[#b42318] transition hover:bg-[#fff3f2] hover:text-[#7a1b14]"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-
-                    {group.items.length === 0 ? (
+                          <div className="mt-4 grid gap-2 text-sm text-[#6f6a75]">
+                            <div className="rounded-xl bg-[#fafbfe] px-3 py-2">
+                              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#9793a0]">Primary Contact</p>
+                              <p className="mt-1 line-clamp-2">{opportunity.primaryContactName || "No primary contact set"}</p>
+                            </div>
+                            <div className="rounded-xl bg-[#fafbfe] px-3 py-2">
+                              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#9793a0]">Location</p>
+                              <p className="mt-1 line-clamp-2">{opportunity.location || "No location set"}</p>
+                            </div>
+                            <p className="font-medium text-[#17141a]">{formatCurrency(opportunity.estimatedValue)}</p>
+                          </div>
+                          <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf0f6] pt-3">
+                            <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${opportunity.quotationFinished ? "border-[#cfead7] bg-[#eefaf2] text-[#1f7a3d]" : "border-[#e6decd] bg-[#faf5ea] text-[#876536]"}`}>
+                              {opportunity.quotationFinished ? "Quote finished" : "Quote pending"}
+                            </span>
+                            <span className="text-xs text-[#9793a0]">{formatDate(opportunity.updatedAt)}</span>
+                          </div>
+                          <div className="mt-3 flex items-center gap-2">
+                            <Link
+                              href={getAdminRoute(`/crm/opportunities/${opportunity.id}`)}
+                              className="inline-flex flex-1 items-center justify-center rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:bg-white hover:text-[var(--brand)]"
+                            >
+                              Open
+                            </Link>
+                            <Link
+                              href={getAdminRoute(`/crm/${opportunity.accountId}`)}
+                              className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#6f6a75] transition hover:border-[#d9dce8] hover:text-[var(--brand)]"
+                            >
+                              Account
+                            </Link>
+                          </div>
+                        </article>
+                      ))
+                    ) : (
                       <div className="rounded-[1.1rem] border border-dashed border-[#d8dde8] bg-white px-4 py-8 text-center text-sm text-[#9793a0]">
-                        No records in this status.
+                        No opportunities here.
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 </section>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+            <div className="hidden grid-cols-[1.2fr_1fr_0.9fr_0.9fr_0.9fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
+              <span>Opportunity</span>
+              <span>Account</span>
+              <span>Stage</span>
+              <span>Primary Contact</span>
+              <span>Value</span>
+              <span className="text-right">Actions</span>
+            </div>
+            <div className="grid gap-0">
+              {filteredOpportunities.map((opportunity) => (
+                <div key={opportunity.id} className="grid gap-4 border-b border-[#edf0f6] px-5 py-4 transition hover:bg-[#fcfcfe] last:border-b-0 lg:grid-cols-[1.2fr_1fr_0.9fr_0.9fr_0.9fr_auto] lg:items-center">
+                  <div className="min-w-0">
+                    <Link href={getAdminRoute(`/crm/opportunities/${opportunity.id}`)} className="font-medium text-[#17141a] transition hover:text-[var(--brand)]">
+                      {opportunity.name}
+                    </Link>
+                    <p className="mt-1 text-sm text-[#6f6a75]">{opportunity.location || "No location"}</p>
+                  </div>
+                  <Link href={getAdminRoute(`/crm/${opportunity.accountId}`)} className="text-sm text-[#6f6a75] transition hover:text-[var(--brand)]">
+                    {opportunity.accountName}
+                  </Link>
+                  <div>
+                    <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${getStageTone(opportunity.stage)}`}>
+                      {formatStageLabel(opportunity.stage)}
+                    </span>
+                  </div>
+                  <div className="text-sm text-[#6f6a75]">{opportunity.primaryContactName || "-"}</div>
+                  <div className="text-sm font-medium text-[#17141a]">{formatCurrency(opportunity.estimatedValue)}</div>
+                  <div className="flex items-center justify-end gap-3">
+                    <Link
+                      href={getAdminRoute(`/crm/opportunities/${opportunity.id}`)}
+                      className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-4 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:bg-white hover:text-[var(--brand)]"
+                    >
+                      Open / Edit
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setOpportunityToDelete(opportunity)}
+                      className="cursor-pointer text-xs font-medium uppercase tracking-[0.16em] text-[#b42318] transition hover:text-[#7a1b14]"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         )
       ) : (
         <div className="rounded-[1.5rem] border border-[#e7e9f2] bg-white px-5 py-10 text-sm text-[#6f6a75] shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
-          No CRM projects match the current search or status.
+          No opportunities match the current search or filters.
         </div>
       )}
 
       <Modal
-        open={Boolean(leadToDelete)}
-        onClose={() => (isDeleting ? null : setLeadToDelete(null))}
-        title="Delete CRM project?"
-        description={leadToDelete ? `This will permanently remove ${leadToDelete.projectName}. This action cannot be undone.` : ""}
+        open={Boolean(opportunityToDelete)}
+        onClose={() => (isDeleting ? null : setOpportunityToDelete(null))}
+        title="Delete opportunity?"
+        description={opportunityToDelete ? `This will permanently remove ${opportunityToDelete.name}. This action cannot be undone.` : ""}
       >
         <form action={deleteAction} className="grid gap-4">
-          <input type="hidden" name="projectLeadId" value={leadToDelete?.id ?? ""} />
+          <input type="hidden" name="opportunityId" value={opportunityToDelete?.id ?? ""} />
           {deleteState.error ? <p className="text-sm text-[#b42318]">{deleteState.error}</p> : null}
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => setLeadToDelete(null)}
+              onClick={() => setOpportunityToDelete(null)}
               disabled={isDeleting}
               className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60"
             >
@@ -339,7 +434,7 @@ export function CrmTable({ leads }: { leads: ProjectLead[] }) {
               disabled={isDeleting}
               className="inline-flex items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isDeleting ? "Deleting..." : "Delete Project"}
+              {isDeleting ? "Deleting..." : "Delete Opportunity"}
             </button>
           </div>
         </form>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CrmCalendar } from "@/components/admin/crm-calendar";
 import { getAdminRoute } from "@/lib/admin-path";
 import { getCategories } from "@/services/category.service";
-import { getProjectLeads } from "@/services/project-lead.service";
+import { getCrmAccounts, getCrmOpportunities } from "@/services/crm.service";
 import { getProducts } from "@/services/product.service";
 
 function MetricLink({
@@ -19,10 +19,7 @@ function MetricLink({
   cta: string;
 }) {
   return (
-    <Link
-      href={href}
-      className="block rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(35,31,32,0.08)]"
-    >
+    <Link href={href} className="block rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(35,31,32,0.08)]">
       <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">{label}</p>
       <p className="mt-3 text-3xl font-semibold tracking-tight text-[#17141a]">{value}</p>
       <p className="mt-2 text-sm text-[#6f6a75]">{note}</p>
@@ -57,31 +54,31 @@ function formatCurrency(value: number | null) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-PH", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
 
 export default async function AdminDashboardPage() {
-  const [products, categories, projectLeads] = await Promise.all([getProducts(), getCategories(), getProjectLeads()]);
+  const [products, categories, accounts, opportunities] = await Promise.all([
+    getProducts(),
+    getCategories(),
+    getCrmAccounts(),
+    getCrmOpportunities(),
+  ]);
+
   const recentProducts = products.slice(0, 5);
-  const activeProjects = projectLeads.filter((lead) => lead.status === "ongoing").length;
-  const quotationProjects = projectLeads.filter((lead) => lead.status === "quotation_in_progress" || lead.status === "quotation_sent").length;
-  const recentLeads = projectLeads.slice(0, 5);
-  const quotationWatchlist = projectLeads
-    .filter((lead) => lead.status === "quotation_in_progress" || lead.status === "quotation_sent")
-    .slice(0, 5);
+  const activeProjects = opportunities.filter((item) => item.stage === "ongoing" || item.stage === "awarded").length;
+  const quotationProjects = opportunities.filter((item) => item.stage === "bidding" || item.stage === "negotiation").length;
+  const recentOpportunities = opportunities.slice(0, 5);
+  const quotationWatchlist = opportunities.filter((item) => item.stage === "bidding" || item.stage === "negotiation").slice(0, 5);
   const imageCoverageCount = products.filter((product) => product.imageUrl).length;
   const imageCoverageRate = products.length > 0 ? Math.round((imageCoverageCount / products.length) * 100) : 0;
   const brandCoverage = new Set(products.map((product) => product.brandName)).size;
   const categoryCoverage = new Set(products.map((product) => product.category)).size;
   const statusSummary = [
-    { label: "New leads", value: projectLeads.filter((lead) => lead.status === "new_lead").length, tone: "bg-[#eefaf2] text-[#2d7f54]" },
-    { label: "Quotation", value: quotationProjects, tone: "bg-[#fff7ea] text-[#9a5b12]" },
-    { label: "Ongoing", value: activeProjects, tone: "bg-[#eef4ff] text-[#2859b8]" },
-    { label: "Completed", value: projectLeads.filter((lead) => lead.status === "completed").length, tone: "bg-[#ebf8ee] text-[#1f7a3d]" },
+    { label: "New leads", value: opportunities.filter((item) => item.stage === "new_lead").length, tone: "bg-[#eefaf2] text-[#2d7f54]" },
+    { label: "Bids", value: opportunities.filter((item) => item.stage === "bidding").length, tone: "bg-[#f6f1ff] text-[#734ab5]" },
+    { label: "Negotiation", value: opportunities.filter((item) => item.stage === "negotiation").length, tone: "bg-[#fff7ea] text-[#9a5b12]" },
+    { label: "Awarded / Ongoing", value: activeProjects, tone: "bg-[#eef4ff] text-[#2859b8]" },
   ];
 
   return (
@@ -93,22 +90,16 @@ export default async function AdminDashboardPage() {
               <p className="text-[11px] uppercase tracking-[0.24em] text-[#9793a0]">Dashboard</p>
               <h1 className="mt-3 text-[2.15rem] font-semibold tracking-tight text-[#17141a]">Operations Overview</h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f6a75]">
-                A software-style workspace overview of catalog activity, CRM workload, and the areas that need attention next.
+                A software-style workspace overview of catalog activity and the new account-based CRM pipeline.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Link
-                href={getAdminRoute("/products/new")}
-                className="inline-flex items-center justify-center rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_24px_rgba(237,35,37,0.18)] transition hover:bg-[#c81a1d]"
-              >
+              <Link href={getAdminRoute("/products/new")} className="inline-flex items-center justify-center rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_24px_rgba(237,35,37,0.18)] transition hover:bg-[#c81a1d]">
                 Add Product
               </Link>
-              <Link
-                href={getAdminRoute("/crm/new")}
-                className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-5 py-3 text-sm font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:text-[var(--brand)]"
-              >
-                New CRM Project
+              <Link href={getAdminRoute("/crm/new")} className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-5 py-3 text-sm font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:text-[var(--brand)]">
+                New Account
               </Link>
             </div>
           </div>
@@ -117,58 +108,29 @@ export default async function AdminDashboardPage() {
         <div className="flex flex-wrap gap-2 border-b border-[#edf0f6] px-6 py-3 sm:px-7">
           <span className="inline-flex items-center rounded-full bg-[#17141a] px-3 py-1.5 text-xs font-medium text-white">Workspace home</span>
           <span className="inline-flex items-center rounded-full border border-[#e4e7ef] bg-white px-3 py-1.5 text-xs font-medium text-[#6f6a75]">
-            {activeProjects} ongoing projects
+            {accounts.length} active accounts
           </span>
           <span className="inline-flex items-center rounded-full border border-[#e4e7ef] bg-white px-3 py-1.5 text-xs font-medium text-[#6f6a75]">
-            {quotationProjects} in quotation flow
+            {quotationProjects} in bid / negotiation
           </span>
         </div>
 
         <div className="grid gap-4 px-6 py-5 sm:px-7 lg:grid-cols-3">
-          <MetricLink
-            label="Products"
-            value={String(products.length)}
-            note={products.length > 0 ? "Catalog entries available." : "No products added yet."}
-            href={getAdminRoute("/products")}
-            cta="Open products"
-          />
-          <MetricLink
-            label="Categories"
-            value={String(categories.length)}
-            note="Configured category structure."
-            href={getAdminRoute("/categories")}
-            cta="Open categories"
-          />
-          <MetricLink
-            label="CRM Projects"
-            value={String(projectLeads.length)}
-            note={projectLeads.length > 0 ? "Tracked project leads and active jobs." : "No CRM projects added yet."}
-            href={getAdminRoute("/crm")}
-            cta="Open CRM"
-          />
+          <MetricLink label="Products" value={String(products.length)} note={products.length > 0 ? "Catalog entries available." : "No products added yet."} href={getAdminRoute("/products")} cta="Open products" />
+          <MetricLink label="Categories" value={String(categories.length)} note="Configured category structure." href={getAdminRoute("/categories")} cta="Open categories" />
+          <MetricLink label="CRM Accounts" value={String(accounts.length)} note={accounts.length > 0 ? `${opportunities.length} linked opportunities across the account base.` : "No CRM accounts added yet."} href={getAdminRoute("/crm")} cta="Open CRM" />
         </div>
       </section>
 
-      <CrmCalendar leads={projectLeads} compact />
+      <CrmCalendar opportunities={opportunities} compact />
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="grid gap-6">
-          <Panel
-            title="Recent Products"
-            action={
-              <Link href={getAdminRoute("/products")} className="text-sm font-medium text-[var(--brand)]">
-                View all
-              </Link>
-            }
-          >
+          <Panel title="Recent Products" action={<Link href={getAdminRoute("/products")} className="text-sm font-medium text-[var(--brand)]">View all</Link>}>
             {recentProducts.length > 0 ? (
               <div className="grid gap-0">
                 {recentProducts.map((product) => (
-                  <Link
-                    key={product.id}
-                    href={getAdminRoute(`/products/${product.id}`)}
-                    className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1"
-                  >
+                  <Link key={product.id} href={getAdminRoute(`/products/${product.id}`)} className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1">
                     <span className="font-medium text-[#17141a]">{product.name}</span>
                     <span className="text-sm text-[#6f6a75]">{product.productCode} - {product.brandName} - {product.category}</span>
                   </Link>
@@ -201,89 +163,50 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-6">
-          <Panel
-            title="CRM Pipeline Snapshot"
-            action={
-              <Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)]">
-                Open CRM
-              </Link>
-            }
-          >
+          <Panel title="CRM Pipeline Snapshot" action={<Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)]">Open CRM</Link>}>
             <div className="grid gap-3">
               {statusSummary.map((item) => (
                 <div key={item.label} className="flex items-center justify-between gap-4 rounded-[1.1rem] border border-[#eef0f6] bg-white px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.12em] ${item.tone}`}>
-                      {item.label}
-                    </span>
-                  </div>
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.12em] ${item.tone}`}>{item.label}</span>
                   <span className="text-lg font-semibold tracking-tight text-[#17141a]">{item.value}</span>
                 </div>
               ))}
             </div>
           </Panel>
 
-          <Panel
-            title="Quotation Watchlist"
-            action={
-              <Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)]">
-                Review all
-              </Link>
-            }
-          >
+          <Panel title="Quotation Watchlist" action={<Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)]">Review all</Link>}>
             {quotationWatchlist.length > 0 ? (
               <div className="grid gap-0">
-                {quotationWatchlist.map((lead) => (
-                  <Link
-                    key={lead.id}
-                    href={getAdminRoute(`/crm/${lead.id}`)}
-                    className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1"
-                  >
+                {quotationWatchlist.map((item) => (
+                  <Link key={item.id} href={getAdminRoute(`/crm/opportunities/${item.id}`)} className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-medium text-[#17141a]">{lead.projectName}</span>
-                      <span className="rounded-full bg-[#fff7ea] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#9a5b12]">
-                        {lead.status.replaceAll("_", " ")}
-                      </span>
+                      <span className="font-medium text-[#17141a]">{item.name}</span>
+                      <span className="rounded-full bg-[#fff7ea] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#9a5b12]">{item.stage.replaceAll("_", " ")}</span>
                     </div>
-                    <span className="text-sm text-[#6f6a75]">
-                      {lead.clientName} · {lead.location || "No location"} · {formatCurrency(lead.estimatedCost)}
-                    </span>
+                    <span className="text-sm text-[#6f6a75]">{item.accountName} · {item.location || "No location"} · {formatCurrency(item.estimatedValue)}</span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#6f6a75]">No records are currently in quotation stage.</p>
+              <p className="text-sm text-[#6f6a75]">No opportunities are currently in bid or negotiation stage.</p>
             )}
           </Panel>
 
-          <Panel
-            title="Recently Updated Projects"
-            action={
-              <Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)]">
-                View pipeline
-              </Link>
-            }
-          >
-            {recentLeads.length > 0 ? (
+          <Panel title="Recently Updated Opportunities" action={<Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)]">View pipeline</Link>}>
+            {recentOpportunities.length > 0 ? (
               <div className="grid gap-0">
-                {recentLeads.map((lead) => (
-                  <Link
-                    key={lead.id}
-                    href={getAdminRoute(`/crm/${lead.id}`)}
-                    className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1"
-                  >
+                {recentOpportunities.map((item) => (
+                  <Link key={item.id} href={getAdminRoute(`/crm/opportunities/${item.id}`)} className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-medium text-[#17141a]">{lead.projectName}</span>
-                      <span className="text-xs text-[#9793a0]">{formatDate(lead.updatedAt)}</span>
+                      <span className="font-medium text-[#17141a]">{item.name}</span>
+                      <span className="text-xs text-[#9793a0]">{formatDate(item.updatedAt)}</span>
                     </div>
-                    <span className="text-sm text-[#6f6a75]">
-                      {lead.clientName} · {lead.status.replaceAll("_", " ")}
-                    </span>
+                    <span className="text-sm text-[#6f6a75]">{item.accountName} · {item.stage.replaceAll("_", " ")}</span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#6f6a75]">No CRM project activity yet.</p>
+              <p className="text-sm text-[#6f6a75]">No CRM opportunity activity yet.</p>
             )}
           </Panel>
         </div>

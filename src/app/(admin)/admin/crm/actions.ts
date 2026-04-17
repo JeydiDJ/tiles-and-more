@@ -1,19 +1,28 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { addProjectLeadActivity, createProjectLead, createProjectLeadAttachment, deleteProjectLead, updateProjectLead } from "@/services/project-lead.service";
+import {
+  addCrmOpportunityActivity,
+  createCrmAccount,
+  createCrmContact,
+  createCrmOpportunity,
+  createCrmOpportunityAttachment,
+  deleteCrmOpportunity,
+  updateCrmAccount,
+  updateCrmOpportunity,
+} from "@/services/crm.service";
 import { uploadCrmAttachment } from "@/services/storage.service";
 import { getAdminRoute } from "@/lib/admin-path";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { ProjectLeadStatus } from "@/types/project-lead";
+import type { CrmOpportunityStage } from "@/types/crm";
 
-export type ProjectLeadFormState = {
+export type CrmFormState = {
   error: string | null;
-  projectLeadId?: string | null;
+  entityId?: string | null;
 };
 
-export type ProjectLeadDeleteState = {
+export type CrmDeleteState = {
   error: string | null;
 };
 
@@ -22,24 +31,43 @@ function normalizeOptional(value: FormDataEntryValue | null) {
   return normalized.length > 0 ? normalized : null;
 }
 
-function parseLeadInput(formData: FormData) {
-  const quotationFinished = String(formData.get("quotationFinished") ?? "") === "true";
-  const estimatedCostRaw = normalizeOptional(formData.get("estimatedCost"));
-  const estimatedCost = quotationFinished && estimatedCostRaw ? Number(estimatedCostRaw) : null;
-
+function parseAccountInput(formData: FormData) {
   return {
-    clientName: String(formData.get("clientName") ?? "").trim(),
-    company: normalizeOptional(formData.get("company")),
+    name: String(formData.get("name") ?? "").trim(),
+    industry: normalizeOptional(formData.get("industry")),
     phone: normalizeOptional(formData.get("phone")),
     email: normalizeOptional(formData.get("email")),
-    projectName: String(formData.get("projectName") ?? "").trim(),
-    location: normalizeOptional(formData.get("location")),
-    estimatedCost: Number.isFinite(estimatedCost) ? estimatedCost : null,
-    status: String(formData.get("status") ?? "new_lead").trim() as ProjectLeadStatus,
-    source: normalizeOptional(formData.get("source")) ?? "manual",
-    inquiryType: normalizeOptional(formData.get("inquiryType")),
+    address: normalizeOptional(formData.get("address")),
+    city: normalizeOptional(formData.get("city")),
     notes: normalizeOptional(formData.get("notes")),
-    quotationFinished,
+  };
+}
+
+function parseContactInput(formData: FormData) {
+  return {
+    accountId: String(formData.get("accountId") ?? "").trim(),
+    fullName: String(formData.get("fullName") ?? "").trim(),
+    jobTitle: normalizeOptional(formData.get("jobTitle")),
+    phone: normalizeOptional(formData.get("phone")),
+    email: normalizeOptional(formData.get("email")),
+    notes: normalizeOptional(formData.get("notes")),
+  };
+}
+
+function parseOpportunityInput(formData: FormData) {
+  const estimatedValueRaw = normalizeOptional(formData.get("estimatedValue"));
+  const estimatedValue = estimatedValueRaw ? Number(estimatedValueRaw) : null;
+
+  return {
+    accountId: String(formData.get("accountId") ?? "").trim(),
+    primaryContactId: normalizeOptional(formData.get("primaryContactId")),
+    name: String(formData.get("name") ?? "").trim(),
+    location: normalizeOptional(formData.get("location")),
+    estimatedValue: Number.isFinite(estimatedValue) ? estimatedValue : null,
+    stage: String(formData.get("stage") ?? "new_lead").trim() as CrmOpportunityStage,
+    source: normalizeOptional(formData.get("source")) ?? "manual",
+    notes: normalizeOptional(formData.get("notes")),
+    quotationFinished: String(formData.get("quotationFinished") ?? "") === "true",
   };
 }
 
@@ -65,69 +93,138 @@ async function requireAdminUser() {
   }
 }
 
-export async function createProjectLeadAction(_: ProjectLeadFormState, formData: FormData): Promise<ProjectLeadFormState> {
+export async function createCrmAccountAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
   try {
     await requireAdminUser();
 
-    const input = parseLeadInput(formData);
-    const attachments = parseAttachmentFiles(formData);
-    if (!input.clientName || !input.projectName) {
-      return { error: "Client name and project name are required.", projectLeadId: null };
+    const accountInput = parseAccountInput(formData);
+    if (!accountInput.name) {
+      return { error: "Account name is required.", entityId: null };
     }
 
-    const lead = await createProjectLead(input);
-    await addProjectLeadActivity(lead.id, "system", "CRM project record created.");
+    const account = await createCrmAccount(accountInput);
 
-    if (attachments.length > 0) {
-      for (const file of attachments) {
-        const uploaded = await uploadCrmAttachment(file, lead.id, lead.projectName);
-        await createProjectLeadAttachment({
-          projectLeadId: lead.id,
-          fileName: uploaded.fileName,
-          storagePath: uploaded.path,
-          fileType: uploaded.mimeType,
-          fileSize: uploaded.fileSize,
-        });
-      }
+    const initialContactName = String(formData.get("initialContactName") ?? "").trim();
+    if (initialContactName) {
+      await createCrmContact({
+        accountId: account.id,
+        fullName: initialContactName,
+        jobTitle: normalizeOptional(formData.get("initialContactJobTitle")),
+        phone: normalizeOptional(formData.get("initialContactPhone")),
+        email: normalizeOptional(formData.get("initialContactEmail")),
+        notes: null,
+      });
+    }
 
-      await addProjectLeadActivity(
-        lead.id,
-        "attachment",
-        `${attachments.length} attachment${attachments.length === 1 ? "" : "s"} added to the project record.`,
-      );
+    const initialOpportunityName = String(formData.get("initialOpportunityName") ?? "").trim();
+    if (initialOpportunityName) {
+      await createCrmOpportunity({
+        accountId: account.id,
+        primaryContactId: null,
+        name: initialOpportunityName,
+        location: normalizeOptional(formData.get("initialOpportunityLocation")),
+        estimatedValue: null,
+        stage: "new_lead",
+        source: "manual",
+        notes: null,
+        quotationFinished: false,
+      });
     }
 
     revalidatePath(getAdminRoute("/crm"));
-    revalidatePath(getAdminRoute(`/crm/${lead.id}`));
-    return { error: null, projectLeadId: lead.id };
+    revalidatePath(getAdminRoute());
+    revalidatePath(getAdminRoute("/calendar"));
+    return { error: null, entityId: account.id };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Unable to create CRM record.", projectLeadId: null };
+    return { error: error instanceof Error ? error.message : "Unable to create account.", entityId: null };
   }
 }
 
-export async function updateProjectLeadAction(_: ProjectLeadFormState, formData: FormData): Promise<ProjectLeadFormState> {
+export async function updateCrmAccountAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
   try {
     await requireAdminUser();
 
-    const projectLeadId = String(formData.get("projectLeadId") ?? "").trim();
-    const previousStatus = String(formData.get("previousStatus") ?? "").trim();
+    const accountId = String(formData.get("accountId") ?? "").trim();
+    if (!accountId) {
+      return { error: "Account ID is required.", entityId: null };
+    }
+
+    const input = parseAccountInput(formData);
+    if (!input.name) {
+      return { error: "Account name is required.", entityId: accountId };
+    }
+
+    await updateCrmAccount(accountId, input);
+    revalidatePath(getAdminRoute("/crm"));
+    revalidatePath(getAdminRoute(`/crm/${accountId}`));
+    return { error: null, entityId: accountId };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to update account.", entityId: null };
+  }
+}
+
+export async function createCrmContactAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const input = parseContactInput(formData);
+    if (!input.accountId || !input.fullName) {
+      return { error: "Account and contact name are required.", entityId: null };
+    }
+
+    await createCrmContact(input);
+    revalidatePath(getAdminRoute(`/crm/${input.accountId}`));
+    return { error: null, entityId: input.accountId };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to create contact.", entityId: null };
+  }
+}
+
+export async function createCrmOpportunityAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const input = parseOpportunityInput(formData);
+    if (!input.accountId || !input.name) {
+      return { error: "Account and opportunity name are required.", entityId: null };
+    }
+
+    const opportunity = await createCrmOpportunity(input);
+    await addCrmOpportunityActivity(opportunity.id, "system", "Opportunity record created.");
+
+    revalidatePath(getAdminRoute("/crm"));
+    revalidatePath(getAdminRoute(`/crm/${input.accountId}`));
+    revalidatePath(getAdminRoute());
+    revalidatePath(getAdminRoute("/calendar"));
+    return { error: null, entityId: opportunity.id };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to create opportunity.", entityId: null };
+  }
+}
+
+export async function updateCrmOpportunityAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const opportunityId = String(formData.get("opportunityId") ?? "").trim();
+    const previousStage = String(formData.get("previousStage") ?? "").trim();
+    if (!opportunityId) {
+      return { error: "Opportunity ID is required.", entityId: null };
+    }
+
+    const input = parseOpportunityInput(formData);
     const attachments = parseAttachmentFiles(formData);
-    if (!projectLeadId) {
-      return { error: "Project record ID is required.", projectLeadId: null };
+    if (!input.accountId || !input.name) {
+      return { error: "Account and opportunity name are required.", entityId: opportunityId };
     }
 
-    const input = parseLeadInput(formData);
-    if (!input.clientName || !input.projectName) {
-      return { error: "Client name and project name are required.", projectLeadId: null };
-    }
-
-    await updateProjectLead(projectLeadId, input);
+    await updateCrmOpportunity(opportunityId, input);
 
     if (attachments.length > 0) {
       for (const file of attachments) {
-        const uploaded = await uploadCrmAttachment(file, projectLeadId, input.projectName);
-        await createProjectLeadAttachment({
-          projectLeadId,
+        const uploaded = await uploadCrmAttachment(file, opportunityId, input.name);
+        await createCrmOpportunityAttachment({
+          opportunityId,
           fileName: uploaded.fileName,
           storagePath: uploaded.path,
           fileType: uploaded.mimeType,
@@ -135,59 +232,64 @@ export async function updateProjectLeadAction(_: ProjectLeadFormState, formData:
         });
       }
 
-      await addProjectLeadActivity(
-        projectLeadId,
+      await addCrmOpportunityActivity(
+        opportunityId,
         "attachment",
-        `${attachments.length} attachment${attachments.length === 1 ? "" : "s"} added to the project record.`,
+        `${attachments.length} attachment${attachments.length === 1 ? "" : "s"} added to the opportunity.`,
       );
     }
 
-    if (previousStatus !== input.status) {
-      await addProjectLeadActivity(projectLeadId, "status_change", `Status changed from ${previousStatus || "unknown"} to ${input.status}.`);
+    if (previousStage !== input.stage) {
+      await addCrmOpportunityActivity(opportunityId, "stage_change", `Stage changed from ${previousStage || "unknown"} to ${input.stage}.`);
     } else {
-      await addProjectLeadActivity(projectLeadId, "system", "CRM project record updated.");
+      await addCrmOpportunityActivity(opportunityId, "system", "Opportunity record updated.");
     }
 
     revalidatePath(getAdminRoute("/crm"));
-    revalidatePath(getAdminRoute(`/crm/${projectLeadId}`));
-    return { error: null, projectLeadId };
+    revalidatePath(getAdminRoute(`/crm/${input.accountId}`));
+    revalidatePath(getAdminRoute(`/crm/opportunities/${opportunityId}`));
+    revalidatePath(getAdminRoute());
+    revalidatePath(getAdminRoute("/calendar"));
+    return { error: null, entityId: opportunityId };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Unable to update CRM record.", projectLeadId: null };
+    return { error: error instanceof Error ? error.message : "Unable to update opportunity.", entityId: null };
   }
 }
 
-export async function addProjectLeadNoteAction(_: ProjectLeadFormState, formData: FormData): Promise<ProjectLeadFormState> {
+export async function addCrmOpportunityNoteAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
   try {
     await requireAdminUser();
 
-    const projectLeadId = String(formData.get("projectLeadId") ?? "").trim();
+    const opportunityId = String(formData.get("opportunityId") ?? "").trim();
     const note = String(formData.get("note") ?? "").trim();
 
-    if (!projectLeadId || !note) {
-      return { error: "Project record and note content are required.", projectLeadId: null };
+    if (!opportunityId || !note) {
+      return { error: "Opportunity and note content are required.", entityId: null };
     }
 
-    await addProjectLeadActivity(projectLeadId, "note", note);
-    revalidatePath(getAdminRoute(`/crm/${projectLeadId}`));
-    return { error: null, projectLeadId };
+    await addCrmOpportunityActivity(opportunityId, "note", note);
+    revalidatePath(getAdminRoute(`/crm/opportunities/${opportunityId}`));
+    return { error: null, entityId: opportunityId };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Unable to add note.", projectLeadId: null };
+    return { error: error instanceof Error ? error.message : "Unable to add note.", entityId: null };
   }
 }
 
-export async function deleteProjectLeadAction(_: ProjectLeadDeleteState, formData: FormData): Promise<ProjectLeadDeleteState> {
+export async function deleteCrmOpportunityAction(_: CrmDeleteState, formData: FormData): Promise<CrmDeleteState> {
   try {
     await requireAdminUser();
 
-    const projectLeadId = String(formData.get("projectLeadId") ?? "").trim();
-    if (!projectLeadId) {
-      return { error: "Project record ID is required." };
+    const opportunityId = String(formData.get("opportunityId") ?? "").trim();
+    if (!opportunityId) {
+      return { error: "Opportunity ID is required." };
     }
 
-    await deleteProjectLead(projectLeadId);
+    await deleteCrmOpportunity(opportunityId);
     revalidatePath(getAdminRoute("/crm"));
+    revalidatePath(getAdminRoute());
+    revalidatePath(getAdminRoute("/calendar"));
     return { error: null };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Unable to delete CRM record." };
+    return { error: error instanceof Error ? error.message : "Unable to delete opportunity." };
   }
 }

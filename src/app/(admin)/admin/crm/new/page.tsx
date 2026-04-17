@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProjectLeadForm } from "@/components/admin/project-lead-form";
+import { CrmAccountForm } from "@/components/admin/crm-forms";
 import { getAdminRoute } from "@/lib/admin-path";
 
 export default function AdminCrmNewPage() {
@@ -9,9 +9,9 @@ export default function AdminCrmNewPage() {
         <p className="text-[11px] uppercase tracking-[0.24em] text-[#9793a0]">CRM</p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-4xl font-semibold tracking-tight text-[#17141a] sm:text-[2.6rem]">Create Project Record</h1>
+            <h1 className="text-4xl font-semibold tracking-tight text-[#17141a] sm:text-[2.6rem]">Create Account</h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f6a75]">
-              Log a new client project, quotation lead, or ongoing job into the CRM pipeline.
+              Start with the company account, then layer in contacts and opportunities the way a supplier-focused CRM should work.
             </p>
           </div>
           <Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)] transition hover:text-[var(--brand-dark)]">
@@ -19,7 +19,7 @@ export default function AdminCrmNewPage() {
           </Link>
         </div>
       </section>
-      <ProjectLeadForm mode="create" />
+      <CrmAccountForm mode="create" />
     </div>
   );
 }

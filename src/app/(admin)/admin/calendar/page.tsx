@@ -1,12 +1,12 @@
 import { CrmCalendar } from "@/components/admin/crm-calendar";
-import { getProjectLeads } from "@/services/project-lead.service";
+import { getCrmOpportunities } from "@/services/crm.service";
 
 export default async function AdminCalendarPage() {
-  const leads = await getProjectLeads();
+  const opportunities = await getCrmOpportunities();
 
   return (
     <div className="grid gap-6">
-      <CrmCalendar leads={leads} />
+      <CrmCalendar opportunities={opportunities} />
     </div>
   );
 }
