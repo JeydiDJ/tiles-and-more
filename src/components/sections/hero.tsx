@@ -1,52 +1,59 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const SLIDE_DURATION_MS = 20000;
 
-type VideoSlide = {
+type BrandSlideBase = {
   id: string;
   title: string;
-  video: string;
-  logo: string;
-};
-
-type ImageBrandSlide = {
-  id: string;
-  title: string;
-  image: string;
+  filterBrand: string;
   logo: string;
   caption: string;
+};
+
+type VideoSlide = BrandSlideBase & {
+  video: string;
+};
+
+type ImageBrandSlide = BrandSlideBase & {
+  image: string;
 };
 
 const slides: (VideoSlide | ImageBrandSlide)[] = [
   {
     id: "rak",
     title: "RAK Ceramics",
+    filterBrand: "RAK Ceramics",
     video: "/hero-videos/rak-hero.mp4",
     logo: "/logo/brand-logos/rak-logo.png",
+    caption: "Precision-crafted surfaces designed for modern living.",
   },
   {
     id: "roca",
     title: "Roca",
+    filterBrand: "Roca",
     image: "/hero-images/roca-hero-1.jpg",
     logo: "/logo/brand-logos/roca-logo.png",
-    caption: "Design-led bathroom collections and architectural solutions.",
+    caption: "Globally recognized for innovative, high-quality ceramic surfaces.",
   },
   {
     id: "geotiles",
     title: "Geo Tiles",
+    filterBrand: "Geo Tiles",
     image: "/hero-images/geotiles-hero.jpg",
     logo: "/logo/brand-logos/geotiles-logo.png",
-    caption: "Contemporary tile collections with bold geometry and expressive surface detail.",
+    caption: "Modern ceramic designs inspired by contemporary global trends.",
   },
   {
     id: "sonite",
     title: "Sonite",
+    filterBrand: "Sonite",
     image: "/hero-images/sonite-hero.jpg",
     logo: "/logo/brand-logos/sonite-logo.png",
-    caption: "Premium tile surfaces crafted for elegant residential and commercial interiors.",
+    caption: "Innovative surfaces combining design, technology, and modern aesthetics.",
   },
 ];
 
@@ -197,8 +204,14 @@ export function Hero() {
                       priority
                     />
                     <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/72 sm:text-base">
-                      Premium surfaces and architectural finishes
+                      {slide.caption}
                     </p>
+                    <Link
+                      href={`/catalog?brand=${encodeURIComponent(slide.filterBrand)}#catalog-results`}
+                      className="inline-flex items-center justify-center border border-white/34 bg-white/10 px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white hover:text-[#231f20]"
+                    >
+                      Browse
+                    </Link>
                   </div>
                 </div>
               </>
@@ -216,7 +229,11 @@ export function Hero() {
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.24)_0%,rgba(0,0,0,0.18)_38%,rgba(0,0,0,0.4)_100%)]" />
 
                 <div className="relative flex min-h-screen items-center justify-center px-6">
-                  <div className="flex flex-col items-center gap-8">
+                  <div
+                    className={`flex flex-col items-center gap-8 ${
+                      slide.id === "sonite" ? "sm:-translate-y-10" : ""
+                    }`}
+                  >
                     <Image
                       src={slide.logo}
                       alt={`${slide.title} logo`}
@@ -234,9 +251,25 @@ export function Hero() {
                       }`}
                       priority
                     />
-                    <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/78 sm:text-base">
-                      {slide.caption}
-                    </p>
+                    <div
+                      className={`flex flex-col items-center ${
+                        slide.id === "roca"
+                          ? "-mt-24 gap-4 sm:-mt-28"
+                          : slide.id === "sonite"
+                            ? "-mt-12 gap-5 sm:-mt-36"
+                            : "gap-8"
+                      }`}
+                    >
+                      <p className="max-w-xl text-center text-sm uppercase tracking-[0.34em] text-white/78 sm:text-base">
+                        {slide.caption}
+                      </p>
+                      <Link
+                        href={`/catalog?brand=${encodeURIComponent(slide.filterBrand)}#catalog-results`}
+                        className="inline-flex items-center justify-center border border-white/34 bg-white/10 px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white hover:text-[#231f20]"
+                      >
+                        Browse
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </>

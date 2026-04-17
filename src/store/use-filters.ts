@@ -20,10 +20,10 @@ const defaultFilters: CatalogFiltersState = {
   application: "all",
 };
 
-export function useFilters(initialQuery = "") {
+export function useFilters(initialQuery = "", initialBrand = "all") {
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState("all");
-  const [brand, setBrand] = useState("all");
+  const [brand, setBrand] = useState(initialBrand);
   const [material, setMaterial] = useState("all");
   const [finish, setFinish] = useState("all");
   const [application, setApplication] = useState("all");
@@ -31,7 +31,7 @@ export function useFilters(initialQuery = "") {
   function resetFilters() {
     setQuery(initialQuery);
     setCategory(defaultFilters.category);
-    setBrand(defaultFilters.brand);
+    setBrand(initialBrand);
     setMaterial(defaultFilters.material);
     setFinish(defaultFilters.finish);
     setApplication(defaultFilters.application);

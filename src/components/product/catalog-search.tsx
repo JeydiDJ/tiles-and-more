@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect } from "react";
+import { useDeferredValue, useEffect, useRef } from "react";
 import type { Product } from "@/types/product";
 import { ProductGrid } from "@/components/product/product-grid";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { useFilters } from "@/store/use-filters";
 type CatalogSearchProps = {
   products: Product[];
   initialQuery?: string;
+  initialBrand?: string;
 };
 
 function SearchIcon() {
@@ -25,7 +26,8 @@ function isPresent(value: string | null | undefined): value is string {
   return Boolean(value);
 }
 
-export function CatalogSearch({ products, initialQuery = "" }: CatalogSearchProps) {
+export function CatalogSearch({ products, initialQuery = "", initialBrand = "all" }: CatalogSearchProps) {
+  const resultsRef = useRef<HTMLElement | null>(null);
   const {
     query,
     setQuery,
@@ -40,7 +42,7 @@ export function CatalogSearch({ products, initialQuery = "" }: CatalogSearchProp
     application,
     setApplication,
     resetFilters,
-  } = useFilters(initialQuery);
+  } = useFilters(initialQuery, initialBrand);
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const hasSearch = normalizedQuery.length > 0;
@@ -54,7 +56,26 @@ export function CatalogSearch({ products, initialQuery = "" }: CatalogSearchProp
 
   useEffect(() => {
     setQuery(initialQuery);
-  }, [initialQuery]);
+  }, [initialQuery, setQuery]);
+
+  useEffect(() => {
+    setBrand(initialBrand);
+  }, [initialBrand, setBrand]);
+
+  useEffect(() => {
+    if (window.location.hash !== "#catalog-results") {
+      return;
+    }
+
+    const scrollToResults = () => {
+      resultsRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
+    };
+
+    scrollToResults();
+    const timeout = window.setTimeout(scrollToResults, 250);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   const categoryOptions = Array.from(new Set(products.map((product) => product.category).filter(isPresent))).sort((a, b) =>
     a.localeCompare(b),
@@ -185,7 +206,11 @@ export function CatalogSearch({ products, initialQuery = "" }: CatalogSearchProp
         </div>
       </div>
 
-      <section className="page-section mt-10 sm:mt-14">
+      <section
+        id="catalog-results"
+        ref={resultsRef}
+        className="page-section mt-10 scroll-mt-24 sm:mt-14 sm:scroll-mt-28"
+      >
         <div className="grid gap-0 border-y border-[var(--border)] lg:grid-cols-[0.72fr_1.28fr]">
           <div className="editorial-band border-b border-[var(--border)] px-6 py-10 sm:px-8 lg:border-b-0 lg:border-r lg:px-10 lg:py-12">
             <p className="page-kicker">Advanced Filters</p>
