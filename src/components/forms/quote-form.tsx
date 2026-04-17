@@ -94,6 +94,7 @@ export function QuoteForm() {
         title="Request a Quote"
         description="Share project type, approximate quantity, and timeline so we can prepare a tailored recommendation."
         imagePath="/hero-images/catalog-hero.png"
+        footerLabel="Tailored product recommendations"
       />
       <div className="bg-white px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
         <p className="page-kicker">Project Details</p>

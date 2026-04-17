@@ -3,6 +3,7 @@ type FormVisualPanelProps = {
   title: string;
   description: string;
   imagePath: string;
+  footerLabel: string;
 };
 
 export function FormVisualPanel({
@@ -10,6 +11,7 @@ export function FormVisualPanel({
   title,
   description,
   imagePath,
+  footerLabel,
 }: FormVisualPanelProps) {
   return (
     <div className="relative isolate min-h-[320px] overflow-hidden bg-[#1f1a1b] sm:min-h-[420px] lg:min-h-full">
@@ -29,7 +31,7 @@ export function FormVisualPanel({
         </div>
         <div className="mt-8 inline-flex w-fit items-center gap-3 rounded-full border border-white/18 bg-black/18 px-4 py-2 text-sm text-white/80 backdrop-blur-sm">
           <span className="h-2.5 w-2.5 rounded-full bg-[var(--brand)]" />
-          Placeholder image panel
+          {footerLabel}
         </div>
       </div>
     </div>

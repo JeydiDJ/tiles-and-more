@@ -81,8 +81,9 @@ export function ContactForm() {
       <FormVisualPanel
         kicker="Contact"
         title="Start Your Inquiry"
-        description="Use this space for a showroom image, a recent installation, or a branded visual while the form stays focused on the right."
+        description="Reach out for product guidance, showroom assistance, and support in choosing the right surfaces for your project."
         imagePath="/hero-images/roca-hero-1.jpg"
+        footerLabel="Showroom support and project guidance"
       />
       <div className="bg-white px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
         <p className="page-kicker">Contact</p>
