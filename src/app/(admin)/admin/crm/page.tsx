@@ -32,12 +32,12 @@ export default async function AdminCrmPage() {
         <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-4 sm:px-6">
           <div>
             <p className="text-[11px] uppercase tracking-[0.22em] text-[#9793a0]">CRM Workspace</p>
-            <h1 className="mt-2 text-[2rem] font-semibold tracking-tight text-[#17141a]">Accounts and Opportunities</h1>
-            <p className="mt-2 text-sm text-[#6f6a75]">Track contractor and developer accounts, their contacts, and every project opportunity underneath them.</p>
+            <h1 className="mt-2 text-[1.7rem] font-semibold tracking-tight text-[#17141a] sm:text-[2rem]">Accounts and Opportunities</h1>
+            <p className="mt-2 text-sm leading-6 text-[#6f6a75]">Track contractor and developer accounts, their contacts, and every project opportunity underneath them.</p>
           </div>
         </div>
 
-        <div className="grid gap-4 px-5 py-5 sm:px-6 md:grid-cols-4">
+        <div className="grid gap-4 px-5 py-5 sm:px-6 sm:grid-cols-2 xl:grid-cols-4">
           <CrmMetric label="Accounts" value={String(accounts.length)} note="Contractors, developers, and partner companies under management." />
           <CrmMetric label="New Leads" value={String(newLeadCount)} note="Fresh opportunities that have just entered the pipeline." />
           <CrmMetric label="Bids / Negotiation" value={String(bidCount)} note="Opportunities in pricing, bidding, or commercial discussion." />

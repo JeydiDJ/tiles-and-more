@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminSessionBar } from "@/components/admin/admin-session-bar";
 import { adminNav } from "@/config/nav";
 import { getAdminRoute } from "@/lib/admin-path";
@@ -20,6 +20,15 @@ function CollapseIcon() {
       <path d="M4 7h16" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M4 12h10" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M4 17h16" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
+      <path d="m6 6 12 12" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M18 6 6 18" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -128,17 +137,55 @@ function getNavIcon(label: string) {
 export function AdminShell({ children, userEmail }: AdminShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
 
   return (
     <div
       className={cn(
-        "grid min-h-screen bg-[#f6f7fb] transition-[grid-template-columns] duration-300",
+        "min-h-screen bg-[#f6f7fb] lg:grid lg:transition-[grid-template-columns] lg:duration-300",
         collapsed ? "lg:grid-cols-[104px_1fr]" : "lg:grid-cols-[292px_1fr]",
       )}
     >
+      <div className="sticky top-0 z-30 border-b border-[#e7e9f2] bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open menu"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#5b5763] transition hover:border-[#d8dce8] hover:bg-white"
+          >
+            <CollapseIcon />
+          </button>
+          <Link href={getAdminRoute()} className="min-w-0 flex-1">
+            <div className="flex items-center justify-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc]">
+                <Image src="/logo/tilesandmore-logo.png" alt="Tiles and More logo" width={34} height={34} className="h-8 w-8 object-contain" priority />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-[10px] uppercase tracking-[0.22em] text-[#8a8793]">Tiles & More</p>
+                <p className="truncate text-sm font-semibold tracking-tight text-[#17141a]">Admin Workspace</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "fixed inset-0 z-40 bg-[#17141a]/35 transition-opacity duration-200 lg:hidden",
+          mobileNavOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+        )}
+        onClick={() => setMobileNavOpen(false)}
+      />
+
       <aside
         className={cn(
-          "flex min-h-full flex-col border-r border-[#e7e9f2] bg-[#ffffff] px-5 py-6 text-[#231f20] sm:px-6",
+          "fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-[320px] flex-col border-r border-[#e7e9f2] bg-[#ffffff] px-5 py-6 text-[#231f20] transition-transform duration-200 sm:px-6 lg:static lg:min-h-full lg:w-auto lg:max-w-none lg:translate-x-0",
+          mobileNavOpen ? "translate-x-0" : "-translate-x-full",
           collapsed && "cursor-e-resize",
         )}
         onClick={collapsed ? () => setCollapsed(false) : undefined}
@@ -159,14 +206,24 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
           </Link>
 
           {!collapsed ? (
-            <button
-              type="button"
-              onClick={() => setCollapsed(true)}
-              aria-label="Collapse menu"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#5b5763] transition hover:border-[#d8dce8] hover:bg-white"
-            >
-              <CollapseIcon />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(false)}
+                aria-label="Close menu"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#5b5763] transition hover:border-[#d8dce8] hover:bg-white lg:hidden"
+              >
+                <CloseIcon />
+              </button>
+              <button
+                type="button"
+                onClick={() => setCollapsed(true)}
+                aria-label="Collapse menu"
+                className="hidden h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#5b5763] transition hover:border-[#d8dce8] hover:bg-white lg:inline-flex"
+              >
+                <CollapseIcon />
+              </button>
+            </div>
           ) : null}
         </div>
 
@@ -184,7 +241,12 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                 key={item.href}
                 href={item.href}
                 title={collapsed ? item.label : undefined}
-                onClick={collapsed ? (event) => event.stopPropagation() : undefined}
+                onClick={(event) => {
+                  if (collapsed) {
+                    event.stopPropagation();
+                  }
+                  setMobileNavOpen(false);
+                }}
                 className={cn(
                   "font-medium transition",
                   collapsed
@@ -208,7 +270,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
         </div>
       </aside>
 
-      <main className="p-5 sm:p-6 lg:p-8">
+      <main className="p-4 sm:p-5 lg:p-8">
         <div className="mx-auto max-w-[1500px]">{children}</div>
       </main>
     </div>

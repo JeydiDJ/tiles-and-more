@@ -178,11 +178,11 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
         </div>
       </section>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
           {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"}
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
           {selectedIds.length > 0 ? (
             <button
               type="button"
@@ -218,7 +218,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="grid gap-4 border-b border-[var(--border)] px-5 py-5 transition hover:bg-[#fcfcfe] last:border-b-0 lg:grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] lg:items-center"
+                className="grid gap-4 border-b border-[var(--border)] px-5 py-5 transition hover:bg-[#fcfcfe] last:border-b-0 lg:grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] lg:items-start"
               >
                 <label className="flex items-center">
                   <input
@@ -262,7 +262,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                   {product.finish ?? "-"}
                 </div>
 
-                <div className="flex items-center justify-between gap-3 lg:justify-end">
+                <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
                   <Link
                     href={getAdminRoute(`/products/${product.id}`)}
                     className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#ed2325]/30 hover:text-[var(--brand)]"

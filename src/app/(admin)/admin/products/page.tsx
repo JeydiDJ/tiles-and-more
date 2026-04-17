@@ -36,13 +36,13 @@ export default async function AdminProductsPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[11px] uppercase tracking-[0.22em] text-[#9793a0]">Catalog Workspace</p>
-              <h1 className="mt-2 text-[2rem] font-semibold tracking-tight text-[#17141a]">Products</h1>
-              <p className="mt-2 text-sm text-[#6f6a75]">Maintain product structure, showroom content quality, and browsing readiness in one place.</p>
+              <h1 className="mt-2 text-[1.7rem] font-semibold tracking-tight text-[#17141a] sm:text-[2rem]">Products</h1>
+              <p className="mt-2 text-sm leading-6 text-[#6f6a75]">Maintain product structure, showroom content quality, and browsing readiness in one place.</p>
             </div>
 
             <Link
               href={getAdminRoute("/products/new")}
-              className="inline-flex items-center justify-center rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_24px_rgba(237,35,37,0.18)] transition hover:bg-[var(--brand-dark)]"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_24px_rgba(237,35,37,0.18)] transition hover:bg-[var(--brand-dark)] sm:w-auto"
             >
               New Product
             </Link>
@@ -59,7 +59,7 @@ export default async function AdminProductsPage() {
           </span>
         </div>
 
-        <div className="grid gap-4 px-5 py-5 sm:px-6 md:grid-cols-3">
+        <div className="grid gap-4 px-5 py-5 sm:px-6 sm:grid-cols-2 xl:grid-cols-3">
           <ProductMetric label="Catalog Size" value={String(products.length)} note="Total entries currently active in the product library." />
           <ProductMetric label="Coverage" value={String(brandCount)} note={`${categoryCount} categories and ${materialCount} material groupings tracked.`} />
           <ProductMetric label="Image Readiness" value={`${imageCoverage}%`} note="Main image coverage across the current catalog." />

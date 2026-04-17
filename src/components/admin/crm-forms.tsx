@@ -272,8 +272,8 @@ export function CrmOpportunityForm({
                 onChange={(event) => setQuotationFinished(event.target.value === "true")}
                 className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]"
               >
-                <option value="false">Quotation not finished</option>
-                <option value="true">Quotation finished</option>
+                <option value="false">Pending</option>
+                <option value="true">Sent</option>
               </Select>
             </Field>
             <Field label="Estimated Value" className="md:col-span-2">

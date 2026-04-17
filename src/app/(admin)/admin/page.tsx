@@ -38,7 +38,7 @@ function Panel({
 }) {
   return (
     <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <h2 className="text-[11px] uppercase tracking-[0.22em] text-[#9793a0]">{title}</h2>
         {action}
       </div>
@@ -88,28 +88,28 @@ export default async function AdminDashboardPage() {
   return (
     <div className="grid gap-6">
       <section className="overflow-hidden rounded-[1.75rem] border border-[#e3e7f0] bg-white shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
-        <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-6 py-5 sm:px-7">
+        <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-4 py-5 sm:px-6 lg:px-7">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div>
               <p className="text-[11px] uppercase tracking-[0.24em] text-[#9793a0]">Dashboard</p>
-              <h1 className="mt-3 text-[2.15rem] font-semibold tracking-tight text-[#17141a]">Operations Overview</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f6a75]">
+              <h1 className="mt-3 text-[1.8rem] font-semibold tracking-tight text-[#17141a] sm:text-[2.15rem]">Operations Overview</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6a75] sm:leading-7">
                 A software-style workspace overview of catalog activity and the new account-based CRM pipeline.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Link href={getAdminRoute("/products/new")} className="inline-flex items-center justify-center rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_24px_rgba(237,35,37,0.18)] transition hover:bg-[#c81a1d]">
+            <div className="grid gap-3 sm:flex sm:flex-wrap">
+              <Link href={getAdminRoute("/products/new")} className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-medium text-white shadow-[0_12px_24px_rgba(237,35,37,0.18)] transition hover:bg-[#c81a1d] sm:w-auto">
                 Add Product
               </Link>
-              <Link href={getAdminRoute("/crm/new")} className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-5 py-3 text-sm font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:text-[var(--brand)]">
+              <Link href={getAdminRoute("/crm/new")} className="inline-flex w-full items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-5 py-3 text-sm font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:text-[var(--brand)] sm:w-auto">
                 New Account
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 border-b border-[#edf0f6] px-6 py-3 sm:px-7">
+        <div className="flex flex-wrap gap-2 border-b border-[#edf0f6] px-4 py-3 sm:px-6 lg:px-7">
           <span className="inline-flex items-center rounded-full bg-[#17141a] px-3 py-1.5 text-xs font-medium text-white">Workspace home</span>
           <span className="inline-flex items-center rounded-full border border-[#e4e7ef] bg-white px-3 py-1.5 text-xs font-medium text-[#6f6a75]">
             {accounts.length} active accounts
@@ -119,7 +119,7 @@ export default async function AdminDashboardPage() {
           </span>
         </div>
 
-        <div className="grid gap-4 px-6 py-5 sm:px-7 lg:grid-cols-3">
+        <div className="grid gap-4 px-4 py-5 sm:px-6 lg:px-7 lg:grid-cols-3">
           <MetricLink label="Products" value={String(products.length)} note={products.length > 0 ? "Catalog entries available." : "No products added yet."} href={getAdminRoute("/products")} cta="Open products" />
           <MetricLink label="Categories" value={String(categories.length)} note="Configured category structure." href={getAdminRoute("/categories")} cta="Open categories" />
           <MetricLink label="CRM Accounts" value={String(accounts.length)} note={accounts.length > 0 ? `${opportunities.length} linked opportunities across the account base.` : "No CRM accounts added yet."} href={getAdminRoute("/crm")} cta="Open CRM" />
@@ -133,7 +133,7 @@ export default async function AdminDashboardPage() {
                 {recentProducts.map((product) => (
                   <Link key={product.id} href={getAdminRoute(`/products/${product.id}`)} className="grid gap-1 border-b border-[#eef0f6] py-4 transition last:border-b-0 hover:translate-x-1">
                     <span className="font-medium text-[#17141a]">{product.name}</span>
-                    <span className="text-sm text-[#6f6a75]">{product.productCode} - {product.brandName} - {product.category}</span>
+                    <span className="text-sm text-[#6f6a75]">{product.productCode} / {product.brandName} / {product.category}</span>
                   </Link>
                 ))}
               </div>

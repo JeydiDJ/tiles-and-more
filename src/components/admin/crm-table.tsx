@@ -403,7 +403,7 @@ export function CrmTable({
                             </div>
                             <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf0f6] pt-3">
                               <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${opportunity.quotationFinished ? "border-[#cfead7] bg-[#eefaf2] text-[#1f7a3d]" : "border-[#e6decd] bg-[#faf5ea] text-[#876536]"}`}>
-                                {opportunity.quotationFinished ? "Quote finished" : "Quote pending"}
+                                {opportunity.quotationFinished ? "Quotation sent" : "Quotation pending"}
                               </span>
                               <span className="text-xs text-[#9793a0]">{formatDate(opportunity.updatedAt)}</span>
                             </div>
