@@ -235,6 +235,15 @@ export async function updateCrmAccount(id: string, input: CrmAccountInput) {
   }
 }
 
+export async function deleteCrmAccount(id: string) {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("crm_accounts").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function getCrmContacts(accountId: string) {
   if (!hasSupabaseEnv()) {
     return fallbackContacts.filter((item) => item.accountId === accountId);

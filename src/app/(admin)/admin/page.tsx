@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { CrmCalendar } from "@/components/admin/crm-calendar";
 import { getAdminRoute } from "@/lib/admin-path";
 import { getCategories } from "@/services/category.service";
 import { getCrmAccounts, getCrmOpportunities } from "@/services/crm.service";
@@ -121,9 +120,6 @@ export default async function AdminDashboardPage() {
           <MetricLink label="CRM Accounts" value={String(accounts.length)} note={accounts.length > 0 ? `${opportunities.length} linked opportunities across the account base.` : "No CRM accounts added yet."} href={getAdminRoute("/crm")} cta="Open CRM" />
         </div>
       </section>
-
-      <CrmCalendar opportunities={opportunities} compact />
-
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="grid gap-6">
           <Panel title="Recent Products" action={<Link href={getAdminRoute("/products")} className="text-sm font-medium text-[var(--brand)]">View all</Link>}>

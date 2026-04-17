@@ -7,6 +7,7 @@ import {
   createCrmContact,
   createCrmOpportunity,
   createCrmOpportunityAttachment,
+  deleteCrmAccount,
   deleteCrmOpportunity,
   updateCrmAccount,
   updateCrmOpportunity,
@@ -291,5 +292,24 @@ export async function deleteCrmOpportunityAction(_: CrmDeleteState, formData: Fo
     return { error: null };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Unable to delete opportunity." };
+  }
+}
+
+export async function deleteCrmAccountAction(_: CrmDeleteState, formData: FormData): Promise<CrmDeleteState> {
+  try {
+    await requireAdminUser();
+
+    const accountId = String(formData.get("accountId") ?? "").trim();
+    if (!accountId) {
+      return { error: "Account ID is required." };
+    }
+
+    await deleteCrmAccount(accountId);
+    revalidatePath(getAdminRoute("/crm"));
+    revalidatePath(getAdminRoute());
+    revalidatePath(getAdminRoute("/calendar"));
+    return { error: null };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to delete account." };
   }
 }
