@@ -259,13 +259,24 @@ export function ProductForm({ options, mode = "create", initialProduct = null }:
         <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
           {isEditMode ? "Ready to update" : "Ready to save"}
         </p>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="inline-flex min-w-36 items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
-        >
-          {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Product" : "Save Product"}
-        </button>
+        <div className="flex items-center gap-3">
+          {isEditMode ? (
+            <button
+              type="button"
+              onClick={() => router.push(getAdminRoute("/products"))}
+              className="inline-flex min-w-28 items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
+            >
+              Cancel
+            </button>
+          ) : null}
+          <button
+            type="submit"
+            disabled={isPending}
+            className="inline-flex min-w-36 items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+          >
+            {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Product" : "Save Product"}
+          </button>
+        </div>
       </div>
     </form>
   );
