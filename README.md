@@ -148,6 +148,22 @@ Relevant files:
 - [config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/supabase/config.ts)
 - [actions.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/%28admin%29/admin/products/actions.ts)
 
+## Database Schema (ERD)
+
+The Supabase database structure for this project is documented separately for clarity and maintainability.
+
+It includes:
+
+- Full entity relationship diagram (ERD)
+- Table structures and fields
+- Relationships between catalog, CRM, and project lead modules
+- Notes on constraints and design decisions
+
+View the full documentation here:
+
+👉 https://github.com/JeydiDJ/tiles-and-more/docs/supabase-erd-documentation.md
+
+
 ### EmailJS
 
 The contact and quote forms send email through EmailJS on the client side.
