@@ -179,6 +179,49 @@ export async function getProductBySlug(slug: string) {
   return products.find((product) => product.slug === slug) ?? null;
 }
 
+export async function getProductById(id: string) {
+  if (hasSupabaseEnv()) {
+    try {
+      const supabase = await createSupabaseServerClient();
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          id,
+          product_code,
+          name,
+          slug,
+          brand_id,
+          category_id,
+          product_family_id,
+          applications,
+          material,
+          finish,
+          image_url,
+          summary,
+          brands(name),
+          categories(name,slug),
+          product_families(name,slug)
+        `)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      return mapProduct(data as unknown as ProductRow);
+    } catch {
+      return products.find((product) => product.id === id) ?? null;
+    }
+  }
+
+  return products.find((product) => product.id === id) ?? null;
+}
+
 export async function getProductFormOptions(): Promise<ProductFormOptions> {
   if (!hasSupabaseEnv()) {
     return {
@@ -253,6 +296,31 @@ export async function updateProductImageUrl(productId: string, imageUrl: string 
     .from("products")
     .update({
       image_url: imageUrl,
+    })
+    .eq("id", productId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function updateProduct(productId: string, input: ProductFormInput) {
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase
+    .from("products")
+    .update({
+      product_code: input.productCode,
+      name: input.name,
+      slug: input.slug,
+      brand_id: input.brandId,
+      category_id: input.categoryId,
+      product_family_id: input.productFamilyId,
+      applications: input.applications,
+      material: input.material,
+      finish: input.finish,
+      image_url: input.imageUrl,
+      summary: input.summary,
     })
     .eq("id", productId);
 

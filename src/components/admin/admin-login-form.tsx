@@ -12,10 +12,7 @@ export function AdminLoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
 
   return (
-    <form
-      action={formAction}
-      className="w-full max-w-md rounded-[1.75rem] border border-[#231f20]/10 bg-[rgba(255,255,255,0.92)] p-6 shadow-[0_28px_80px_rgba(35,31,32,0.14)] backdrop-blur-xl sm:p-8"
-    >
+    <form action={formAction} className="mx-auto w-full max-w-md">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--brand)]">Private Access</p>

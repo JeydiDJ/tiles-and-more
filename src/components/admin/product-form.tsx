@@ -2,8 +2,8 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ProductFormOptions } from "@/types/product";
-import { createProductAction, type ProductFormState } from "@/app/(admin)/admin/products/actions";
+import type { Product, ProductFormOptions } from "@/types/product";
+import { createProductAction, type ProductFormState, updateProductAction } from "@/app/(admin)/admin/products/actions";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import { getAdminRoute } from "@/lib/admin-path";
 type ProductFormProps = {
   options: ProductFormOptions;
   mode?: "create" | "edit";
+  initialProduct?: Product | null;
 };
 
 const initialState: ProductFormState = {
@@ -51,13 +52,14 @@ function FormSection({
   );
 }
 
-export function ProductForm({ options, mode = "create" }: ProductFormProps) {
+export function ProductForm({ options, mode = "create", initialProduct = null }: ProductFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(createProductAction, initialState);
   const isEditMode = mode === "edit";
-  const [selectedBrandId, setSelectedBrandId] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  const [selectedFamilyId, setSelectedFamilyId] = useState("");
+  const action = isEditMode ? updateProductAction : createProductAction;
+  const [state, formAction, isPending] = useActionState(action, initialState);
+  const [selectedBrandId, setSelectedBrandId] = useState(initialProduct?.brandId ?? "");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialProduct?.categoryId ?? "");
+  const [selectedFamilyId, setSelectedFamilyId] = useState(initialProduct?.productFamilyId ?? "");
   const [applicationImageName, setApplicationImageName] = useState("");
   const [sampleImageNames, setSampleImageNames] = useState<string[]>([]);
 
@@ -66,10 +68,10 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
     : [];
 
   useEffect(() => {
-    if (options.categories.length === 1 && !selectedCategoryId) {
+    if (!initialProduct && options.categories.length === 1 && !selectedCategoryId) {
       setSelectedCategoryId(options.categories[0].id);
     }
-  }, [options.categories, selectedCategoryId]);
+  }, [initialProduct, options.categories, selectedCategoryId]);
 
   useEffect(() => {
     if (!filteredFamilies.some((family) => family.id === selectedFamilyId)) {
@@ -85,21 +87,29 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
   }, [router, state.productId]);
 
   return (
-    <form action={isEditMode ? undefined : formAction} className="border-t border-[var(--border)] pt-6">
+    <form action={formAction} className="border-t border-[var(--border)] pt-6">
+      {isEditMode && initialProduct ? (
+        <>
+          <input type="hidden" name="productId" value={initialProduct.id} />
+          <input type="hidden" name="previousSlug" value={initialProduct.slug} />
+          <input type="hidden" name="currentImageUrl" value={initialProduct.imageUrl ?? ""} />
+        </>
+      ) : null}
       <input type="hidden" name="brandId" value={selectedBrandId} />
       <input type="hidden" name="categoryId" value={selectedCategoryId} />
       <input type="hidden" name="productFamilyId" value={selectedFamilyId} />
-
-      {isEditMode ? <p className="text-sm text-[var(--muted)]">Editing will be enabled next.</p> : null}
 
       <div className="mt-6 grid gap-8">
         <FormSection title="Basic">
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Product Name">
-              <Input placeholder="Calacatta Porcelain" name="name" disabled={isEditMode} />
+              <Input placeholder="Calacatta Porcelain" name="name" defaultValue={initialProduct?.name ?? ""} />
             </Field>
             <Field label="Product Code">
-              <Input placeholder="GT-1001" name="productCode" disabled={isEditMode} />
+              <Input placeholder="GT-1001" name="productCode" defaultValue={initialProduct?.productCode ?? ""} />
+            </Field>
+            <Field label="Slug" className="md:col-span-2">
+              <Input placeholder="calacatta-porcelain" name="slug" defaultValue={initialProduct?.slug ?? ""} />
             </Field>
           </div>
         </FormSection>
@@ -110,7 +120,7 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
               <Select
                 value={selectedBrandId}
                 onChange={(event) => setSelectedBrandId(event.target.value)}
-                disabled={isEditMode || options.brands.length === 0}
+                disabled={options.brands.length === 0}
                 required
               >
                 <option value="" disabled>
@@ -130,7 +140,7 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
                   setSelectedCategoryId(event.target.value);
                   setSelectedFamilyId("");
                 }}
-                disabled={isEditMode || options.categories.length === 0}
+                disabled={options.categories.length === 0}
                 required
               >
                 <option value="" disabled>
@@ -148,7 +158,7 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
                 value={selectedFamilyId}
                 onChange={(event) => setSelectedFamilyId(event.target.value)}
                 key={selectedCategoryId}
-                disabled={isEditMode || filteredFamilies.length === 0}
+                disabled={filteredFamilies.length === 0}
                 required
               >
                 <option value="" disabled>
@@ -171,13 +181,17 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
         <FormSection title="Details">
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Applications" className="md:col-span-2">
-              <Input placeholder="Floor, Wall, Bathroom" name="applications" disabled={isEditMode} />
+              <Input
+                placeholder="Floor, Wall, Bathroom"
+                name="applications"
+                defaultValue={initialProduct?.applications.join(", ") ?? ""}
+              />
             </Field>
             <Field label="Material">
-              <Input placeholder="Porcelain" name="material" disabled={isEditMode} />
+              <Input placeholder="Porcelain" name="material" defaultValue={initialProduct?.material ?? ""} />
             </Field>
             <Field label="Finish">
-              <Input placeholder="Matte" name="finish" disabled={isEditMode} />
+              <Input placeholder="Matte" name="finish" defaultValue={initialProduct?.finish ?? ""} />
             </Field>
             <Field label="Application Image" className="md:col-span-2">
               <div className="grid gap-3">
@@ -185,12 +199,16 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
                   type="file"
                   name="applicationImage"
                   accept="image/png,image/jpeg,image/webp,image/avif"
-                  disabled={isEditMode}
+                  disabled
                   onChange={(event) => setApplicationImageName(event.target.files?.[0]?.name ?? "")}
                   className="w-full rounded-sm border border-dashed border-[var(--border)] bg-white px-4 py-4 text-[15px] text-[var(--foreground)] file:mr-4 file:rounded-sm file:border-0 file:bg-[var(--brand)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:border-[#bdbabd] focus:outline-none focus:ring-4 focus:ring-[rgba(237,35,37,0.08)] disabled:cursor-not-allowed disabled:bg-[#f3f3f3]"
                 />
                 <p className="text-sm text-[var(--muted)]">
-                  {applicationImageName || "Main applied image shown on the product page."}
+                  {isEditMode
+                    ? initialProduct?.imageUrl
+                      ? "Application image replacement is not enabled yet. Current main image is preserved."
+                      : "No main image on record yet. Image replacement will be added next."
+                    : applicationImageName || "Main applied image shown on the product page."}
                 </p>
               </div>
             </Field>
@@ -201,12 +219,16 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
                   name="sampleImages"
                   accept="image/png,image/jpeg,image/webp,image/avif"
                   multiple
-                  disabled={isEditMode}
+                  disabled
                   onChange={(event) => setSampleImageNames(Array.from(event.target.files ?? []).map((file) => file.name))}
                   className="w-full rounded-sm border border-dashed border-[var(--border)] bg-white px-4 py-4 text-[15px] text-[var(--foreground)] file:mr-4 file:rounded-sm file:border-0 file:bg-[var(--brand)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:border-[#bdbabd] focus:outline-none focus:ring-4 focus:ring-[rgba(237,35,37,0.08)] disabled:cursor-not-allowed disabled:bg-[#f3f3f3]"
                 />
                 <p className="text-sm text-[var(--muted)]">
-                  {sampleImageNames.length > 0 ? `${sampleImageNames.length} sample image(s) selected` : "Upload isolated tile or product images."}
+                  {isEditMode
+                    ? "Sample image editing is not enabled yet."
+                    : sampleImageNames.length > 0
+                      ? `${sampleImageNames.length} sample image(s) selected`
+                      : "Upload isolated tile or product images."}
                 </p>
                 {sampleImageNames.length > 0 ? (
                   <div className="grid gap-1 text-sm text-[var(--muted)]">
@@ -218,7 +240,12 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
               </div>
             </Field>
             <Field label="Summary" className="md:col-span-2">
-              <Textarea placeholder="Short product description" name="summary" className="min-h-28" disabled={isEditMode} />
+              <Textarea
+                placeholder="Short product description"
+                name="summary"
+                className="min-h-28"
+                defaultValue={initialProduct?.summary ?? ""}
+              />
             </Field>
           </div>
         </FormSection>
@@ -230,14 +257,14 @@ export function ProductForm({ options, mode = "create" }: ProductFormProps) {
 
       <div className="mt-8 flex items-center justify-between gap-4 border-t border-[var(--border)] pt-5">
         <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
-          {isEditMode ? "Read-only for now" : "Ready to save"}
+          {isEditMode ? "Ready to update" : "Ready to save"}
         </p>
         <button
           type="submit"
-          disabled={isPending || isEditMode}
+          disabled={isPending}
           className="inline-flex min-w-36 items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
         >
-          {isEditMode ? "Update Product Soon" : isPending ? "Saving..." : "Save Product"}
+          {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Product" : "Save Product"}
         </button>
       </div>
     </form>

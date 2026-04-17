@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ProductForm } from "@/components/admin/product-form";
 import { getAdminRoute } from "@/lib/admin-path";
-import { getProductFormOptions } from "@/services/product.service";
+import { getProductById, getProductFormOptions } from "@/services/product.service";
+import { notFound } from "next/navigation";
 
 type AdminProductPageProps = {
   params: Promise<{ id: string }>;
@@ -9,7 +10,11 @@ type AdminProductPageProps = {
 
 export default async function AdminProductDetailPage({ params }: AdminProductPageProps) {
   const { id } = await params;
-  const options = await getProductFormOptions();
+  const [options, product] = await Promise.all([getProductFormOptions(), getProductById(id)]);
+
+  if (!product) {
+    notFound();
+  }
 
   return (
     <div className="grid gap-6">
@@ -23,7 +28,7 @@ export default async function AdminProductDetailPage({ params }: AdminProductPag
           </Link>
         </div>
       </section>
-      <ProductForm options={options} mode="edit" />
+      <ProductForm options={options} mode="edit" initialProduct={product} />
     </div>
   );
 }

@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { collections } from "@/data/collections";
-import { gallery } from "@/data/gallery";
 import { getAdminRoute } from "@/lib/admin-path";
 import { getCategories } from "@/services/category.service";
 import { getProducts } from "@/services/product.service";
@@ -87,7 +85,7 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-4">
+      <section className="grid gap-6 lg:grid-cols-2">
         <MetricLink
           label="Products"
           value={String(products.length)}
@@ -101,20 +99,6 @@ export default async function AdminDashboardPage() {
           note="Configured category structure."
           href={getAdminRoute("/categories")}
           cta="Open categories"
-        />
-        <MetricLink
-          label="Collections"
-          value={String(collections.length)}
-          note="Collection content records."
-          href={getAdminRoute("/collections")}
-          cta="Open collections"
-        />
-        <MetricLink
-          label="Gallery"
-          value={String(gallery.length)}
-          note="Gallery items currently tracked."
-          href={getAdminRoute("/gallery")}
-          cta="Open gallery"
         />
       </section>
 
@@ -161,11 +145,6 @@ export default async function AdminDashboardPage() {
                 href: getAdminRoute("/categories"),
                 meta: "Check the categories that control family selection in the form.",
               },
-              {
-                label: "Prepare gallery content",
-                href: getAdminRoute("/gallery"),
-                meta: "Review gallery items and prepare for image upload integration.",
-              },
             ]}
           />
         </div>
@@ -178,11 +157,6 @@ export default async function AdminDashboardPage() {
                 label: "Products",
                 href: getAdminRoute("/products"),
                 meta: "Manage product entries and catalog content.",
-              },
-              {
-                label: "Collections",
-                href: getAdminRoute("/collections"),
-                meta: "Review collection-based content sections.",
               },
               {
                 label: "Inquiries",
@@ -199,11 +173,6 @@ export default async function AdminDashboardPage() {
                 label: "Enable product editing",
                 href: getAdminRoute("/products"),
                 meta: "Complete the edit flow after content entry begins.",
-              },
-              {
-                label: "Add image uploads",
-                href: getAdminRoute("/gallery"),
-                meta: "Connect Supabase Storage for product and gallery images.",
               },
               {
                 label: "Expand live admin data",

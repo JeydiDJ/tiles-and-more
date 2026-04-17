@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DeleteProductButton } from "@/components/admin/delete-product-button";
+import { AdminProductsTable } from "@/components/admin/admin-products-table";
 import { getAdminRoute } from "@/lib/admin-path";
 import { getProducts } from "@/services/product.service";
 
@@ -24,24 +24,7 @@ export default async function AdminProductsPage() {
       </section>
 
       {products.length > 0 ? (
-        <div className="grid gap-0 border-t border-[var(--border)]">
-          {products.map((product) => (
-            <div key={product.id} className="grid gap-4 border-b border-[var(--border)] py-4 md:grid-cols-[1.3fr_0.8fr_0.7fr_auto] md:items-center md:gap-6">
-              <div>
-                <Link href={getAdminRoute(`/products/${product.id}`)} className="font-medium text-[#231f20] transition hover:text-[var(--brand)]">
-                  {product.name}
-                </Link>
-                <p className="mt-1 text-sm text-[var(--muted)]">{product.productCode}</p>
-              </div>
-              <div className="text-sm text-[var(--muted)]">
-                <p>{product.brandName}</p>
-                <p className="mt-1">{product.category}</p>
-              </div>
-              <div className="text-sm text-[var(--muted)]">{product.productFamily}</div>
-              <DeleteProductButton productId={product.id} />
-            </div>
-          ))}
-        </div>
+        <AdminProductsTable products={products} />
       ) : (
         <p className="text-sm text-[var(--muted)]">No products added yet.</p>
       )}

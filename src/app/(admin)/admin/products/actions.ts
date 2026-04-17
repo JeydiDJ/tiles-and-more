@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createProduct, createProductMedia, deleteProduct, updateProductImageUrl } from "@/services/product.service";
+import { createProduct, createProductMedia, deleteProduct, updateProduct, updateProductImageUrl } from "@/services/product.service";
 import { uploadProductImage } from "@/services/storage.service";
 import { getAdminRoute } from "@/lib/admin-path";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
@@ -153,4 +153,106 @@ export async function deleteProductAction(_: ProductDeleteState, formData: FormD
   revalidatePath(getAdminRoute("/products"));
 
   return { error: null };
+}
+
+export async function deleteProductsAction(_: ProductDeleteState, formData: FormData): Promise<ProductDeleteState> {
+  if (!hasSupabaseEnv()) {
+    return { error: "Supabase env vars are missing. Add them before deleting products." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in to delete products." };
+  }
+
+  const productIds = formData
+    .getAll("productIds")
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean);
+
+  if (productIds.length === 0) {
+    return { error: "Select at least one product to delete." };
+  }
+
+  try {
+    await Promise.all(productIds.map((productId) => deleteProduct(productId)));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to delete selected products.";
+    return { error: message };
+  }
+
+  revalidatePath("/catalog");
+  revalidatePath(getAdminRoute("/products"));
+
+  return { error: null };
+}
+
+export async function updateProductAction(_: ProductFormState, formData: FormData): Promise<ProductFormState> {
+  if (!hasSupabaseEnv()) {
+    return { error: "Supabase env vars are missing. Add them before editing products.", productId: null };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in to edit products.", productId: null };
+  }
+
+  const productId = String(formData.get("productId") ?? "").trim();
+  const previousSlug = String(formData.get("previousSlug") ?? "").trim();
+  const currentImageUrl = normalizeOptional(formData.get("currentImageUrl"));
+  const name = String(formData.get("name") ?? "").trim();
+  const productCode = String(formData.get("productCode") ?? "").trim();
+  const slugInput = String(formData.get("slug") ?? "").trim();
+  const brandId = String(formData.get("brandId") ?? "").trim();
+  const categoryId = String(formData.get("categoryId") ?? "").trim();
+  const productFamilyId = String(formData.get("productFamilyId") ?? "").trim();
+
+  if (!productId) {
+    return { error: "Product ID is required.", productId: null };
+  }
+
+  if (!name || !productCode || !brandId || !categoryId || !productFamilyId) {
+    return { error: "Name, product code, brand, category, and product family are required.", productId: null };
+  }
+
+  const nextSlug = slugInput || slugify(name);
+
+  try {
+    await updateProduct(productId, {
+      productCode,
+      name,
+      slug: nextSlug,
+      brandId,
+      categoryId,
+      productFamilyId,
+      applications: String(formData.get("applications") ?? "")
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean),
+      material: normalizeOptional(formData.get("material")),
+      finish: normalizeOptional(formData.get("finish")),
+      imageUrl: currentImageUrl,
+      summary: normalizeOptional(formData.get("summary")),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to update product.";
+    return { error: message, productId: null };
+  }
+
+  revalidatePath("/catalog");
+  revalidatePath(getAdminRoute("/products"));
+  if (previousSlug) {
+    revalidatePath(`/products/${previousSlug}`);
+  }
+  revalidatePath(`/products/${nextSlug}`);
+
+  return { error: null, productId };
 }
