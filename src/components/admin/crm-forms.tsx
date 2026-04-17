@@ -277,14 +277,22 @@ export function CrmOpportunityForm({
               </Select>
             </Field>
             <Field label="Estimated Value" className="md:col-span-2">
-              <Input
-                name="estimatedValue"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder={quotationFinished ? "Enter expected project value" : "Can still be added before quotation is complete"}
-                defaultValue={initialOpportunity?.estimatedValue ?? ""}
-              />
+              <div className="grid gap-2">
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-[#6f6a75]">PHP</span>
+                  <Input
+                    name="estimatedValue"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    min="0"
+                    placeholder={quotationFinished ? "0.00" : "Can still be added before quotation is complete"}
+                    defaultValue={initialOpportunity?.estimatedValue?.toFixed(2) ?? ""}
+                    className="pl-14"
+                  />
+                </div>
+                <p className="text-sm text-[var(--muted)]">Enter the opportunity value in Philippine Peso with centavos when needed.</p>
+              </div>
             </Field>
             <Field label="Opportunity Notes" className="md:col-span-2">
               <Textarea

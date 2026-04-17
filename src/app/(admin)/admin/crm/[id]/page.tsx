@@ -6,7 +6,12 @@ import { getCrmAccountById, getCrmContacts, getCrmOpportunities } from "@/servic
 
 function formatCurrency(value: number | null) {
   if (value === null) return "-";
-  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 export default async function AdminCrmAccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
