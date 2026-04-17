@@ -19,5 +19,6 @@ export const adminNav = [
   { href: getAdminRoute(), label: "Dashboard" },
   { href: getAdminRoute("/products"), label: "Products" },
   { href: getAdminRoute("/categories"), label: "Categories" },
-  { href: getAdminRoute("/inquiries"), label: "Inquiries" },
+  { href: getAdminRoute("/crm"), label: "CRM" },
+  { href: getAdminRoute("/calendar"), label: "Calendar" },
 ];

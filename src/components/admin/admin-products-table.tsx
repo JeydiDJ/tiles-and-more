@@ -67,6 +67,16 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
     });
   }, [brand, category, normalizedQuery, products]);
 
+  const categoryBreakdown = useMemo(() => {
+    return categoryOptions
+      .map((item) => ({
+        name: item,
+        count: products.filter((product) => product.category === item).length,
+      }))
+      .filter((item) => item.count > 0)
+      .slice(0, 6);
+  }, [categoryOptions, products]);
+
   const allFilteredSelected = filteredProducts.length > 0 && filteredProducts.every((product) => selectedIds.includes(product.id));
 
   useEffect(() => {
@@ -99,45 +109,73 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
 
   return (
     <div className="grid gap-5">
-      <section className="grid gap-4 border border-[var(--border)] bg-white p-4 sm:p-5 lg:grid-cols-[1.25fr_0.7fr_0.7fr]">
-        <label className="grid gap-2">
-          <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Search</span>
-          <div className="flex items-center gap-3 border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
-            <span className="text-[var(--muted)]">
-              <SearchIcon />
+      <section className="rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+        <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 lg:grid-cols-[1.25fr_0.7fr_0.7fr_auto] lg:items-end">
+          <label className="grid gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Search</span>
+            <div className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+              <span className="text-[var(--muted)]">
+                <SearchIcon />
+              </span>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by name, code, brand, family, material, or finish"
+                className="w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[#8f8b85]"
+              />
+            </div>
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Brand</span>
+            <Select value={brand} onChange={(event) => setBrand(event.target.value)}>
+              <option value="all">All brands</option>
+              {brandOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </Select>
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Category</span>
+            <Select value={category} onChange={(event) => setCategory(event.target.value)}>
+              <option value="all">All categories</option>
+              {categoryOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </Select>
+          </label>
+
+          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3 py-2 text-xs font-medium text-[#6f6a75]">
+              {filteredProducts.length} visible
             </span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by name, code, brand, family, material, or finish"
-              className="w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[#8f8b85]"
-            />
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setBrand("all");
+                setCategory("all");
+              }}
+              className="cursor-pointer rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
+            >
+              Reset
+            </button>
           </div>
-        </label>
+        </div>
 
-        <label className="grid gap-2">
-          <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Brand</span>
-          <Select value={brand} onChange={(event) => setBrand(event.target.value)}>
-            <option value="all">All brands</option>
-            {brandOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </Select>
-        </label>
-
-        <label className="grid gap-2">
-          <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Category</span>
-          <Select value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option value="all">All categories</option>
-            {categoryOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </Select>
-        </label>
+        <div className="flex flex-wrap gap-2 px-4 py-3 text-xs text-[#6f6a75] sm:px-5">
+          {categoryBreakdown.map((item) => (
+            <span key={item.name} className="inline-flex items-center gap-2 rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3 py-1.5 font-medium">
+              {item.name}
+              <span className="text-[#9793a0]">{item.count}</span>
+            </span>
+          ))}
+        </div>
       </section>
 
       <div className="flex items-center justify-between gap-4">
@@ -154,23 +192,12 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
               Delete selected ({selectedIds.length})
             </button>
           ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              setBrand("all");
-              setCategory("all");
-            }}
-            className="cursor-pointer text-sm font-medium text-[var(--brand)] transition hover:text-[var(--brand-dark)]"
-          >
-            Clear filters
-          </button>
         </div>
       </div>
 
       {filteredProducts.length > 0 ? (
-        <div className="overflow-hidden border border-[var(--border)] bg-white">
-          <div className="hidden grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] gap-4 border-b border-[var(--border)] bg-[#f8f5f0] px-5 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--muted)] lg:grid">
+        <div className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+          <div className="hidden grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] gap-4 border-b border-[var(--border)] bg-[#fafbfe] px-5 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--muted)] lg:grid">
             <label className="flex items-center">
               <input
                 type="checkbox"
@@ -191,7 +218,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="grid gap-4 border-b border-[var(--border)] px-5 py-5 last:border-b-0 lg:grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] lg:items-center"
+                className="grid gap-4 border-b border-[var(--border)] px-5 py-5 transition hover:bg-[#fcfcfe] last:border-b-0 lg:grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] lg:items-center"
               >
                 <label className="flex items-center">
                   <input
@@ -207,7 +234,12 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                   <Link href={getAdminRoute(`/products/${product.id}`)} className="font-medium text-[#231f20] transition hover:text-[var(--brand)]">
                     {product.name}
                   </Link>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{product.productFamily}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
+                    <span>{product.productFamily}</span>
+                    <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
+                      {product.imageUrl ? "Image ready" : "No image"}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="text-sm text-[var(--muted)]">
