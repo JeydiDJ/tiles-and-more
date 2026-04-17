@@ -1,272 +1,340 @@
 # Tiles & More
 
-Tiles & More is a Next.js 16 showroom and catalog site for surfacing products, sanitary products, and related brands. The repository currently includes a public-facing marketing/catalog experience, a lightweight admin area, mock API routes, and a Supabase-ready data direction that is not fully wired into the app yet.
+Tiles & More is a production Next.js showroom and catalog website for tile, surface, flooring, and sanitary products. It is already deployed through Vercel and serves as both a public-facing brand site and a lightweight private admin workspace for managing catalog content.
 
-## Current Status
+Live site: [https://tiles-and-more.vercel.app/](https://tiles-and-more.vercel.app/)
 
-- Public storefront pages are in place for home, catalog, collections, gallery, about, contact, quote, privacy, and terms.
-- Admin pages exist for categories, collections, gallery, inquiries, and products.
-- The homepage hero includes brand-led slides, including the latest `Geo Tiles` slide wired to assets in `public/logo/brand-logos` and `public/hero-images`.
-- Featured collection cards have a hover lift interaction and white card titles for better contrast.
-- The footer is now a solid dark grey block.
-- The app still uses local mock data in `src/data` and service placeholders in `src/services`.
-- Supabase schema planning is underway, but the frontend is not yet reading from Supabase.
+## Overview
 
-## Stack
+The site is built around two main experiences:
 
-- Next.js 16 App Router
-- React 19
-- TypeScript
+- A public marketing and catalog site for browsing brands, categories, products, collections, gallery content, and inquiry forms.
+- A protected admin area for authenticated product management backed by Supabase.
+
+The frontend is built with Next.js App Router, TypeScript, Tailwind CSS 4, and React 19. Product data can be read from Supabase when environment variables are present, with local data fallbacks still available in parts of the codebase as a safety net during development.
+
+## What The Site Includes
+
+### Public site
+
+- Homepage with fullscreen branded hero slideshow
+- Brand-specific hero captions and catalog deep links
+- Catalog page with search, brand filtering, category filtering, material filtering, finish filtering, and application filtering
+- Category catalog pages with product image cards
+- Product detail pages with gallery and product specs
+- Collections page
+- Gallery page
+- About page
+- Contact page with EmailJS-powered inquiry form
+- Quote page with EmailJS-powered quote request form
+- Privacy policy and terms pages
+- Floating return-to-top button on the home and catalog pages
+
+### Admin site
+
+- Hidden admin entry path controlled by `ADMIN_SECRET_PATH`
+- Supabase Auth login flow
+- Admin dashboard
+- Product listing
+- New product creation
+- Product editing
+- Product deletion
+- Category, collection, gallery, and inquiry admin sections
+
+### Content and interaction work already implemented
+
+- Homepage hero slideshow with RAK, Roca, Geo Tiles, and Sonite slides
+- Brand-specific `Browse` CTA buttons that pre-filter the catalog
+- Catalog redirect behavior that scrolls users directly into the filters/results section
+- Product cards that are fully clickable, image-led, and hover-reactive
+- Category browsing section on the main catalog page
+- Contact and quote forms with finalized left-panel copy instead of placeholder text
+
+## Tech Stack
+
+- Next.js 16.2.3
+- React 19.2.4
+- TypeScript 5
 - Tailwind CSS 4
-- Embla Carousel
+- Supabase
+- EmailJS
+- Vercel
 - ESLint
 
-## Scripts
+## Architecture Summary
 
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-```
-
-## Local Development
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Start the dev server:
-
-```bash
-npm run dev
-```
-
-3. Open [http://localhost:3000](http://localhost:3000)
-
-Current env file:
-
-```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
-NEXT_PUBLIC_EMAILJS_CONTACT_TEMPLATE_ID=your_contact_template_id
-NEXT_PUBLIC_EMAILJS_QUOTE_TEMPLATE_ID=your_quote_template_id
-```
-
-EmailJS template variables expected by the forms:
-
-- Contact template:
-  `form_type`, `name`, `email`, `phone`, `message`
-- Quote template:
-  `form_type`, `full_name`, `email`, `phone`, `project_name`, `project_type`, `square_footage`, `message`
-
-`src/lib/db.ts` is still a placeholder and does not yet return a live Supabase client.
-
-## Project Structure
+### App structure
 
 ```text
 src/
   app/
     (main)/        Public storefront routes
     (admin)/       Admin routes and admin layout
-    api/           Mock API endpoints for products, inquiries, and uploads
+    api/           API endpoints for products, inquiries, and uploads
   components/
-    admin/         Admin UI pieces
-    catalog/       Catalog/category UI
-    forms/         Contact, quote, inquiry cart
-    layout/        Navbar, footer, shared layout components
-    product/       Product grid, gallery, filters, specs
+    admin/         Admin UI
+    catalog/       Category browsing UI
+    forms/         Contact and quote form UI
+    layout/        Navbar, footer, scroll-to-top, intro shell
+    product/       Product grid, cards, gallery, filters, specs
     sections/      Homepage sections
     ui/            Shared primitives
-  config/          Site and navigation config
-  data/            Temporary mock data source
-  lib/             Utilities, validation, DB placeholder
-  services/        Data access layer, currently reading from mock data
-  store/           Client-side filter/cart state
-  styles/          Extra CSS animations
+  config/          Site metadata and nav config
+  data/            Local fallback/mock content
+  lib/             Utilities, EmailJS, Supabase helpers, validation
+  services/        Data access layer
+  store/           Client-side catalog filters
+  styles/          Additional animation styles
   types/           Shared TypeScript types
 public/
   hero-images/
-  logo/brand-logos/
+  hero-videos/
+  logo/
+  favicon/
 ```
 
-## Data Layer Today
+### Route map
 
-The current app is still backed by static arrays:
+#### Public routes
 
-- [products.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/data/products.ts)
-- [categories.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/data/categories.ts)
-- [collections.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/data/collections.ts)
-- [gallery.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/data/gallery.ts)
+- `/`
+- `/about`
+- `/catalog`
+- `/catalog/[category]`
+- `/products/[slug]`
+- `/collections`
+- `/gallery`
+- `/contact`
+- `/quote`
+- `/privacy`
+- `/terms`
 
-Services currently proxy those local datasets:
+#### Admin routes
+
+- `/{ADMIN_SECRET_PATH}`
+- `/{ADMIN_SECRET_PATH}/products`
+- `/{ADMIN_SECRET_PATH}/products/new`
+- `/{ADMIN_SECRET_PATH}/products/[id]`
+- `/{ADMIN_SECRET_PATH}/categories`
+- `/{ADMIN_SECRET_PATH}/collections`
+- `/{ADMIN_SECRET_PATH}/gallery`
+- `/{ADMIN_SECRET_PATH}/inquiries`
+- `/admin-login`
+
+## Data and Integrations
+
+### Supabase
+
+The project is already wired to read product data from Supabase when the required environment variables are present.
+
+Current live-facing Supabase usage includes:
+
+- Reading products from the `products` table
+- Joining related `brands`, `categories`, and `product_families`
+- Reading `product_media` for product detail galleries
+- Using Supabase Auth to protect admin actions
+- Creating products from the admin interface
+- Uploading product imagery and saving image URLs for catalog display
+
+Fallback behavior:
+
+- If Supabase environment variables are missing, some services fall back to local data in `src/data`
+- This helps local development continue even when the database is unavailable
+
+Relevant files:
 
 - [product.service.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/services/product.service.ts)
-- [category.service.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/services/category.service.ts)
-- [inquiry.service.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/services/inquiry.service.ts)
-- [db.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/db.ts)
+- [server.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/supabase/server.ts)
+- [config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/supabase/config.ts)
+- [actions.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/%28admin%29/admin/products/actions.ts)
 
-This means:
+### EmailJS
 
-- product and category data are mock-only
-- inquiries are in-memory only
-- uploads are placeholder-only
-- restarts reset non-file-backed data
+The contact and quote forms send email through EmailJS on the client side.
 
-## Finalized Catalog Taxonomy
+Implemented flows:
 
-The agreed top-level categories are:
+- Contact inquiry submission
+- Quote request submission
 
-- `tiles`
-- `quartz-slabs`
-- `decorative-surfaces`
-- `specialty-flooring`
-- `sanitary`
-- `lifestyle-accessories`
+Relevant file:
 
-Product families under them:
+- [emailjs.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/emailjs.ts)
 
-- `tiles`
-  - `porcelain-tiles`
-  - `ceramic-tiles`
-  - `large-format-tiles`
-  - `outdoor-tiles`
-- `quartz-slabs`
-  - `quartz-slabs`
-- `decorative-surfaces`
-  - `mosaics`
-  - `feature-panels`
-  - `textured-surfaces`
-- `specialty-flooring`
-  - `laminate-flooring`
-  - `spc-flooring`
-  - `lvt-flooring`
-  - `carpet-tiles`
-- `sanitary`
-  - `sinks`
-  - `water-closets`
-  - `faucets`
-  - `showers`
-  - `bidets`
-  - `accessories`
-- `lifestyle-accessories`
-  - `mugs`
-  - `coasters`
+Expected template params:
 
-This taxonomy supports two key browse modes:
+- Contact template:
+  `form_type`, `name`, `email`, `phone`, `message`
+- Quote template:
+  `form_type`, `full_name`, `email`, `phone`, `project_name`, `project_type`, `square_footage`, `message`
 
-- by brand, regardless of category
-- by category or family, regardless of brand
+### Vercel
 
-## Finalized Product Schema Direction
+The site is already deployed through Vercel and is currently accessible at:
 
-Target product shape:
+- [https://tiles-and-more.vercel.app/](https://tiles-and-more.vercel.app/)
 
-```ts
-type Product = {
-  id: string;
-  productCode: string;
-  name: string;
-  slug: string;
-  brandId: string;
-  category: string;
-  productFamily: string;
-  applications?: string[];
-  material?: string;
-  finish?: string;
-  image: string;
-  summary: string;
-};
+The codebase is structured so local development and production deployment use the same Next.js app.
+
+## Catalog Behavior
+
+The catalog experience currently supports:
+
+- Free-text search
+- Brand filtering
+- Category filtering
+- Material filtering
+- Finish filtering
+- Application filtering
+- Brand-directed entry from homepage hero slides
+- Deep-link navigation into the results section via `#catalog-results`
+
+Product cards now include:
+
+- Main product image
+- Product name
+- Brand name
+- Product summary
+- Product code
+- Full-card click behavior linking to the product detail page
+- Hover motion and image zoom treatment
+
+## Homepage Behavior
+
+The homepage includes a large branded slideshow with dedicated content for:
+
+- RAK Ceramics
+- Roca
+- Geo Tiles
+- Sonite
+
+Each slide includes:
+
+- Brand logo
+- Personalized fine print
+- `Browse` CTA
+- Redirect to the catalog page with the correct brand filter already applied
+
+## Environment Variables
+
+Typical local environment values:
+
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
+NEXT_PUBLIC_EMAILJS_CONTACT_TEMPLATE_ID=your_contact_template_id
+NEXT_PUBLIC_EMAILJS_QUOTE_TEMPLATE_ID=your_quote_template_id
+
+ADMIN_SECRET_PATH=your-hidden-admin-segment
 ```
 
 Notes:
 
-- `applications` is for installation/use contexts like `floor`, `wall`, `bathroom`, or `outdoor`
-- `applications` can be omitted or empty for non-installation products like mugs or coasters
-- `productCode` is required because the client confirmed every product has one
-- `dimensions` was intentionally removed from the agreed schema
+- `ADMIN_SECRET_PATH` controls the hidden public-facing admin route segment.
+- If Supabase vars are missing, product reads may fall back to local data.
+- If EmailJS vars are missing, contact and quote form submission will fail.
 
-## Supabase Direction
+## Local Development
 
-Current intended tables:
+### Install dependencies
 
-- `brands`
-- `categories`
-- `product_families`
-- `products`
+```bash
+npm install
+```
 
-Current database shape already created in Supabase:
+### Start the dev server
 
-- `brands`
-- `categories`
-- `product_families`
-- `products`
+```bash
+npm run dev
+```
 
-Current known brands:
-
-- Geo Tiles
-- RAK
-- Roca
-- Sonite
-- Tajima
-- Quickstep
-- Aica
-- Sangetsu
-- American Standard
-- HCG
-
-Recommended next integration steps:
-
-1. Seed categories, product families, and brands in Supabase.
-2. Add public read policies if using Supabase directly from the frontend.
-3. Replace `src/data/*` with Supabase-backed service functions.
-4. Update product/category types to match the finalized schema.
-5. Migrate admin forms and API routes to create and update real Supabase records.
-
-## API Routes
-
-Current routes:
-
-- `GET /api/products`
-- `GET /api/inquiries`
-- `POST /api/inquiries`
-- `POST /api/upload`
-
-These are currently mock-oriented and should be treated as temporary scaffolding.
-
-## Important Repo Notes
-
-- The public site and admin area are presentationally ahead of the data layer.
-- There may be duplicate or transitional route structure in `src/app/(admin)` while the admin area is being shaped.
-- The repo has already been verified to build successfully with:
+### Production build
 
 ```bash
 npm run build
+npm run start
 ```
 
-## Priority Next Steps
+### Lint
 
-1. Replace placeholder DB access with a real Supabase client.
-2. Align `src/types/product.ts` and `src/types/category.ts` with the finalized taxonomy.
-3. Normalize mock data to use `brandId`, `category`, `productFamily`, and `productCode`.
-4. Wire admin product creation/editing to Supabase.
-5. Add brand-based and family-based filtering to the storefront catalog UI.
+```bash
+npm run lint
+```
+
+## Important Files
+
+### Core config
+
+- [package.json](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/package.json)
+- [next.config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/next.config.ts)
+- [site.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/config/site.ts)
+
+### Public UI
+
+- [hero.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/sections/hero.tsx)
+- [catalog-search.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/product/catalog-search.tsx)
+- [product-card.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/product/product-card.tsx)
+- [scroll-to-top-button.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/layout/scroll-to-top-button.tsx)
+
+### Forms
+
+- [contact-form.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/forms/contact-form.tsx)
+- [quote-form.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/forms/quote-form.tsx)
+- [form-visual-panel.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/forms/form-visual-panel.tsx)
+
+### Admin
+
+- [admin-login\page.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/admin-login/page.tsx)
+- [admin-path.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/admin-path.ts)
+- [actions.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/%28admin%29/admin/products/actions.ts)
+
+## Current State
+
+The site is no longer just a static concept build. It already has:
+
+- A deployed public storefront
+- Live production domain
+- Supabase-aware product services
+- Supabase Auth-protected admin product creation flow
+- Supabase-hosted product imagery
+- EmailJS-powered public inquiry forms
+- Updated brand-led homepage interactions
+- Catalog image cards and improved product browsing behavior
+
+Some parts of the repo still show an in-progress transition pattern:
+
+- Local fallback datasets still exist in `src/data`
+- Some API endpoints are scaffold-like and may not be central to the current production flow
+- Some admin sections are present structurally before being fully operationalized
+
+## Recommended Next Documentation Additions
+
+If this README keeps evolving, the next useful additions would be:
+
+1. A Supabase schema section listing exact tables and columns in production
+2. A deployment section with Vercel project/environment guidance
+3. A content operations guide for adding brands, products, and images
+4. A troubleshooting section for common issues like missing env vars, image host config, or EmailJS failures
 
 ## Maintainer Notes
 
-When adding new products:
+When updating homepage slides:
 
-- always assign a `brandId`
-- always assign one strict top-level `category`
-- always assign one strict `productFamily`
-- include `productCode`
-- use `applications` only when the product has a real installation/use context
+- Store logos in `public/logo/brand-logos`
+- Store hero backgrounds in `public/hero-images` or `public/hero-videos`
+- Update [hero.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/sections/hero.tsx)
 
-When adding new brand hero slides:
+When updating product imagery:
 
-- place logos in `public/logo/brand-logos`
-- place backgrounds in `public/hero-images`
-- update [hero.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/sections/hero.tsx)
+- Product card images and product detail galleries can use Supabase-hosted media
+- Remote image hosts must remain allowed in [next.config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/next.config.ts)
+
+When updating forms:
+
+- Keep EmailJS template variables aligned with `src/lib/emailjs.ts`
+- Keep left-panel form copy final and client-facing, not placeholder guidance
