@@ -208,9 +208,23 @@ export function Hero() {
                     </p>
                     <Link
                       href={`/catalog?brand=${encodeURIComponent(slide.filterBrand)}#catalog-results`}
-                      className="inline-flex items-center justify-center border border-white/34 bg-white/10 px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white hover:text-[#231f20]"
+                      className="group relative inline-flex min-w-36 items-center justify-center overflow-hidden border border-white/34 bg-white/10 px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white"
                     >
-                      Browse
+                      <span
+                        className="absolute inset-0 flex items-center justify-center translate-x-0 opacity-100 transition duration-300 group-hover:translate-x-full group-hover:opacity-0"
+                      >
+                        Browse
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-0 flex -translate-x-full items-center justify-center text-[#231f20] opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.8">
+                          <path d="M4.5 12H17" strokeLinecap="square" />
+                          <path d="m11.5 6 6 6-6 6" strokeLinecap="square" strokeLinejoin="miter" />
+                        </svg>
+                      </span>
+                      <span className="invisible">Browse</span>
                     </Link>
                   </div>
                 </div>
@@ -265,9 +279,23 @@ export function Hero() {
                       </p>
                       <Link
                         href={`/catalog?brand=${encodeURIComponent(slide.filterBrand)}#catalog-results`}
-                        className="inline-flex items-center justify-center border border-white/34 bg-white/10 px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white hover:text-[#231f20]"
+                        className="group relative inline-flex min-w-36 items-center justify-center overflow-hidden border border-white/34 bg-white/10 px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white"
                       >
-                        Browse
+                        <span
+                          className="absolute inset-0 flex items-center justify-center translate-x-0 opacity-100 transition duration-300 group-hover:translate-x-full group-hover:opacity-0"
+                        >
+                          Browse
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-0 flex -translate-x-full items-center justify-center text-[#231f20] opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <path d="M4.5 12H17" strokeLinecap="square" />
+                            <path d="m11.5 6 6 6-6 6" strokeLinecap="square" strokeLinejoin="miter" />
+                          </svg>
+                        </span>
+                        <span className="invisible">Browse</span>
                       </Link>
                     </div>
                   </div>
