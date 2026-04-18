@@ -125,6 +125,18 @@ function CalendarIcon() {
   );
 }
 
+function AccountingIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
+      <path d="M5 18.5h14" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M7.5 15V8.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M12 15V5.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M16.5 15v-4" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="m6 10.5 1.5-2 2.5 2.5 3.5-4 4 2" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function getNavIcon(label: string) {
   switch (label) {
     case "Dashboard":
@@ -139,6 +151,8 @@ function getNavIcon(label: string) {
       return <InquiryIcon />;
     case "Calendar":
       return <CalendarIcon />;
+    case "Accounting":
+      return <AccountingIcon />;
     case "Collections":
       return <CollectionIcon />;
     case "Gallery":

@@ -1,0 +1,42 @@
+export type AccountingPeriod = {
+  id: string;
+  label: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  openingBalance: number;
+  salesCollected: number;
+  receivablesCollected: number;
+  otherIncome: number;
+  inventoryPurchases: number;
+  payroll: number;
+  rentUtilities: number;
+  operatingExpenses: number;
+  marketing: number;
+  taxes: number;
+  loanPayments: number;
+  ownerDraws: number;
+  capitalExpenses: number;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AccountingPeriodInput = {
+  label: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  openingBalance: number;
+  salesCollected: number;
+  receivablesCollected: number;
+  otherIncome: number;
+  inventoryPurchases: number;
+  payroll: number;
+  rentUtilities: number;
+  operatingExpenses: number;
+  marketing: number;
+  taxes: number;
+  loanPayments: number;
+  ownerDraws: number;
+  capitalExpenses: number;
+  notes: string | null;
+};

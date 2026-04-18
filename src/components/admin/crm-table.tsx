@@ -105,8 +105,12 @@ export function CrmTable({
     error: null,
   } satisfies CrmDeleteState);
   const [layout, setLayout] = useState<"list" | "board">("list");
+  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "opportunities" | "reports">("overview");
   const [accountsExpanded, setAccountsExpanded] = useState(true);
   const [query, setQuery] = useState("");
+  const [accountQuery, setAccountQuery] = useState("");
+  const [accountIndustry, setAccountIndustry] = useState("all");
+  const [accountActivity, setAccountActivity] = useState("all");
   const [stage, setStage] = useState("all");
   const [accountId, setAccountId] = useState("all");
   const [opportunityToDelete, setOpportunityToDelete] = useState<CrmOpportunity | null>(null);
@@ -133,19 +137,21 @@ export function CrmTable({
     velocity: 0,
   });
   const deferredQuery = useDeferredValue(query);
+  const deferredAccountQuery = useDeferredValue(accountQuery);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
+  const normalizedAccountQuery = deferredAccountQuery.trim().toLowerCase();
   const router = useRouter();
 
   useEffect(() => {
     if (wasDeletingOpportunity.current && !isDeletingOpportunity && !opportunityDeleteState.error) {
-      setOpportunityToDelete(null);
+      window.setTimeout(() => setOpportunityToDelete(null), 0);
     }
     wasDeletingOpportunity.current = isDeletingOpportunity;
   }, [isDeletingOpportunity, opportunityDeleteState.error]);
 
   useEffect(() => {
     if (wasDeletingAccount.current && !isDeletingAccount && !accountDeleteState.error) {
-      setAccountToDelete(null);
+      window.setTimeout(() => setAccountToDelete(null), 0);
     }
     wasDeletingAccount.current = isDeletingAccount;
   }, [accountDeleteState.error, isDeletingAccount]);
@@ -171,6 +177,39 @@ export function CrmTable({
     });
   }, [accountId, normalizedQuery, opportunities, stage]);
 
+  const industryOptions = useMemo(
+    () =>
+      Array.from(new Set(accounts.map((account) => account.industry).filter((value): value is string => Boolean(value))))
+        .sort((a, b) => a.localeCompare(b)),
+    [accounts],
+  );
+
+  const filteredAccounts = useMemo(() => {
+    return accounts.filter((account) => {
+      const opportunityCount = opportunities.filter((opportunity) => opportunity.accountId === account.id).length;
+      const matchesQuery = normalizedAccountQuery
+        ? [
+            account.name,
+            account.industry ?? "",
+            account.city ?? "",
+            account.address ?? "",
+            account.email ?? "",
+            account.phone ?? "",
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedAccountQuery)
+        : true;
+      const matchesIndustry = accountIndustry === "all" || account.industry === accountIndustry;
+      const matchesActivity =
+        accountActivity === "all" ||
+        (accountActivity === "with-opportunities" && opportunityCount > 0) ||
+        (accountActivity === "without-opportunities" && opportunityCount === 0);
+
+      return matchesQuery && matchesIndustry && matchesActivity;
+    });
+  }, [accountActivity, accountIndustry, accounts, normalizedAccountQuery, opportunities]);
+
   const grouped = useMemo(() => {
     return crmOpportunityStages.map((groupStage) => ({
       stage: groupStage,
@@ -189,6 +228,40 @@ export function CrmTable({
 
   const accountListScrollable = accounts.length > 10;
   const opportunityListScrollable = filteredOpportunities.length > 10;
+  const totalPipelineValue = useMemo(
+    () =>
+      opportunities
+        .filter((opportunity) => ["new_lead", "opportunity", "bidding", "negotiation", "awarded", "ongoing"].includes(opportunity.stage))
+        .reduce((sum, opportunity) => sum + (opportunity.estimatedValue ?? 0), 0),
+    [opportunities],
+  );
+  const wonValue = useMemo(
+    () =>
+      opportunities
+        .filter((opportunity) => opportunity.stage === "completed" || opportunity.stage === "ongoing" || opportunity.stage === "awarded")
+        .reduce((sum, opportunity) => sum + (opportunity.estimatedValue ?? 0), 0),
+    [opportunities],
+  );
+  const topAccounts = useMemo(
+    () =>
+      accounts
+        .map((account) => {
+          const linked = opportunities.filter((opportunity) => opportunity.accountId === account.id);
+          return {
+            id: account.id,
+            name: account.name,
+            opportunityCount: linked.length,
+            totalValue: linked.reduce((sum, opportunity) => sum + (opportunity.estimatedValue ?? 0), 0),
+            activeCount: linked.filter((opportunity) =>
+              ["new_lead", "opportunity", "bidding", "negotiation", "awarded", "ongoing"].includes(opportunity.stage),
+            ).length,
+          };
+        })
+        .filter((account) => account.opportunityCount > 0)
+        .sort((a, b) => b.totalValue - a.totalValue || b.opportunityCount - a.opportunityCount)
+        .slice(0, 6),
+    [accounts, opportunities],
+  );
 
   function handleBoardPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement | null;
@@ -299,6 +372,132 @@ export function CrmTable({
   return (
     <div className="grid gap-5">
       <section className="rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+        <div className="flex flex-wrap gap-3 px-4 py-4 sm:px-5">
+          <button
+            type="button"
+            onClick={() => setActiveTab("overview")}
+            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+              activeTab === "overview"
+                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("accounts")}
+            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+              activeTab === "accounts"
+                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+            }`}
+          >
+            Accounts
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("opportunities")}
+            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+              activeTab === "opportunities"
+                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+            }`}
+          >
+            Opportunities
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("reports")}
+            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+              activeTab === "reports"
+                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+            }`}
+          >
+            Reports
+          </button>
+        </div>
+      </section>
+
+      {activeTab === "reports" ? (
+        <>
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Total Accounts</p>
+              <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[#17141a]">{accounts.length}</p>
+              <p className="mt-2 text-sm leading-6 text-[#6f6a75]">All active CRM accounts currently stored.</p>
+            </div>
+            <div className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Opportunities</p>
+              <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[#17141a]">{opportunities.length}</p>
+              <p className="mt-2 text-sm leading-6 text-[#6f6a75]">All opportunities across the CRM workspace.</p>
+            </div>
+            <div className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Open Pipeline</p>
+              <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[#17141a]">{formatCurrency(totalPipelineValue)}</p>
+              <p className="mt-2 text-sm leading-6 text-[#6f6a75]">Estimated value across open and active stages.</p>
+            </div>
+            <div className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Awarded / Closed Value</p>
+              <p className="mt-3 text-[2rem] font-semibold tracking-tight text-[#17141a]">{formatCurrency(wonValue)}</p>
+              <p className="mt-2 text-sm leading-6 text-[#6f6a75]">Estimated value of awarded, ongoing, and completed work.</p>
+            </div>
+          </section>
+
+          <section className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+              <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-4">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Stage Report</p>
+              </div>
+              <div className="grid gap-3 p-5">
+                {stageSummary.map((item) => (
+                  <div key={item.stage} className="rounded-[1rem] border border-[#eef0f6] bg-white p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${getStageTone(item.stage)}`}>
+                        {formatStageLabel(item.stage)}
+                      </span>
+                      <span className="text-sm font-semibold text-[#17141a]">{item.count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+              <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-4">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Top Accounts</p>
+              </div>
+              <div className="overflow-x-auto px-5 py-5">
+                <table className="min-w-full border-separate border-spacing-0">
+                  <thead>
+                    <tr>
+                      {["Account", "Active Deals", "Total Deals", "Estimated Value"].map((label) => (
+                        <th key={label} className="border-b border-[#edf0f6] px-3 py-3 text-left text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">
+                          {label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topAccounts.map((account) => (
+                      <tr key={account.id}>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">{account.name}</td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#6f6a75]">{account.activeCount}</td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#6f6a75]">{account.opportunityCount}</td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">{formatCurrency(account.totalValue)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </>
+      ) : null}
+
+      {activeTab === "overview" || activeTab === "opportunities" ? (
+      <section className="rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
         <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 xl:grid-cols-[1.2fr_0.7fr_0.7fr_auto] xl:items-end">
           <label className="grid gap-2">
             <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Search</span>
@@ -384,8 +583,65 @@ export function CrmTable({
           ))}
         </div>
       </section>
+      ) : null}
 
+      {activeTab === "overview" || activeTab === "accounts" ? (
       <section className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+        {activeTab === "accounts" ? (
+          <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 xl:grid-cols-[1.2fr_0.7fr_0.7fr_auto] xl:items-end">
+            <label className="grid gap-2">
+              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Search</span>
+              <div className="flex items-center gap-3 rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-4 py-3 text-[#7d7882]">
+                <SearchIcon />
+                <input
+                  value={accountQuery}
+                  onChange={(event) => setAccountQuery(event.target.value)}
+                  placeholder="Search by account, industry, city, email, or phone"
+                  className="w-full bg-transparent text-sm text-[#17141a] outline-none placeholder:text-[#8f8b85]"
+                />
+              </div>
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Industry</span>
+              <Select value={accountIndustry} onChange={(event) => setAccountIndustry(event.target.value)} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
+                <option value="all">All industries</option>
+                {industryOptions.map((industry) => (
+                  <option key={industry} value={industry}>
+                    {industry}
+                  </option>
+                ))}
+              </Select>
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Activity</span>
+              <Select value={accountActivity} onChange={(event) => setAccountActivity(event.target.value)} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
+                <option value="all">All accounts</option>
+                <option value="with-opportunities">With opportunities</option>
+                <option value="without-opportunities">Without opportunities</option>
+              </Select>
+            </label>
+
+            <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+              <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3 py-2 text-xs font-medium text-[#6f6a75]">
+                {filteredAccounts.length} visible
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAccountQuery("");
+                  setAccountIndustry("all");
+                  setAccountActivity("all");
+                }}
+                className="cursor-pointer rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         <button
           type="button"
           onClick={() => setAccountsExpanded((current) => !current)}
@@ -413,7 +669,7 @@ export function CrmTable({
 
         <div className="crm-collapsible-content" data-open={accountsExpanded}>
           <div className="crm-collapsible-inner">
-            {accounts.length > 0 ? (
+            {filteredAccounts.length > 0 ? (
               <>
                 <div className="hidden grid-cols-[1.45fr_0.8fr_0.95fr_0.95fr_0.7fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
                   <span>Account</span>
@@ -424,7 +680,7 @@ export function CrmTable({
                   <span className="text-right">Actions</span>
                 </div>
                 <div className={accountListScrollable ? "grid max-h-[55rem] gap-0 overflow-y-auto" : "grid gap-0"}>
-                  {accounts.map((account) => {
+                  {filteredAccounts.map((account) => {
                     const count = opportunities.filter((opportunity) => opportunity.accountId === account.id).length;
                     const location = [account.city, account.address].filter(Boolean).join(", ");
                     const contactLine = account.phone || account.email || "Not set yet";
@@ -516,13 +772,18 @@ export function CrmTable({
                 </div>
               </>
             ) : (
-              <div className="px-5 py-10 text-sm text-[#6f6a75]">No accounts yet. Create your first account to start tracking contacts and opportunities.</div>
+              <div className="px-5 py-10 text-sm text-[#6f6a75]">
+                {activeTab === "accounts"
+                  ? "No accounts match the current search or filters."
+                  : "No accounts yet. Create your first account to start tracking contacts and opportunities."}
+              </div>
             )}
           </div>
         </div>
       </section>
+      ) : null}
 
-      {filteredOpportunities.length > 0 ? (
+      {activeTab === "overview" || activeTab === "opportunities" ? (filteredOpportunities.length > 0 ? (
         layout === "board" ? (
           <div
             ref={boardScrollRef}
@@ -684,7 +945,7 @@ export function CrmTable({
         <div className="rounded-[1.5rem] border border-[#e7e9f2] bg-white px-5 py-10 text-sm text-[#6f6a75] shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
           No opportunities match the current search or filters.
         </div>
-      )}
+      )) : null}
 
       <Modal
         open={Boolean(opportunityToDelete)}
