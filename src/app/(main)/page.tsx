@@ -7,7 +7,6 @@ import { siteConfig } from "@/config/site";
 import { absoluteUrl, createPageMetadata, defaultOgImagePath } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
-  title: "Tile, Surface, and Sanitary Solutions in Central Luzon",
   description:
     "Explore Tiles & More for tile, quartz slab, decorative surface, flooring, and sanitary product selections backed by project-ready support in Central Luzon.",
   path: "/",
