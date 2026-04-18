@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Tiles & More",
   description:
     "Tile, surface, and sanitary solutions with a catalog and finished-project showcase for residential and commercial spaces in Central Luzon.",
-  url: "https://tilesandmore.ph",
+  url: "https://tiles-and-more.vercel.app",
   email: "info.tilesandmore@gmail.com",
   phone: "+639171681324",
   address: "Panipuan, Calulut Rd, Mexico, Pampanga",
