@@ -140,6 +140,7 @@ export function CrmTable({
   const deferredAccountQuery = useDeferredValue(accountQuery);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const normalizedAccountQuery = deferredAccountQuery.trim().toLowerCase();
+  const areAccountsVisible = activeTab === "accounts" ? true : accountsExpanded;
   const router = useRouter();
 
   useEffect(() => {
@@ -642,33 +643,49 @@ export function CrmTable({
           </div>
         ) : null}
 
-        <button
-          type="button"
-          onClick={() => setAccountsExpanded((current) => !current)}
-          aria-expanded={accountsExpanded}
-          className="flex w-full cursor-pointer items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 text-left transition hover:bg-[#fafbfe] sm:px-5"
-        >
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Accounts</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center text-[#7c7784]">
-              <ChevronIcon open={accountsExpanded} />
-            </span>
-            <Link
-              href={getAdminRoute("/crm/new")}
-              aria-label="New account"
-              title="New account"
-              onClick={(event) => event.stopPropagation()}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] shadow-[0_10px_22px_rgba(35,31,32,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--brand)] hover:bg-[var(--brand)] hover:text-white hover:shadow-[0_14px_28px_rgba(237,35,37,0.24)]"
+          {activeTab === "overview" ? (
+            <button
+              type="button"
+              onClick={() => setAccountsExpanded((current) => !current)}
+              aria-expanded={accountsExpanded}
+              className="flex w-full cursor-pointer items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 text-left transition hover:bg-[#fafbfe] sm:px-5"
             >
-              <PlusIcon />
-            </Link>
-          </div>
-        </button>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Accounts</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center text-[#7c7784]">
+                  <ChevronIcon open={accountsExpanded} />
+                </span>
+                <Link
+                  href={getAdminRoute("/crm/new")}
+                  aria-label="New account"
+                  title="New account"
+                  onClick={(event) => event.stopPropagation()}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] shadow-[0_10px_22px_rgba(35,31,32,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--brand)] hover:bg-[var(--brand)] hover:text-white hover:shadow-[0_14px_28px_rgba(237,35,37,0.24)]"
+                >
+                  <PlusIcon />
+                </Link>
+              </div>
+            </button>
+          ) : (
+            <div className="flex items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Accounts</p>
+              </div>
+              <Link
+                href={getAdminRoute("/crm/new")}
+                aria-label="New account"
+                title="New account"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] shadow-[0_10px_22px_rgba(35,31,32,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--brand)] hover:bg-[var(--brand)] hover:text-white hover:shadow-[0_14px_28px_rgba(237,35,37,0.24)]"
+              >
+                <PlusIcon />
+              </Link>
+            </div>
+          )}
 
-        <div className="crm-collapsible-content" data-open={accountsExpanded}>
-          <div className="crm-collapsible-inner">
+        <div className="crm-collapsible-content" data-open={areAccountsVisible}>
+            <div className="crm-collapsible-inner">
             {filteredAccounts.length > 0 ? (
               <>
                 <div className="hidden grid-cols-[1.45fr_0.8fr_0.95fr_0.95fr_0.7fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
@@ -689,7 +706,7 @@ export function CrmTable({
                       <div
                         key={account.id}
                         role="link"
-                        tabIndex={accountsExpanded ? 0 : -1}
+                        tabIndex={areAccountsVisible ? 0 : -1}
                         onClick={() => router.push(getAdminRoute(`/crm/${account.id}`))}
                         onKeyDown={(event) => {
                           if (event.key === "Enter" || event.key === " ") {
