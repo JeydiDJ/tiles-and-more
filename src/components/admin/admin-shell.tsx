@@ -98,6 +98,20 @@ function InquiryIcon() {
   );
 }
 
+function CrmIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
+      <path d="M5 18.5h14" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M7.5 18.5V9.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M12 18.5V5.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M16.5 18.5v-6" strokeWidth="1.7" strokeLinecap="round" />
+      <circle cx="7.5" cy="8" r="1.5" strokeWidth="1.7" />
+      <circle cx="12" cy="4" r="1.5" strokeWidth="1.7" />
+      <circle cx="16.5" cy="11" r="1.5" strokeWidth="1.7" />
+    </svg>
+  );
+}
+
 function CalendarIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
@@ -120,6 +134,8 @@ function getNavIcon(label: string) {
     case "Categories":
       return <CategoryIcon />;
     case "CRM":
+      return <CrmIcon />;
+    case "Inbox":
       return <InquiryIcon />;
     case "Calendar":
       return <CalendarIcon />;
@@ -244,7 +260,10 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
         <div className={cn("border-t border-[#edf0f6] pt-3", isDesktopExpanded ? "" : "px-1")}>
           <nav className={cn("grid text-sm", isDesktopExpanded ? "gap-2" : "gap-2")}>
           {adminNav.map((item) => {
-            const isActive = pathname === item.href;
+            const isRootAdminRoute = item.href === getAdminRoute();
+            const isActive = isRootAdminRoute
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <Link
