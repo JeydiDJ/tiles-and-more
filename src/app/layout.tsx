@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   metadataBase: siteUrl,
   applicationName: siteConfig.name,
   title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
+    default: "TILES & MORE",
+    template: `%s | TILES & MORE`,
   },
   ...createPageMetadata(),
   referrer: "origin-when-cross-origin",
