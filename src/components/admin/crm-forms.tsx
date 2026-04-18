@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -10,6 +9,7 @@ import {
   createCrmOpportunityAction,
   type CrmFormState,
   updateCrmAccountAction,
+  updateCrmContactAction,
   updateCrmOpportunityAction,
 } from "@/app/(admin)/admin/crm/actions";
 import { getAdminRoute } from "@/lib/admin-path";
@@ -65,7 +65,7 @@ export function CrmAccountForm({
   }, [router, state.entityId]);
 
   return (
-    <form action={formAction} className="grid gap-6 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-6">
+    <form action={formAction} className="crm-popover-form grid gap-6 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-6">
       {isEditMode && initialAccount ? <input type="hidden" name="accountId" value={initialAccount.id} /> : null}
 
       <div className="grid gap-8">
@@ -73,25 +73,28 @@ export function CrmAccountForm({
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">Account</p>
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Account Name">
-              <Input name="name" placeholder="Projexasia" defaultValue={initialAccount?.name ?? ""} required />
+              <Input name="name" placeholder="Enter the company name" defaultValue={initialAccount?.name ?? ""} required />
             </Field>
             <Field label="Industry">
-              <Input name="industry" placeholder="Contractor / Developer" defaultValue={initialAccount?.industry ?? ""} />
+              <Input name="industry" placeholder="Describe the industry or business type" defaultValue={initialAccount?.industry ?? ""} />
+            </Field>
+            <Field label="Company Website">
+              <Input name="website" type="url" placeholder="https://www.company.com" defaultValue={initialAccount?.website ?? ""} />
             </Field>
             <Field label="Phone">
-              <Input name="phone" placeholder="0917..." defaultValue={initialAccount?.phone ?? ""} />
+              <Input name="phone" placeholder="Enter the main company phone number" defaultValue={initialAccount?.phone ?? ""} />
             </Field>
             <Field label="Email">
-              <Input name="email" type="email" placeholder="procurement@company.com" defaultValue={initialAccount?.email ?? ""} />
+              <Input name="email" type="email" placeholder="Enter the main company email address" defaultValue={initialAccount?.email ?? ""} />
             </Field>
             <Field label="Address" className="md:col-span-2">
-              <Input name="address" placeholder="Complete office address" defaultValue={initialAccount?.address ?? ""} />
+              <Input name="address" placeholder="Enter the complete office address" defaultValue={initialAccount?.address ?? ""} />
             </Field>
             <Field label="City">
-              <Input name="city" placeholder="Quezon City" defaultValue={initialAccount?.city ?? ""} />
+              <Input name="city" placeholder="Enter the city or locality" defaultValue={initialAccount?.city ?? ""} />
             </Field>
             <Field label="Internal Notes" className="md:col-span-2">
-              <Textarea name="notes" className="min-h-28" placeholder="Relationship notes, buying habits, account context..." defaultValue={initialAccount?.notes ?? ""} />
+              <Textarea name="notes" className="min-h-28" placeholder="Add internal notes, commercial context, or account history" defaultValue={initialAccount?.notes ?? ""} />
             </Field>
           </div>
         </section>
@@ -102,16 +105,16 @@ export function CrmAccountForm({
               <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">Initial Contact</p>
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Full Name">
-                  <Input name="initialContactName" placeholder="Procurement Officer" />
+                  <Input name="initialContactName" placeholder="Enter the primary contact name" />
                 </Field>
                 <Field label="Job Title">
-                  <Input name="initialContactJobTitle" placeholder="Procurement Manager" />
+                  <Input name="initialContactJobTitle" placeholder="Enter the contact's job title" />
                 </Field>
                 <Field label="Phone">
-                  <Input name="initialContactPhone" placeholder="0917..." />
+                  <Input name="initialContactPhone" placeholder="Enter the direct contact number" />
                 </Field>
                 <Field label="Email">
-                  <Input name="initialContactEmail" type="email" placeholder="contact@company.com" />
+                  <Input name="initialContactEmail" type="email" placeholder="Enter the contact email address" />
                 </Field>
               </div>
             </section>
@@ -120,10 +123,10 @@ export function CrmAccountForm({
               <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">Initial Opportunity</p>
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Opportunity Name">
-                  <Input name="initialOpportunityName" placeholder="Project supply opportunity" />
+                  <Input name="initialOpportunityName" placeholder="Enter the project or opportunity name" />
                 </Field>
                 <Field label="Location">
-                  <Input name="initialOpportunityLocation" placeholder="Project site location" />
+                  <Input name="initialOpportunityLocation" placeholder="Enter the project location" />
                 </Field>
               </div>
             </section>
@@ -157,37 +160,72 @@ export function CrmAccountForm({
 }
 
 export function CrmContactForm({ accountId }: { accountId: string }) {
-  const [state, formAction, isPending] = useActionState(createCrmContactAction, initialState);
+  return <CrmContactFormInner accountId={accountId} />;
+}
+
+export function CrmContactFormInner({
+  accountId,
+  mode = "create",
+  initialContact = null,
+  onSuccess,
+  onCancel,
+}: {
+  accountId: string;
+  mode?: "create" | "edit";
+  initialContact?: CrmContact | null;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}) {
+  const isEditMode = mode === "edit";
+  const [state, formAction, isPending] = useActionState(isEditMode ? updateCrmContactAction : createCrmContactAction, initialState);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.entityId) {
+      router.refresh();
+      onSuccess?.();
+    }
+  }, [onSuccess, router, state.entityId]);
 
   return (
-    <form action={formAction} className="grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+    <form action={formAction} className="crm-popover-form grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
       <input type="hidden" name="accountId" value={accountId} />
-      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Add Contact</p>
+      {isEditMode && initialContact ? <input type="hidden" name="contactId" value={initialContact.id} /> : null}
+      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Edit Contact" : "Add Contact"}</p>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Full Name">
-          <Input name="fullName" placeholder="Juan Dela Cruz" required />
+          <Input name="fullName" placeholder="Enter the contact's full name" defaultValue={initialContact?.fullName ?? ""} required />
         </Field>
         <Field label="Job Title">
-          <Input name="jobTitle" placeholder="Project Architect" />
+          <Input name="jobTitle" placeholder="Enter the contact's role or title" defaultValue={initialContact?.jobTitle ?? ""} />
         </Field>
         <Field label="Phone">
-          <Input name="phone" placeholder="0917..." />
+          <Input name="phone" placeholder="Enter the contact phone number" defaultValue={initialContact?.phone ?? ""} />
         </Field>
         <Field label="Email">
-          <Input name="email" type="email" placeholder="contact@account.com" />
+          <Input name="email" type="email" placeholder="Enter the contact email address" defaultValue={initialContact?.email ?? ""} />
         </Field>
         <Field label="Notes" className="md:col-span-2">
-          <Textarea name="notes" className="min-h-24" placeholder="Relationship notes or preferred communication details..." />
+          <Textarea name="notes" className="min-h-24" placeholder="Add relationship notes or communication preferences" defaultValue={initialContact?.notes ?? ""} />
         </Field>
       </div>
       {state.error ? <p className="text-sm text-[#8f1d1d]">{state.error}</p> : null}
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-3">
+        {isEditMode ? (
+          <button
+            type="button"
+            onClick={() => onCancel?.()}
+            className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
+          >
+            Cancel
+          </button>
+        ) : null}
         <button
           type="submit"
           disabled={isPending}
           className="inline-flex min-w-32 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Saving..." : "Add Contact"}
+          {isPending ? "Saving..." : isEditMode ? "Update Contact" : "Add Contact"}
         </button>
       </div>
     </form>
@@ -220,7 +258,7 @@ export function CrmOpportunityForm({
   }, [isEditMode, router, state.entityId]);
 
   return (
-    <form action={formAction} className="grid gap-6 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-6">
+    <form action={formAction} className="crm-popover-form grid gap-6 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-6">
       <input type="hidden" name="accountId" value={accountId} />
       {isEditMode && initialOpportunity ? (
         <>
@@ -234,10 +272,10 @@ export function CrmOpportunityForm({
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">{isEditMode ? "Opportunity" : "New Opportunity"}</p>
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Opportunity Name">
-              <Input name="name" placeholder="Residential tower tile supply" defaultValue={initialOpportunity?.name ?? ""} required />
+              <Input name="name" placeholder="Enter the opportunity or project name" defaultValue={initialOpportunity?.name ?? ""} required />
             </Field>
             <Field label="Location">
-              <Input name="location" placeholder="Project site location" defaultValue={initialOpportunity?.location ?? ""} />
+              <Input name="location" placeholder="Enter the project or site location" defaultValue={initialOpportunity?.location ?? ""} />
             </Field>
             <Field label="Stage">
               <Select name="stage" defaultValue={initialOpportunity?.stage ?? "new_lead"} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
@@ -263,7 +301,7 @@ export function CrmOpportunityForm({
               </Select>
             </Field>
             <Field label="Source">
-              <Input name="source" placeholder="manual / referral / bid invite" defaultValue={initialOpportunity?.source ?? "manual"} />
+              <Input name="source" placeholder="Enter the lead source or commercial channel" defaultValue={initialOpportunity?.source ?? "manual"} />
             </Field>
             <Field label="Quotation Status">
               <Select
@@ -286,7 +324,7 @@ export function CrmOpportunityForm({
                     inputMode="decimal"
                     step="0.01"
                     min="0"
-                    placeholder={quotationFinished ? "0.00" : "Can still be added before quotation is complete"}
+                placeholder={quotationFinished ? "0.00" : "Can still be added before quotation is complete"}
                     defaultValue={initialOpportunity?.estimatedValue?.toFixed(2) ?? ""}
                     className="pl-14"
                   />
@@ -299,6 +337,7 @@ export function CrmOpportunityForm({
                 name="notes"
                 className="min-h-28"
                 placeholder="Scope, material requirements, commercial context, next steps..."
+                
                 defaultValue={initialOpportunity?.notes ?? ""}
               />
             </Field>
@@ -357,7 +396,7 @@ export function CrmOpportunityNoteForm({ opportunityId }: { opportunityId: strin
   const [state, formAction, isPending] = useActionState(addCrmOpportunityNoteAction, initialState);
 
   return (
-    <form action={formAction} className="grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+    <form action={formAction} className="crm-popover-form grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
       <input type="hidden" name="opportunityId" value={opportunityId} />
       <div>
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Add Note</p>

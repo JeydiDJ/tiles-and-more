@@ -4,6 +4,7 @@ create table if not exists public.crm_accounts (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   industry text,
+  website text,
   phone text,
   email text,
   address text,

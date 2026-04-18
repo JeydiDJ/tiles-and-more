@@ -17,6 +17,7 @@ type CrmAccountRow = {
   id: string;
   name: string;
   industry: string | null;
+  website: string | null;
   phone: string | null;
   email: string | null;
   address: string | null;
@@ -92,6 +93,7 @@ function mapAccount(row: CrmAccountRow): CrmAccount {
     id: row.id,
     name: row.name,
     industry: row.industry,
+    website: row.website,
     phone: row.phone,
     email: row.email,
     address: row.address,
@@ -198,6 +200,7 @@ export async function createCrmAccount(input: CrmAccountInput) {
     .insert({
       name: input.name,
       industry: input.industry,
+      website: input.website,
       phone: input.phone,
       email: input.email,
       address: input.address,
@@ -221,6 +224,7 @@ export async function updateCrmAccount(id: string, input: CrmAccountInput) {
     .update({
       name: input.name,
       industry: input.industry,
+      website: input.website,
       phone: input.phone,
       email: input.email,
       address: input.address,
@@ -283,6 +287,34 @@ export async function createCrmContact(input: CrmContactInput) {
   }
 
   return mapContact(data as CrmContactRow);
+}
+
+export async function updateCrmContact(id: string, input: Omit<CrmContactInput, "accountId">) {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("crm_contacts")
+    .update({
+      full_name: input.fullName,
+      job_title: input.jobTitle,
+      phone: input.phone,
+      email: input.email,
+      notes: input.notes,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function deleteCrmContact(id: string) {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("crm_contacts").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 export async function getCrmOpportunities(accountId?: string) {

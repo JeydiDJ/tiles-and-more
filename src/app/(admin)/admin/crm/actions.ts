@@ -7,9 +7,11 @@ import {
   createCrmContact,
   createCrmOpportunity,
   createCrmOpportunityAttachment,
+  deleteCrmContact,
   deleteCrmAccount,
   deleteCrmOpportunity,
   updateCrmAccount,
+  updateCrmContact,
   updateCrmOpportunity,
 } from "@/services/crm.service";
 import { uploadCrmAttachment } from "@/services/storage.service";
@@ -36,6 +38,7 @@ function parseAccountInput(formData: FormData) {
   return {
     name: String(formData.get("name") ?? "").trim(),
     industry: normalizeOptional(formData.get("industry")),
+    website: normalizeOptional(formData.get("website")),
     phone: normalizeOptional(formData.get("phone")),
     email: normalizeOptional(formData.get("email")),
     address: normalizeOptional(formData.get("address")),
@@ -181,6 +184,32 @@ export async function createCrmContactAction(_: CrmFormState, formData: FormData
   }
 }
 
+export async function updateCrmContactAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const contactId = String(formData.get("contactId") ?? "").trim();
+    const accountId = String(formData.get("accountId") ?? "").trim();
+    const input = parseContactInput(formData);
+
+    if (!contactId || !accountId || !input.fullName) {
+      return { error: "Account, contact, and full name are required.", entityId: null };
+    }
+
+    await updateCrmContact(contactId, {
+      fullName: input.fullName,
+      jobTitle: input.jobTitle,
+      phone: input.phone,
+      email: input.email,
+      notes: input.notes,
+    });
+    revalidatePath(getAdminRoute(`/crm/${accountId}`));
+    return { error: null, entityId: accountId };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to update contact.", entityId: null };
+  }
+}
+
 export async function createCrmOpportunityAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
   try {
     await requireAdminUser();
@@ -311,5 +340,24 @@ export async function deleteCrmAccountAction(_: CrmDeleteState, formData: FormDa
     return { error: null };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Unable to delete account." };
+  }
+}
+
+export async function deleteCrmContactAction(_: CrmDeleteState, formData: FormData): Promise<CrmDeleteState> {
+  try {
+    await requireAdminUser();
+
+    const contactId = String(formData.get("contactId") ?? "").trim();
+    const accountId = String(formData.get("accountId") ?? "").trim();
+    if (!contactId || !accountId) {
+      return { error: "Contact and account IDs are required." };
+    }
+
+    await deleteCrmContact(contactId);
+    revalidatePath(getAdminRoute(`/crm/${accountId}`));
+    revalidatePath(getAdminRoute("/crm"));
+    return { error: null };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to delete contact." };
   }
 }

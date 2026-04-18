@@ -15,6 +15,7 @@ export type CrmAccount = {
   id: string;
   name: string;
   industry: string | null;
+  website: string | null;
   phone: string | null;
   email: string | null;
   address: string | null;
@@ -75,6 +76,7 @@ export type CrmOpportunityAttachment = {
 export type CrmAccountInput = {
   name: string;
   industry: string | null;
+  website: string | null;
   phone: string | null;
   email: string | null;
   address: string | null;

@@ -138,16 +138,20 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [isDesktopHoveringNav, setIsDesktopHoveringNav] = useState(false);
+  const isDesktopExpanded = !collapsed || isDesktopHoveringNav;
 
   useEffect(() => {
     setMobileNavOpen(false);
+    setCollapsed(true);
+    setIsDesktopHoveringNav(false);
   }, [pathname]);
 
   return (
     <div
       className={cn(
-        "min-h-screen bg-[#f6f7fb] lg:grid lg:transition-[grid-template-columns] lg:duration-300",
-        collapsed ? "lg:grid-cols-[104px_1fr]" : "lg:grid-cols-[292px_1fr]",
+        "min-h-screen bg-[#f6f7fb] lg:grid lg:transition-[grid-template-columns] lg:duration-300 lg:ease-out",
+        isDesktopExpanded ? "lg:grid-cols-[292px_1fr]" : "lg:grid-cols-[104px_1fr]",
       )}
     >
       <div className="sticky top-0 z-30 border-b border-[#e7e9f2] bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
@@ -189,23 +193,33 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
           collapsed && "cursor-e-resize",
         )}
         onClick={collapsed ? () => setCollapsed(false) : undefined}
+        onMouseEnter={() => {
+          if (collapsed) {
+            setIsDesktopHoveringNav(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (collapsed) {
+            setIsDesktopHoveringNav(false);
+          }
+        }}
       >
-        <div className={cn("flex items-start", collapsed ? "flex-col items-center gap-4" : "justify-between gap-3")}>
+        <div className={cn("flex min-h-[5.5rem] items-start", isDesktopExpanded ? "justify-between gap-3" : "justify-center")}>
           <Link href={getAdminRoute()} className="transition hover:opacity-92">
-            <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
+            <div className={cn("flex items-center", isDesktopExpanded ? "gap-3" : "justify-center")}>
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] shadow-[0_8px_24px_rgba(35,31,32,0.06)]">
                 <Image src="/logo/tilesandmore-logo.png" alt="Tiles and More logo" width={42} height={42} className="h-10 w-10 object-contain" priority />
               </div>
-              {!collapsed ? (
-                <div className="min-w-0">
+              {isDesktopExpanded ? (
+                <div className="min-w-0 whitespace-nowrap">
                   <p className="text-[11px] uppercase tracking-[0.24em] text-[#8a8793]">Tiles & More</p>
-                  <p className="mt-1 text-xl font-semibold tracking-tight text-[#17141a]">Admin Workspace</p>
+                  <p className="mt-1 whitespace-nowrap text-xl font-semibold tracking-tight text-[#17141a]">Admin</p>
                 </div>
               ) : null}
             </div>
           </Link>
 
-          {!collapsed ? (
+          {isDesktopExpanded ? (
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -227,12 +241,8 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
           ) : null}
         </div>
 
-        <div className={cn("mt-8 border-t border-[#edf0f6] pt-6", collapsed ? "px-1" : "")}>
-          {!collapsed ? (
-            <p className="pb-3 text-[11px] font-medium uppercase tracking-[0.22em] text-[#9a96a3]">Navigation</p>
-          ) : null}
-
-          <nav className={cn("grid text-sm", collapsed ? "gap-2" : "gap-1")}>
+        <div className={cn("border-t border-[#edf0f6] pt-3", isDesktopExpanded ? "" : "px-1")}>
+          <nav className={cn("grid text-sm", isDesktopExpanded ? "gap-2" : "gap-2")}>
           {adminNav.map((item) => {
             const isActive = pathname === item.href;
 
@@ -240,25 +250,47 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                title={collapsed ? item.label : undefined}
+                title={!isDesktopExpanded ? item.label : undefined}
                 onClick={(event) => {
-                  if (collapsed) {
+                  if (!isDesktopExpanded) {
                     event.stopPropagation();
                   }
+                  setCollapsed(true);
+                  setIsDesktopHoveringNav(false);
                   setMobileNavOpen(false);
                 }}
                 className={cn(
-                  "font-medium transition",
-                  collapsed
-                    ? "flex h-11 items-center justify-center rounded-2xl text-[#7c7784] hover:bg-white hover:text-[#17141a]"
-                    : "flex items-center gap-3 rounded-xl px-3 py-3 text-[#68636f] hover:bg-white hover:text-[#17141a]",
+                  "group relative font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                  isDesktopExpanded
+                    ? "flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-[#68636f] outline-none transition-[background-color,color,box-shadow] duration-200 ease-out hover:border-transparent hover:bg-white hover:text-[#17141a]"
+                    : "flex h-12 items-center rounded-2xl border border-transparent px-3 text-[#7c7784] transition-all duration-200 ease-out hover:border-[#f4c8cb] hover:bg-[linear-gradient(135deg,#fff7f7_0%,#ffffff_100%)] hover:text-[var(--brand)] hover:shadow-[0_12px_24px_rgba(237,35,37,0.1)]",
                   isActive &&
-                    (collapsed
-                      ? "bg-[var(--brand)] text-white shadow-[0_12px_24px_rgba(237,35,37,0.22)]"
-                      : "bg-white text-[#17141a] shadow-[0_10px_24px_rgba(35,31,32,0.08)]"),
+                    (isDesktopExpanded
+                      ? "border-transparent bg-white text-[#17141a] shadow-[0_10px_24px_rgba(35,31,32,0.08)]"
+                      : "border-[var(--brand)] bg-[var(--brand)] text-white shadow-[0_12px_24px_rgba(237,35,37,0.22)]"),
                 )}
               >
-                {collapsed ? getNavIcon(item.label) : <><span className={cn(isActive ? "text-[var(--brand)]" : "text-[#8d8896]")}>{getNavIcon(item.label)}</span><span>{item.label}</span></>}
+                {isDesktopExpanded ? (
+                  <>
+                    <span
+                      className={cn(
+                        "transition-[transform,opacity,color] duration-200 ease-out",
+                        isActive ? "text-[var(--brand)]" : "text-[#8d8896] group-hover:text-[var(--brand)]",
+                      )}
+                    >
+                      {getNavIcon(item.label)}
+                    </span>
+                    <span className="flex-1 transition-[opacity,transform] duration-200 ease-out">{item.label}</span>
+                    <span
+                      className={cn(
+                        "absolute inset-y-2 left-0 w-1 rounded-r-full transition-opacity duration-200 ease-out",
+                        isActive ? "bg-[var(--brand)] opacity-100" : "bg-[#f3b1b6] opacity-0 group-hover:opacity-100",
+                      )}
+                    />
+                  </>
+                ) : (
+                  getNavIcon(item.label)
+                )}
               </Link>
             );
           })}
@@ -266,7 +298,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
         </div>
 
         <div className="mt-auto border-t border-[#edf0f6] pt-5">
-          <AdminSessionBar email={userEmail} compact={collapsed} />
+          <AdminSessionBar email={userEmail} compact={!isDesktopExpanded} />
         </div>
       </aside>
 

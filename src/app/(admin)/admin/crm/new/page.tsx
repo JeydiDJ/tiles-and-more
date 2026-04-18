@@ -10,9 +10,7 @@ export default function AdminCrmNewPage() {
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-4xl font-semibold tracking-tight text-[#17141a] sm:text-[2.6rem]">Create Account</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f6a75]">
-              Start with the company account, then layer in contacts and opportunities the way a supplier-focused CRM should work.
-            </p>
+      
           </div>
           <Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)] transition hover:text-[var(--brand-dark)]">
             Back to CRM

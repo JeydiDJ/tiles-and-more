@@ -6,6 +6,42 @@
   animation: fade-in 0.6s ease-out both;
 }
 
+.crm-popover-form {
+  animation: crm-popover-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+.crm-modal-backdrop {
+  animation: crm-modal-backdrop-enter 0.24s ease-out both;
+}
+
+.crm-modal-panel {
+  animation: crm-popover-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center;
+}
+
+.crm-collapsible-content {
+  display: grid;
+  overflow: hidden;
+  transition:
+    grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.26s ease-out;
+}
+
+.crm-collapsible-content[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.crm-collapsible-content[data-open="false"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.crm-collapsible-inner {
+  min-height: 0;
+}
+
 .hero-progress-fill {
   animation: hero-progress-fill linear forwards;
 }
@@ -98,6 +134,30 @@
   }
 }
 
+@keyframes crm-popover-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes crm-modal-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes hero-progress-fill {
   from {
     width: 0;
@@ -153,9 +213,14 @@
   .site-intro-shell.is-intro-active,
   .site-intro-overlay,
   .site-intro-overlay::after,
-  .site-intro-mark {
+  .site-intro-mark,
+  .crm-popover-form,
+  .crm-modal-backdrop,
+  .crm-modal-panel,
+  .crm-collapsible-content {
     animation: none !important;
     transform: none !important;
     filter: none !important;
+    transition: none !important;
   }
 }
