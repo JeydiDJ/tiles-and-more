@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
+import { createPageMetadata } from "@/lib/seo";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Admin Login",
+  description: "Private admin login for Tiles & More.",
+  path: "/admin-login",
+  noIndex: true,
+});
 
 export default function AdminLoginPage() {
   return (

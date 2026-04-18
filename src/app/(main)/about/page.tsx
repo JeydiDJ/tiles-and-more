@@ -1,3 +1,13 @@
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "About",
+  description:
+    "Learn how Tiles & More supports residential and commercial projects in Central Luzon with product expertise, estimation, logistics, and service support.",
+  path: "/about",
+  keywords: ["about tiles and more", "tile supplier pampanga", "project support central luzon"],
+});
+
 const capabilities = [
   {
     label: "Projects Department",

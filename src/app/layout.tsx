@@ -1,13 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
+import { createPageMetadata, siteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl,
+  applicationName: siteConfig.name,
   title: {
-    default: "TILES & MORE",
-    template: `%s | TILES & MORE`,
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: siteConfig.description,
+  ...createPageMetadata(),
+  referrer: "origin-when-cross-origin",
+  category: "Construction and home improvement",
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  formatDetection: {
+    email: true,
+    address: true,
+    telephone: true,
+  },
   icons: {
     icon: [
       { url: "/favicon/favicon.ico" },
@@ -18,6 +31,16 @@ export const metadata: Metadata = {
     shortcut: ["/favicon/favicon.ico"],
   },
   manifest: "/favicon/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: siteConfig.name,
+  },
+  other: {
+    "theme-color": "#231f20",
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({

@@ -1,4 +1,13 @@
 import { ProjectShowcaseGrid } from "@/components/sections/project-showcase-grid";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Projects",
+  description:
+    "View finished residential and commercial project showcases from Tiles & More across tile, quartz, decorative surfaces, and sanitary applications.",
+  path: "/projects",
+  keywords: ["tile projects", "finished projects", "tiles and more showcase"],
+});
 
 export default function ProjectsPage() {
   return (

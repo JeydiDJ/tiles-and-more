@@ -1,7 +1,16 @@
 import { CategoryGrid } from "@/components/catalog/category-grid";
 import { CatalogSearch } from "@/components/product/catalog-search";
+import { createPageMetadata } from "@/lib/seo";
 import { getCategories } from "@/services/category.service";
 import { getProducts } from "@/services/product.service";
+
+export const metadata = createPageMetadata({
+  title: "Catalog",
+  description:
+    "Browse the Tiles & More catalog of tiles, slabs, sanitary products, and specialty surfaces for residential and commercial projects.",
+  path: "/catalog",
+  keywords: ["tile catalog", "surface catalog", "sanitary catalog", "tiles and more products"],
+});
 
 type CatalogPageProps = {
   searchParams?: Promise<{ q?: string; brand?: string }>;

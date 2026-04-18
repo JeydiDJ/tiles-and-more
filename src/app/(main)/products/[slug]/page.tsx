@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { createPageMetadata, defaultOgImagePath } from "@/lib/seo";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductSpecs } from "@/components/product/product-specs";
 import { getProductBySlug } from "@/services/product.service";
@@ -6,6 +8,29 @@ import { getProductBySlug } from "@/services/product.service";
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return createPageMetadata({
+      title: "Product",
+      description: "Browse product selections from Tiles & More.",
+      path: "/catalog",
+    });
+  }
+
+  return createPageMetadata({
+    title: product.name,
+    description:
+      product.summary ??
+      `${product.name} from the ${product.category} range at Tiles & More for residential and commercial projects.`,
+    path: `/products/${product.slug}`,
+    image: product.imageUrl ?? defaultOgImagePath,
+    keywords: [product.name.toLowerCase(), product.category.toLowerCase(), product.brandName.toLowerCase()],
+  });
+}
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;

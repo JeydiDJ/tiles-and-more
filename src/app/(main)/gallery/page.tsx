@@ -1,4 +1,14 @@
 import { gallery } from "@/data/gallery";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Gallery",
+  description:
+    "See installed inspiration and applied product ideas from Tiles & More across surface, flooring, and sanitary spaces.",
+  path: "/gallery",
+  keywords: ["tile gallery", "surface inspiration", "installed projects"],
+});
+
 export default function GalleryPage() {
   return (
     <section className="page-section py-20 sm:py-24">

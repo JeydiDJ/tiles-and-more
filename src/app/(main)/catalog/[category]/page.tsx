@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { createPageMetadata } from "@/lib/seo";
 import { ProductGrid } from "@/components/product/product-grid";
 import { getCategoryBySlug } from "@/services/category.service";
 import { getProductsByCategory } from "@/services/product.service";
@@ -6,6 +8,26 @@ import { getProductsByCategory } from "@/services/product.service";
 type CategoryPageProps = {
   params: Promise<{ category: string }>;
 };
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { category } = await params;
+  const categoryData = await getCategoryBySlug(category);
+
+  if (!categoryData) {
+    return createPageMetadata({
+      title: "Category",
+      description: "Browse product categories from Tiles & More.",
+      path: "/catalog",
+    });
+  }
+
+  return createPageMetadata({
+    title: categoryData.name,
+    description: categoryData.description,
+    path: `/catalog/${categoryData.slug}`,
+    keywords: [categoryData.name.toLowerCase(), "tiles and more category", "surface solutions"],
+  });
+}
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
