@@ -107,6 +107,25 @@ export function CrmTable({
   const [accountToDelete, setAccountToDelete] = useState<CrmAccount | null>(null);
   const wasDeletingOpportunity = useRef(false);
   const wasDeletingAccount = useRef(false);
+  const boardScrollRef = useRef<HTMLDivElement | null>(null);
+  const boardMomentumFrameRef = useRef<number | null>(null);
+  const boardDragRef = useRef<{
+    pointerId: number | null;
+    startX: number;
+    startScrollLeft: number;
+    moved: boolean;
+    lastX: number;
+    lastTime: number;
+    velocity: number;
+  }>({
+    pointerId: null,
+    startX: 0,
+    startScrollLeft: 0,
+    moved: false,
+    lastX: 0,
+    lastTime: 0,
+    velocity: 0,
+  });
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const router = useRouter();
@@ -164,6 +183,112 @@ export function CrmTable({
 
   const accountListScrollable = accounts.length > 10;
   const opportunityListScrollable = filteredOpportunities.length > 10;
+
+  function handleBoardPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest("a, button, input, select, textarea, label")) {
+      return;
+    }
+
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    const container = boardScrollRef.current;
+    if (!container) {
+      return;
+    }
+
+    if (boardMomentumFrameRef.current !== null) {
+      window.cancelAnimationFrame(boardMomentumFrameRef.current);
+      boardMomentumFrameRef.current = null;
+    }
+
+    boardDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startScrollLeft: container.scrollLeft,
+      moved: false,
+      lastX: event.clientX,
+      lastTime: performance.now(),
+      velocity: 0,
+    };
+
+    container.setPointerCapture(event.pointerId);
+  }
+
+  function handleBoardPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const container = boardScrollRef.current;
+    const drag = boardDragRef.current;
+
+    if (!container || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - drag.startX;
+    const now = performance.now();
+    const deltaSinceLast = event.clientX - drag.lastX;
+    const timeSinceLast = Math.max(now - drag.lastTime, 1);
+    if (Math.abs(deltaX) > 4) {
+      drag.moved = true;
+    }
+
+    container.scrollLeft = drag.startScrollLeft - deltaX;
+    drag.velocity = deltaSinceLast / timeSinceLast;
+    drag.lastX = event.clientX;
+    drag.lastTime = now;
+  }
+
+  function handleBoardPointerEnd(event: React.PointerEvent<HTMLDivElement>) {
+    const container = boardScrollRef.current;
+    const drag = boardDragRef.current;
+
+    if (!container || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    if (container.hasPointerCapture(event.pointerId)) {
+      container.releasePointerCapture(event.pointerId);
+    }
+
+    const initialVelocity = drag.velocity;
+    if (Math.abs(initialVelocity) > 0.01) {
+      let velocity = initialVelocity * 18;
+
+      const step = () => {
+        const currentContainer = boardScrollRef.current;
+        if (!currentContainer) {
+          boardMomentumFrameRef.current = null;
+          return;
+        }
+
+        currentContainer.scrollLeft -= velocity;
+        velocity *= 0.92;
+
+        if (Math.abs(velocity) < 0.35) {
+          boardMomentumFrameRef.current = null;
+          return;
+        }
+
+        boardMomentumFrameRef.current = window.requestAnimationFrame(step);
+      };
+
+      boardMomentumFrameRef.current = window.requestAnimationFrame(step);
+    }
+
+    window.setTimeout(() => {
+      boardDragRef.current.moved = false;
+    }, 0);
+
+    boardDragRef.current.pointerId = null;
+  }
+
+  function handleBoardClickCapture(event: React.MouseEvent<HTMLDivElement>) {
+    if (boardDragRef.current.moved) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
 
   return (
     <div className="grid gap-5">
@@ -255,30 +380,30 @@ export function CrmTable({
       </section>
 
       <section className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
-        <div className="flex items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5">
+        <button
+          type="button"
+          onClick={() => setAccountsExpanded((current) => !current)}
+          aria-expanded={accountsExpanded}
+          className="flex w-full cursor-pointer items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 text-left transition hover:bg-[#fafbfe] sm:px-5"
+        >
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Accounts</p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setAccountsExpanded((current) => !current)}
-              aria-expanded={accountsExpanded}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3.5 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-white"
-            >
-              {accountsExpanded ? "Collapse" : "Expand"}
+            <span className="inline-flex items-center text-[#7c7784]">
               <ChevronIcon open={accountsExpanded} />
-            </button>
+            </span>
             <Link
               href={getAdminRoute("/crm/new")}
               aria-label="New account"
               title="New account"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_10px_22px_rgba(237,35,37,0.2)] transition hover:-translate-y-0.5 hover:bg-[var(--brand-dark)] hover:shadow-[0_14px_28px_rgba(237,35,37,0.24)]"
+              onClick={(event) => event.stopPropagation()}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#e7e9f2] bg-white text-[#17141a] shadow-[0_10px_22px_rgba(35,31,32,0.06)] transition hover:-translate-y-0.5 hover:border-[var(--brand)] hover:bg-[var(--brand)] hover:text-white hover:shadow-[0_14px_28px_rgba(237,35,37,0.24)]"
             >
               <PlusIcon />
             </Link>
           </div>
-        </div>
+        </button>
 
         <div className="crm-collapsible-content" data-open={accountsExpanded}>
           <div className="crm-collapsible-inner">
@@ -393,14 +518,23 @@ export function CrmTable({
 
       {filteredOpportunities.length > 0 ? (
         layout === "board" ? (
-          <div className="overflow-x-auto pb-2">
-            <div className="grid min-w-[1840px] grid-cols-8 gap-5">
+          <div
+            ref={boardScrollRef}
+            className="crm-board-drag cursor-grab overflow-x-auto pb-2 select-none active:cursor-grabbing"
+            onPointerDown={handleBoardPointerDown}
+            onPointerMove={handleBoardPointerMove}
+            onPointerUp={handleBoardPointerEnd}
+            onPointerCancel={handleBoardPointerEnd}
+            onLostPointerCapture={handleBoardPointerEnd}
+            onClickCapture={handleBoardClickCapture}
+          >
+            <div className="grid min-w-[2760px] grid-cols-8 gap-5">
               {grouped.map((group) => {
                 const stageClasses = getStageTone(group.stage).split(" ");
                 const accentClass = stageClasses[1] ?? "bg-[#eefaf2]";
 
                 return (
-                  <section key={group.stage} className="min-w-[220px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+                  <section key={group.stage} className="min-w-[320px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
                     <div className={`border-b px-4 py-4 ${getStageTone(group.stage)}`}>
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-semibold uppercase tracking-[0.14em]">{formatStageLabel(group.stage)}</span>

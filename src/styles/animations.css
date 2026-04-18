@@ -78,6 +78,12 @@
   min-height: 0;
 }
 
+.crm-board-drag,
+.crm-board-drag * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .hero-progress-fill {
   animation: hero-progress-fill linear forwards;
 }
