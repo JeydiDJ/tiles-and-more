@@ -171,7 +171,7 @@ export function CrmCalendar({ opportunities, compact = false }: CrmCalendarProps
         ) : null}
       </div>
 
-      <div className={cn("grid gap-0", compact ? "xl:grid-cols-[minmax(0,1fr)_280px]" : "xl:grid-cols-[minmax(0,1fr)_340px]")}>
+      <div className={cn("grid gap-0", compact ? "xl:grid-cols-[minmax(0,1fr)_320px]" : "xl:grid-cols-[minmax(0,1fr)_420px]")}>
         <div className="px-4 py-4 sm:px-5">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -244,12 +244,14 @@ export function CrmCalendar({ opportunities, compact = false }: CrmCalendarProps
             <div className="mt-4 grid gap-3">
               {visibleAgenda.map((event) => (
                 <Link key={event.id} href={getAdminRoute(`/crm/opportunities/${event.opportunityId}`)} className="rounded-[1.1rem] border border-[#e7e9f2] bg-white p-3 transition hover:border-[#cfd5e2] hover:bg-[#fcfcfe]">
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="grid gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-medium text-[#17141a]">{event.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-[#6f6a75]">{event.detail}</p>
+                      <p className="mt-1 break-words text-sm leading-6 text-[#6f6a75]">{event.detail}</p>
                     </div>
-                    <span className={cn("inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em]", getToneClasses(event.tone))}>{event.tone}</span>
+                    <div className="flex justify-start">
+                      <span className={cn("inline-flex shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em]", getToneClasses(event.tone))}>{event.tone}</span>
+                    </div>
                   </div>
                 </Link>
               ))}

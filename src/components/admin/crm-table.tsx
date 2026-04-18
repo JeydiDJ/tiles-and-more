@@ -55,6 +55,12 @@ function getStageTone(stage: string) {
   }
 }
 
+function getQuotationTone(quotationFinished: boolean) {
+  return quotationFinished
+    ? "border-[#22c55e] bg-[#22c55e] text-white shadow-[0_8px_18px_rgba(34,197,94,0.24)]"
+    : "border-[#f59e0b] bg-[#f59e0b] text-white shadow-[0_8px_18px_rgba(245,158,11,0.24)]";
+}
+
 function SearchIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4.5 w-4.5 fill-none stroke-current">
@@ -528,13 +534,13 @@ export function CrmTable({
             onLostPointerCapture={handleBoardPointerEnd}
             onClickCapture={handleBoardClickCapture}
           >
-            <div className="grid min-w-[2760px] grid-cols-8 gap-5">
+            <div className="grid min-w-[3320px] grid-cols-8 gap-5">
               {grouped.map((group) => {
                 const stageClasses = getStageTone(group.stage).split(" ");
                 const accentClass = stageClasses[1] ?? "bg-[#eefaf2]";
 
                 return (
-                  <section key={group.stage} className="min-w-[320px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+                  <section key={group.stage} className="min-w-[390px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
                     <div className={`border-b px-4 py-4 ${getStageTone(group.stage)}`}>
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-semibold uppercase tracking-[0.14em]">{formatStageLabel(group.stage)}</span>
@@ -569,8 +575,8 @@ export function CrmTable({
                               <p className="font-medium text-[#17141a]">{formatCurrency(opportunity.estimatedValue)}</p>
                             </div>
                             <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf0f6] pt-3">
-                              <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${opportunity.quotationFinished ? "border-[#cfead7] bg-[#eefaf2] text-[#1f7a3d]" : "border-[#e6decd] bg-[#faf5ea] text-[#876536]"}`}>
-                                {opportunity.quotationFinished ? "Quotation sent" : "Quotation pending"}
+                              <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${getQuotationTone(opportunity.quotationFinished)}`}>
+                                {opportunity.quotationFinished ? "SENT" : "PENDING"}
                               </span>
                               <span className="text-xs text-[#9793a0]">{formatDate(opportunity.updatedAt)}</span>
                             </div>
@@ -603,10 +609,11 @@ export function CrmTable({
           </div>
         ) : (
           <div className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
-            <div className="hidden grid-cols-[1.2fr_1fr_0.9fr_0.9fr_0.9fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
+            <div className="hidden grid-cols-[1.2fr_1fr_0.9fr_0.95fr_0.9fr_0.9fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
               <span>Opportunity</span>
               <span>Account</span>
               <span>Stage</span>
+              <span>Quotation</span>
               <span>Primary Contact</span>
               <span>Value</span>
               <span className="text-right">Actions</span>
@@ -624,7 +631,7 @@ export function CrmTable({
                       router.push(getAdminRoute(`/crm/opportunities/${opportunity.id}`));
                     }
                   }}
-                  className="group grid cursor-pointer gap-4 border-b border-[#edf0f6] px-5 py-4 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 lg:grid-cols-[1.2fr_1fr_0.9fr_0.9fr_0.9fr_auto] lg:items-start"
+                  className="group grid cursor-pointer gap-4 border-b border-[#edf0f6] px-5 py-4 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 lg:grid-cols-[1.2fr_1fr_0.9fr_0.95fr_0.9fr_0.9fr_auto] lg:items-start"
                 >
                   <div className="min-w-0">
                     <span className="font-medium text-[#17141a] transition group-hover:text-[var(--brand)]">
@@ -639,6 +646,14 @@ export function CrmTable({
                     <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${getStageTone(opportunity.stage)}`}>
                       {formatStageLabel(opportunity.stage)}
                     </span>
+                  </div>
+                  <div className="rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Quotation</p>
+                    <div className="mt-1 lg:mt-0">
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${getQuotationTone(opportunity.quotationFinished)}`}>
+                        {opportunity.quotationFinished ? "SENT" : "PENDING"}
+                      </span>
+                    </div>
                   </div>
                   <div className="rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Primary Contact</p>
