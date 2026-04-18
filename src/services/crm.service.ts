@@ -45,6 +45,16 @@ type CrmOpportunityRow = {
   primary_contact_id: string | null;
   name: string;
   location: string | null;
+  architect_designer_firm: string | null;
+  architect_designer_contact_person: string | null;
+  architect_designer_position: string | null;
+  architect_designer_contact_number: string | null;
+  architect_designer_email: string | null;
+  owner_name: string | null;
+  owner_contact_person: string | null;
+  owner_position: string | null;
+  owner_contact_number: string | null;
+  owner_email: string | null;
   estimated_value: number | null;
   stage: CrmOpportunityStage;
   source: string | null;
@@ -130,6 +140,16 @@ function mapOpportunity(row: CrmOpportunityRow): CrmOpportunity {
     primaryContactName: primaryContact?.full_name ?? null,
     name: row.name,
     location: row.location,
+    architectDesignerFirm: row.architect_designer_firm,
+    architectDesignerContactPerson: row.architect_designer_contact_person,
+    architectDesignerPosition: row.architect_designer_position,
+    architectDesignerContactNumber: row.architect_designer_contact_number,
+    architectDesignerEmail: row.architect_designer_email,
+    ownerName: row.owner_name,
+    ownerContactPerson: row.owner_contact_person,
+    ownerPosition: row.owner_position,
+    ownerContactNumber: row.owner_contact_number,
+    ownerEmail: row.owner_email,
     estimatedValue: row.estimated_value,
     stage: row.stage,
     source: row.source ?? "manual",
@@ -369,6 +389,16 @@ export async function createCrmOpportunity(input: CrmOpportunityInput) {
       primary_contact_id: input.primaryContactId,
       name: input.name,
       location: input.location,
+      architect_designer_firm: input.architectDesignerFirm,
+      architect_designer_contact_person: input.architectDesignerContactPerson,
+      architect_designer_position: input.architectDesignerPosition,
+      architect_designer_contact_number: input.architectDesignerContactNumber,
+      architect_designer_email: input.architectDesignerEmail,
+      owner_name: input.ownerName,
+      owner_contact_person: input.ownerContactPerson,
+      owner_position: input.ownerPosition,
+      owner_contact_number: input.ownerContactNumber,
+      owner_email: input.ownerEmail,
       estimated_value: input.estimatedValue,
       stage: input.stage,
       source: input.source,
@@ -394,6 +424,16 @@ export async function updateCrmOpportunity(id: string, input: CrmOpportunityInpu
       primary_contact_id: input.primaryContactId,
       name: input.name,
       location: input.location,
+      architect_designer_firm: input.architectDesignerFirm,
+      architect_designer_contact_person: input.architectDesignerContactPerson,
+      architect_designer_position: input.architectDesignerPosition,
+      architect_designer_contact_number: input.architectDesignerContactNumber,
+      architect_designer_email: input.architectDesignerEmail,
+      owner_name: input.ownerName,
+      owner_contact_person: input.ownerContactPerson,
+      owner_position: input.ownerPosition,
+      owner_contact_number: input.ownerContactNumber,
+      owner_email: input.ownerEmail,
       estimated_value: input.estimatedValue,
       stage: input.stage,
       source: input.source,

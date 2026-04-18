@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { deleteCrmAccountAction, deleteCrmContactAction, type CrmDeleteState } from "@/app/(admin)/admin/crm/actions";
 import { CrmAccountForm, CrmContactFormInner, CrmOpportunityForm } from "@/components/admin/crm-forms";
+import { AnimatedPresence } from "@/components/ui/animated-presence";
 import { Modal } from "@/components/ui/modal";
 import { getAdminRoute } from "@/lib/admin-path";
 import type { CrmAccount, CrmContact, CrmOpportunity } from "@/types/crm";
@@ -23,24 +24,65 @@ function formatStageLabel(value: string) {
   return value.replaceAll("_", " ");
 }
 
+function getOpportunityStageBadge(stage: string) {
+  switch (stage) {
+    case "new_lead":
+      return "border-[#5aa7ff] bg-[#5aa7ff] text-white shadow-[0_8px_18px_rgba(90,167,255,0.28)]";
+    case "opportunity":
+      return "border-[#2f7dff] bg-[#2f7dff] text-white shadow-[0_8px_18px_rgba(47,125,255,0.28)]";
+    case "bidding":
+      return "border-[#8a5bff] bg-[#8a5bff] text-white shadow-[0_8px_18px_rgba(138,91,255,0.28)]";
+    case "negotiation":
+      return "border-[#ff9f1f] bg-[#ff9f1f] text-white shadow-[0_8px_18px_rgba(255,159,31,0.28)]";
+    case "awarded":
+      return "border-[#16b88a] bg-[#16b88a] text-white shadow-[0_8px_18px_rgba(22,184,138,0.28)]";
+    case "completed":
+      return "border-[#1f9d55] bg-[#1f9d55] text-white shadow-[0_8px_18px_rgba(31,157,85,0.28)]";
+    case "ongoing":
+      return "border-[#0f6cdd] bg-[#0f6cdd] text-white shadow-[0_8px_18px_rgba(15,108,221,0.28)]";
+    case "lost":
+      return "border-[#e5484d] bg-[#e5484d] text-white shadow-[0_8px_18px_rgba(229,72,77,0.28)]";
+    default:
+      return "border-[#6b7280] bg-[#6b7280] text-white shadow-[0_8px_18px_rgba(107,114,128,0.22)]";
+  }
+}
+
 function ActionButton({
   label,
   active = false,
+  tone = "default",
+  size = "default",
   onClick,
 }: {
   label: string;
   active?: boolean;
+  tone?: "default" | "danger";
+  size?: "default" | "compact";
   onClick: () => void;
 }) {
+  if (tone === "danger") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`inline-flex cursor-pointer items-center justify-center rounded-full border border-[#f1d0d0] bg-[#fff5f5] font-medium uppercase tracking-[0.12em] text-[#b42318] transition hover:border-[#d8aaaa] hover:bg-white ${
+          size === "compact" ? "px-3 py-1.5 text-[10px]" : "px-4 py-2 text-xs"
+        }`}
+      >
+        {label}
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex cursor-pointer items-center justify-center rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] transition ${
+      className={`inline-flex cursor-pointer items-center justify-center rounded-full border font-medium uppercase tracking-[0.12em] transition ${
         active
           ? "border-[#17141a] bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
           : "border-[#e7e9f2] bg-white text-[#17141a] hover:-translate-y-0.5 hover:border-[#cfd5e2] hover:bg-[#fafbfe] hover:shadow-[0_10px_20px_rgba(35,31,32,0.08)]"
-      }`}
+      } ${size === "compact" ? "px-3 py-1.5 text-[10px]" : "px-4 py-2 text-xs"}`}
     >
       {label}
     </button>
@@ -92,14 +134,11 @@ export function CrmAccountDetail({
         <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
           <div className="flex flex-col gap-4 border-b border-[#eef0f6] pb-5">
             <div className="flex flex-wrap items-center gap-3">
-              <ActionButton label="Edit account" active={accountPanel === "edit-account"} onClick={() => setAccountPanel((current) => (current === "edit-account" ? "none" : "edit-account"))} />
-              <button
-                type="button"
-                onClick={() => setAccountDeleteOpen(true)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#f1d0d0] bg-[#fff5f5] px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-[#b42318] transition hover:border-[#d8aaaa] hover:bg-white"
-              >
-                Delete account
-              </button>
+              <ActionButton
+                label={accountPanel === "edit-account" ? "Close" : "Edit overview"}
+                active={accountPanel === "edit-account"}
+                onClick={() => setAccountPanel((current) => (current === "edit-account" ? "none" : "edit-account"))}
+              />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -127,7 +166,9 @@ export function CrmAccountDetail({
             </div>
           </div>
 
-          {accountPanel === "edit-account" ? <div className="mt-5"><CrmAccountForm mode="edit" initialAccount={account} /></div> : null}
+          <AnimatedPresence open={accountPanel === "edit-account"} spaced>
+            <CrmAccountForm mode="edit" initialAccount={account} onCancel={() => setAccountPanel("none")} />
+          </AnimatedPresence>
         </section>
 
         <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
@@ -145,19 +186,17 @@ export function CrmAccountDetail({
               />
             </div>
           </div>
-          {contactPanel === "add-contact" ? (
-            <div className="mt-5">
-              <CrmContactFormInner
-                accountId={account.id}
-                onSuccess={() => {
-                  setSelectedContact(null);
-                  setContactPanel("none");
-                }}
-              />
-            </div>
-          ) : null}
-          {contactPanel === "edit-contact" && selectedContact ? (
-            <div className="mt-5">
+          <AnimatedPresence open={contactPanel === "add-contact"} spaced>
+            <CrmContactFormInner
+              accountId={account.id}
+              onSuccess={() => {
+                setSelectedContact(null);
+                setContactPanel("none");
+              }}
+            />
+          </AnimatedPresence>
+          <AnimatedPresence open={contactPanel === "edit-contact" && Boolean(selectedContact)} spaced>
+            {selectedContact ? (
               <CrmContactFormInner
                 accountId={account.id}
                 mode="edit"
@@ -171,8 +210,8 @@ export function CrmAccountDetail({
                   setContactPanel("none");
                 }}
               />
-            </div>
-          ) : null}
+            ) : null}
+          </AnimatedPresence>
           {contacts.length > 0 ? (
             <div className="mt-4 grid gap-3">
               {contacts.map((contact) => (
@@ -185,23 +224,15 @@ export function CrmAccountDetail({
                       ) : null}
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
-                      <button
-                        type="button"
+                      <ActionButton
+                        label="Edit"
+                        size="compact"
                         onClick={() => {
                           setSelectedContact(contact);
                           setContactPanel("edit-contact");
                         }}
-                        className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#e7e9f2] bg-white px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#17141a] transition hover:border-[#cfd5e2] hover:text-[var(--brand)]"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setContactToDelete(contact)}
-                        className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#f1d0d0] bg-[#fff5f5] px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#b42318] transition hover:border-[#d8aaaa] hover:bg-white"
-                      >
-                        Delete
-                      </button>
+                      />
+                      <ActionButton label="Delete" tone="danger" size="compact" onClick={() => setContactToDelete(contact)} />
                     </div>
                   </div>
                   <p className="mt-2 text-sm text-[#6f6a75]">{[contact.phone, contact.email].filter(Boolean).join(" - ") || "No contact details yet"}</p>
@@ -228,7 +259,9 @@ export function CrmAccountDetail({
               />
             </div>
           </div>
-          {opportunityPanel === "add-opportunity" ? <div className="mt-5"><CrmOpportunityForm accountId={account.id} contacts={contacts} /></div> : null}
+          <AnimatedPresence open={opportunityPanel === "add-opportunity"} spaced>
+            <CrmOpportunityForm accountId={account.id} contacts={contacts} onCancel={() => setOpportunityPanel("none")} />
+          </AnimatedPresence>
           {opportunities.length > 0 ? (
             <div className="mt-4 grid gap-3">
               {opportunities.map((opportunity) => (
@@ -242,13 +275,12 @@ export function CrmAccountDetail({
                       <p className="font-medium text-[#17141a]">{opportunity.name}</p>
                       <p className="mt-1 text-sm text-[#6f6a75]">{[opportunity.primaryContactName, opportunity.location].filter(Boolean).join(" - ") || "No extra opportunity details yet"}</p>
                     </div>
-                    <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#56515d]">
+                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${getOpportunityStageBadge(opportunity.stage)}`}>
                       {formatStageLabel(opportunity.stage)}
                     </span>
                   </div>
                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e8ebf3] pt-3">
                     <span className="text-sm font-medium text-[#17141a]">{formatCurrency(opportunity.estimatedValue)}</span>
-                    <span className="text-xs font-medium uppercase tracking-[0.12em] text-[var(--brand)]">Open opportunity</span>
                   </div>
                 </Link>
               ))}
@@ -256,6 +288,16 @@ export function CrmAccountDetail({
           ) : (
             <p className="mt-4 text-sm text-[#6f6a75]">No opportunities added for this account yet.</p>
           )}
+        </section>
+
+        <section className="self-start rounded-[1.3rem] border border-[#f1d0d0] bg-[#fffafa] p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#b42318]">Danger Zone</p>
+          <p className="mt-2 text-sm leading-5 text-[#6f6a75]">
+            Delete this account only if it was created by mistake. This will also remove all related contacts and opportunities.
+          </p>
+          <div className="mt-3">
+            <ActionButton label="Delete account" tone="danger" onClick={() => setAccountDeleteOpen(true)} />
+          </div>
         </section>
       </div>
 

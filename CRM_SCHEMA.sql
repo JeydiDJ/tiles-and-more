@@ -32,6 +32,16 @@ create table if not exists public.crm_opportunities (
   primary_contact_id uuid references public.crm_contacts(id) on delete set null,
   name text not null,
   location text,
+  architect_designer_firm text,
+  architect_designer_contact_person text,
+  architect_designer_position text,
+  architect_designer_contact_number text,
+  architect_designer_email text,
+  owner_name text,
+  owner_contact_person text,
+  owner_position text,
+  owner_contact_number text,
+  owner_email text,
   estimated_value numeric(12,2),
   stage text not null default 'new_lead',
   source text not null default 'manual',
@@ -55,6 +65,18 @@ create table if not exists public.crm_opportunities (
     estimated_value is null or estimated_value >= 0
   )
 );
+
+alter table if exists public.crm_opportunities
+  add column if not exists architect_designer_firm text,
+  add column if not exists architect_designer_contact_person text,
+  add column if not exists architect_designer_position text,
+  add column if not exists architect_designer_contact_number text,
+  add column if not exists architect_designer_email text,
+  add column if not exists owner_name text,
+  add column if not exists owner_contact_person text,
+  add column if not exists owner_position text,
+  add column if not exists owner_contact_number text,
+  add column if not exists owner_email text;
 
 create table if not exists public.crm_opportunity_activity_logs (
   id uuid primary key default gen_random_uuid(),

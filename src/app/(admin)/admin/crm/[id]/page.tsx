@@ -14,6 +14,22 @@ function formatCurrency(value: number | null) {
   }).format(value);
 }
 
+function BackLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="group inline-flex items-center gap-2 self-start rounded-full border border-[#f0d4d7] bg-white px-4 py-2.5 text-sm font-medium text-[var(--brand)] shadow-[0_10px_22px_rgba(35,31,32,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--brand)] hover:bg-[#fff7f7] hover:shadow-[0_14px_28px_rgba(237,35,37,0.12)]"
+    >
+      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#fff1f1] text-[var(--brand)] transition duration-200 group-hover:-translate-x-0.5 group-hover:bg-[var(--brand)] group-hover:text-white">
+        <svg viewBox="0 0 20 20" aria-hidden="true" className="h-3.5 w-3.5 fill-none stroke-current">
+          <path d="M11.5 4.5 6 10l5.5 5.5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      <span>{label}</span>
+    </Link>
+  );
+}
+
 export default async function AdminCrmAccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [account, contacts, opportunities] = await Promise.all([getCrmAccountById(id), getCrmContacts(id), getCrmOpportunities(id)]);
@@ -32,9 +48,7 @@ export default async function AdminCrmAccountDetailPage({ params }: { params: Pr
               <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#17141a] sm:text-[2.6rem]">{account.name}</h1>
               <p className="mt-3 text-sm text-[#6f6a75]">{[account.city, account.industry, account.phone || account.email].filter(Boolean).join(" - ") || "No account details yet."}</p>
             </div>
-            <Link href={getAdminRoute("/crm")} className="text-sm font-medium text-[var(--brand)] transition hover:text-[var(--brand-dark)]">
-              Back to CRM
-            </Link>
+            <BackLink href={getAdminRoute("/crm")} label="Back to CRM" />
           </div>
         </div>
 

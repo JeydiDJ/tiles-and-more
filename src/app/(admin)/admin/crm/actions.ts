@@ -7,6 +7,7 @@ import {
   createCrmContact,
   createCrmOpportunity,
   createCrmOpportunityAttachment,
+  getCrmOpportunityById,
   deleteCrmContact,
   deleteCrmAccount,
   deleteCrmOpportunity,
@@ -67,6 +68,16 @@ function parseOpportunityInput(formData: FormData) {
     primaryContactId: normalizeOptional(formData.get("primaryContactId")),
     name: String(formData.get("name") ?? "").trim(),
     location: normalizeOptional(formData.get("location")),
+    architectDesignerFirm: normalizeOptional(formData.get("architectDesignerFirm")),
+    architectDesignerContactPerson: normalizeOptional(formData.get("architectDesignerContactPerson")),
+    architectDesignerPosition: normalizeOptional(formData.get("architectDesignerPosition")),
+    architectDesignerContactNumber: normalizeOptional(formData.get("architectDesignerContactNumber")),
+    architectDesignerEmail: normalizeOptional(formData.get("architectDesignerEmail")),
+    ownerName: normalizeOptional(formData.get("ownerName")),
+    ownerContactPerson: normalizeOptional(formData.get("ownerContactPerson")),
+    ownerPosition: normalizeOptional(formData.get("ownerPosition")),
+    ownerContactNumber: normalizeOptional(formData.get("ownerContactNumber")),
+    ownerEmail: normalizeOptional(formData.get("ownerEmail")),
     estimatedValue: Number.isFinite(estimatedValue) ? estimatedValue : null,
     stage: String(formData.get("stage") ?? "new_lead").trim() as CrmOpportunityStage,
     source: normalizeOptional(formData.get("source")) ?? "manual",
@@ -80,6 +91,14 @@ function parseAttachmentFiles(formData: FormData) {
     .getAll("attachments")
     .filter((value): value is File => value instanceof File)
     .filter((file) => file.size > 0);
+}
+
+function revalidateCrmOpportunityPaths(accountId: string, opportunityId: string) {
+  revalidatePath(getAdminRoute("/crm"));
+  revalidatePath(getAdminRoute(`/crm/${accountId}`));
+  revalidatePath(getAdminRoute(`/crm/opportunities/${opportunityId}`));
+  revalidatePath(getAdminRoute());
+  revalidatePath(getAdminRoute("/calendar"));
 }
 
 async function requireAdminUser() {
@@ -275,14 +294,151 @@ export async function updateCrmOpportunityAction(_: CrmFormState, formData: Form
       await addCrmOpportunityActivity(opportunityId, "system", "Opportunity record updated.");
     }
 
-    revalidatePath(getAdminRoute("/crm"));
-    revalidatePath(getAdminRoute(`/crm/${input.accountId}`));
-    revalidatePath(getAdminRoute(`/crm/opportunities/${opportunityId}`));
-    revalidatePath(getAdminRoute());
-    revalidatePath(getAdminRoute("/calendar"));
+    revalidateCrmOpportunityPaths(input.accountId, opportunityId);
     return { error: null, entityId: opportunityId };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Unable to update opportunity.", entityId: null };
+  }
+}
+
+export async function updateCrmOpportunityOverviewAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const opportunityId = String(formData.get("opportunityId") ?? "").trim();
+    if (!opportunityId) {
+      return { error: "Opportunity ID is required.", entityId: null };
+    }
+
+    const existing = await getCrmOpportunityById(opportunityId);
+    if (!existing) {
+      return { error: "Opportunity not found.", entityId: null };
+    }
+
+    const estimatedValueRaw = normalizeOptional(formData.get("estimatedValue"));
+    const estimatedValue = estimatedValueRaw ? Number(estimatedValueRaw) : null;
+    const stage = String(formData.get("stage") ?? existing.stage).trim() as CrmOpportunityStage;
+
+    await updateCrmOpportunity(opportunityId, {
+      accountId: existing.accountId,
+      primaryContactId: normalizeOptional(formData.get("primaryContactId")) ?? existing.primaryContactId,
+      name: String(formData.get("name") ?? existing.name).trim() || existing.name,
+      location: normalizeOptional(formData.get("location")) ?? existing.location,
+      architectDesignerFirm: existing.architectDesignerFirm,
+      architectDesignerContactPerson: existing.architectDesignerContactPerson,
+      architectDesignerPosition: existing.architectDesignerPosition,
+      architectDesignerContactNumber: existing.architectDesignerContactNumber,
+      architectDesignerEmail: existing.architectDesignerEmail,
+      ownerName: existing.ownerName,
+      ownerContactPerson: existing.ownerContactPerson,
+      ownerPosition: existing.ownerPosition,
+      ownerContactNumber: existing.ownerContactNumber,
+      ownerEmail: existing.ownerEmail,
+      estimatedValue: Number.isFinite(estimatedValue) ? estimatedValue : existing.estimatedValue,
+      stage,
+      source: normalizeOptional(formData.get("source")) ?? existing.source,
+      notes: normalizeOptional(formData.get("notes")) ?? existing.notes,
+      quotationFinished: String(formData.get("quotationFinished") ?? String(existing.quotationFinished)) === "true",
+    });
+
+    if (existing.stage !== stage) {
+      await addCrmOpportunityActivity(opportunityId, "stage_change", `Stage changed from ${existing.stage} to ${stage}.`);
+    } else {
+      await addCrmOpportunityActivity(opportunityId, "system", "Opportunity overview updated.");
+    }
+
+    revalidateCrmOpportunityPaths(existing.accountId, opportunityId);
+    return { error: null, entityId: opportunityId };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to update opportunity overview.", entityId: null };
+  }
+}
+
+export async function updateCrmOpportunityArchitectAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const opportunityId = String(formData.get("opportunityId") ?? "").trim();
+    if (!opportunityId) {
+      return { error: "Opportunity ID is required.", entityId: null };
+    }
+
+    const existing = await getCrmOpportunityById(opportunityId);
+    if (!existing) {
+      return { error: "Opportunity not found.", entityId: null };
+    }
+
+    await updateCrmOpportunity(opportunityId, {
+      accountId: existing.accountId,
+      primaryContactId: existing.primaryContactId,
+      name: existing.name,
+      location: existing.location,
+      architectDesignerFirm: normalizeOptional(formData.get("architectDesignerFirm")),
+      architectDesignerContactPerson: normalizeOptional(formData.get("architectDesignerContactPerson")),
+      architectDesignerPosition: normalizeOptional(formData.get("architectDesignerPosition")),
+      architectDesignerContactNumber: normalizeOptional(formData.get("architectDesignerContactNumber")),
+      architectDesignerEmail: normalizeOptional(formData.get("architectDesignerEmail")),
+      ownerName: existing.ownerName,
+      ownerContactPerson: existing.ownerContactPerson,
+      ownerPosition: existing.ownerPosition,
+      ownerContactNumber: existing.ownerContactNumber,
+      ownerEmail: existing.ownerEmail,
+      estimatedValue: existing.estimatedValue,
+      stage: existing.stage,
+      source: existing.source,
+      notes: existing.notes,
+      quotationFinished: existing.quotationFinished,
+    });
+
+    await addCrmOpportunityActivity(opportunityId, "system", "Architect / designer details updated.");
+    revalidateCrmOpportunityPaths(existing.accountId, opportunityId);
+    return { error: null, entityId: opportunityId };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to update architect / designer details.", entityId: null };
+  }
+}
+
+export async function updateCrmOpportunityOwnerAction(_: CrmFormState, formData: FormData): Promise<CrmFormState> {
+  try {
+    await requireAdminUser();
+
+    const opportunityId = String(formData.get("opportunityId") ?? "").trim();
+    if (!opportunityId) {
+      return { error: "Opportunity ID is required.", entityId: null };
+    }
+
+    const existing = await getCrmOpportunityById(opportunityId);
+    if (!existing) {
+      return { error: "Opportunity not found.", entityId: null };
+    }
+
+    await updateCrmOpportunity(opportunityId, {
+      accountId: existing.accountId,
+      primaryContactId: existing.primaryContactId,
+      name: existing.name,
+      location: existing.location,
+      architectDesignerFirm: existing.architectDesignerFirm,
+      architectDesignerContactPerson: existing.architectDesignerContactPerson,
+      architectDesignerPosition: existing.architectDesignerPosition,
+      architectDesignerContactNumber: existing.architectDesignerContactNumber,
+      architectDesignerEmail: existing.architectDesignerEmail,
+      ownerName: normalizeOptional(formData.get("ownerName")),
+      ownerContactPerson: normalizeOptional(formData.get("ownerContactPerson")),
+      ownerPosition: normalizeOptional(formData.get("ownerPosition")),
+      ownerContactNumber: normalizeOptional(formData.get("ownerContactNumber")),
+      ownerEmail: normalizeOptional(formData.get("ownerEmail")),
+      estimatedValue: existing.estimatedValue,
+      stage: existing.stage,
+      source: existing.source,
+      notes: existing.notes,
+      quotationFinished: existing.quotationFinished,
+    });
+
+    await addCrmOpportunityActivity(opportunityId, "system", "Owner details updated.");
+    revalidateCrmOpportunityPaths(existing.accountId, opportunityId);
+    return { error: null, entityId: opportunityId };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Unable to update owner details.", entityId: null };
   }
 }
 

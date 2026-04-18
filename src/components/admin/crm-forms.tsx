@@ -48,9 +48,11 @@ function formatStageLabel(value: string) {
 export function CrmAccountForm({
   mode = "create",
   initialAccount = null,
+  onCancel,
 }: {
   mode?: "create" | "edit";
   initialAccount?: CrmAccount | null;
+  onCancel?: () => void;
 }) {
   const router = useRouter();
   const isEditMode = mode === "edit";
@@ -141,7 +143,13 @@ export function CrmAccountForm({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => router.push(getAdminRoute("/crm"))}
+            onClick={() => {
+              if (onCancel) {
+                onCancel();
+                return;
+              }
+              router.push(getAdminRoute("/crm"));
+            }}
             className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
           >
             Cancel
@@ -237,11 +245,13 @@ export function CrmOpportunityForm({
   initialOpportunity = null,
   accountId,
   contacts = [],
+  onCancel,
 }: {
   mode?: "create" | "edit";
   initialOpportunity?: CrmOpportunity | null;
   accountId: string;
   contacts?: CrmContact[];
+  onCancel?: () => void;
 }) {
   const router = useRouter();
   const isEditMode = mode === "edit";
@@ -332,6 +342,78 @@ export function CrmOpportunityForm({
                 <p className="text-sm text-[var(--muted)]">Enter the opportunity value in Philippine Peso with centavos when needed.</p>
               </div>
             </Field>
+            <Field label="Architect / Designer" className="md:col-span-2">
+              <Input
+                name="architectDesignerFirm"
+                placeholder="Enter the architect or design firm"
+                defaultValue={initialOpportunity?.architectDesignerFirm ?? ""}
+              />
+            </Field>
+            <Field label="Architect Contact Person">
+              <Input
+                name="architectDesignerContactPerson"
+                placeholder="Enter the main architect/designer contact"
+                defaultValue={initialOpportunity?.architectDesignerContactPerson ?? ""}
+              />
+            </Field>
+            <Field label="Architect Position">
+              <Input
+                name="architectDesignerPosition"
+                placeholder="Enter the contact's role or title"
+                defaultValue={initialOpportunity?.architectDesignerPosition ?? ""}
+              />
+            </Field>
+            <Field label="Architect Contact Number">
+              <Input
+                name="architectDesignerContactNumber"
+                placeholder="Enter the architect/designer contact number"
+                defaultValue={initialOpportunity?.architectDesignerContactNumber ?? ""}
+              />
+            </Field>
+            <Field label="Architect Email Address">
+              <Input
+                name="architectDesignerEmail"
+                type="email"
+                placeholder="Enter the architect/designer email"
+                defaultValue={initialOpportunity?.architectDesignerEmail ?? ""}
+              />
+            </Field>
+            <Field label="Owner" className="md:col-span-2">
+              <Input
+                name="ownerName"
+                placeholder="Enter the project owner or owner company"
+                defaultValue={initialOpportunity?.ownerName ?? ""}
+              />
+            </Field>
+            <Field label="Owner Contact Person">
+              <Input
+                name="ownerContactPerson"
+                placeholder="Enter the owner's main contact"
+                defaultValue={initialOpportunity?.ownerContactPerson ?? ""}
+              />
+            </Field>
+            <Field label="Owner Position">
+              <Input
+                name="ownerPosition"
+                placeholder="Enter the owner's contact role or title"
+                defaultValue={initialOpportunity?.ownerPosition ?? ""}
+              />
+            </Field>
+            <Field label="Owner Contact Number">
+              <Input
+                name="ownerContactNumber"
+                placeholder="Enter the owner's contact number"
+                defaultValue={initialOpportunity?.ownerContactNumber ?? ""}
+              />
+            </Field>
+            <Field label="Owner Email Address">
+              <Input
+                name="ownerEmail"
+                type="email"
+                placeholder="Enter the owner's email"
+                defaultValue={initialOpportunity?.ownerEmail ?? ""}
+              />
+            </Field>
             <Field label="Opportunity Notes" className="md:col-span-2">
               <Textarea
                 name="notes"
@@ -374,7 +456,13 @@ export function CrmOpportunityForm({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => router.push(isEditMode && initialOpportunity ? getAdminRoute(`/crm/${initialOpportunity.accountId}`) : getAdminRoute(`/crm/${accountId}`))}
+            onClick={() => {
+              if (onCancel) {
+                onCancel();
+                return;
+              }
+              router.push(isEditMode && initialOpportunity ? getAdminRoute(`/crm/${initialOpportunity.accountId}`) : getAdminRoute(`/crm/${accountId}`));
+            }}
             className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
           >
             Cancel
