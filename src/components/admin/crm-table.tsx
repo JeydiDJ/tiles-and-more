@@ -376,10 +376,10 @@ export function CrmTable({
           <button
             type="button"
             onClick={() => setActiveTab("overview")}
-            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
               activeTab === "overview"
-                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
             }`}
           >
             Overview
@@ -387,10 +387,10 @@ export function CrmTable({
           <button
             type="button"
             onClick={() => setActiveTab("accounts")}
-            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
               activeTab === "accounts"
-                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
             }`}
           >
             Accounts
@@ -398,10 +398,10 @@ export function CrmTable({
           <button
             type="button"
             onClick={() => setActiveTab("opportunities")}
-            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
               activeTab === "opportunities"
-                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
             }`}
           >
             Opportunities
@@ -409,10 +409,10 @@ export function CrmTable({
           <button
             type="button"
             onClick={() => setActiveTab("reports")}
-            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
               activeTab === "reports"
-                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
             }`}
           >
             Reports
@@ -699,24 +699,24 @@ export function CrmTable({
                         }}
                         className="group grid cursor-pointer gap-4 border-b border-[#edf0f6] px-5 py-4 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 lg:grid-cols-[1.45fr_0.8fr_0.95fr_0.95fr_0.7fr_auto] lg:items-start"
                       >
-                        <div className="min-w-0 rounded-[1.1rem] border border-[#edf0f6] bg-[linear-gradient(180deg,#ffffff_0%,#fafbfe_100%)] px-4 py-3 transition hover:border-[#d7dce8] hover:shadow-[0_10px_20px_rgba(35,31,32,0.06)] lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:hover:shadow-none">
+                        <div className="admin-account-summary-card min-w-0 rounded-[1.1rem] border border-[#edf0f6] bg-[linear-gradient(180deg,#ffffff_0%,#fafbfe_100%)] px-4 py-3 transition hover:border-[#d7dce8] hover:shadow-[0_10px_20px_rgba(35,31,32,0.06)] lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:hover:shadow-none">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <span className="block font-medium text-[#17141a] transition group-hover:text-[var(--brand)]">
+                              <span className="admin-account-summary-title block font-medium text-[#17141a] transition group-hover:text-[var(--brand)]">
                                 {account.name}
                               </span>
                               <p className="mt-1 text-sm text-[#6f6a75]">{account.email || "No account email added yet."}</p>
                             </div>
-                            <span className="shrink-0 rounded-full border border-[#ebeef5] bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
+                            <span className="admin-account-summary-badge shrink-0 rounded-full border border-[#ebeef5] bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
                               Account
                             </span>
                           </div>
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <span className="inline-flex rounded-full bg-[#f4f6fb] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
+                            <span className="admin-account-summary-meta inline-flex rounded-full bg-[#f4f6fb] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
                               Updated {formatDate(account.updatedAt)}
                             </span>
                             {account.phone ? (
-                              <span className="inline-flex rounded-full bg-[#f4f6fb] px-2.5 py-1 text-[10px] font-medium text-[#6f6a75]">
+                              <span className="admin-account-summary-meta inline-flex rounded-full bg-[#f4f6fb] px-2.5 py-1 text-[10px] font-medium text-[#6f6a75]">
                                 {account.phone}
                               </span>
                             ) : null}
@@ -801,17 +801,17 @@ export function CrmTable({
                 const accentClass = stageClasses[1] ?? "bg-[#eefaf2]";
 
                 return (
-                  <section key={group.stage} className="min-w-[390px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+                  <section key={group.stage} className="admin-board-lane min-w-[390px] overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
                     <div className={`border-b px-4 py-4 ${getStageTone(group.stage)}`}>
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-semibold uppercase tracking-[0.14em]">{formatStageLabel(group.stage)}</span>
-                        <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-current">{group.items.length}</span>
+                        <span className="admin-board-lane-count rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-current">{group.items.length}</span>
                       </div>
                     </div>
-                    <div className="grid gap-3 bg-[#fbfbfd] p-3">
+                    <div className="admin-board-lane-body grid gap-3 bg-[#fbfbfd] p-3">
                       {group.items.length > 0 ? (
                         group.items.map((opportunity) => (
-                          <article key={opportunity.id} className="rounded-[1.15rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_8px_18px_rgba(35,31,32,0.04)] transition hover:-translate-y-0.5 hover:border-[#d0d6e3] hover:shadow-[0_14px_28px_rgba(35,31,32,0.08)]">
+                          <article key={opportunity.id} className="admin-board-card rounded-[1.15rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_8px_18px_rgba(35,31,32,0.04)] transition hover:-translate-y-0.5 hover:border-[#d0d6e3] hover:shadow-[0_14px_28px_rgba(35,31,32,0.08)]">
                             <div className={`mb-3 h-1.5 rounded-full ${accentClass}`} />
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
@@ -844,13 +844,13 @@ export function CrmTable({
                             <div className="mt-3 flex items-center gap-2">
                               <Link
                                 href={getAdminRoute(`/crm/opportunities/${opportunity.id}`)}
-                                className="inline-flex flex-1 items-center justify-center rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:bg-white hover:text-[var(--brand)]"
+                                className="admin-board-card-action-primary inline-flex flex-1 items-center justify-center rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#d9dce8] hover:bg-white hover:text-[var(--brand)]"
                               >
                                 Open
                               </Link>
                               <Link
                                 href={getAdminRoute(`/crm/${opportunity.accountId}`)}
-                                className="inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#6f6a75] transition hover:border-[#d9dce8] hover:text-[var(--brand)]"
+                                className="admin-board-card-action-secondary inline-flex items-center justify-center rounded-xl border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#6f6a75] transition hover:border-[#d9dce8] hover:text-[var(--brand)]"
                               >
                                 Account
                               </Link>
@@ -858,7 +858,7 @@ export function CrmTable({
                           </article>
                         ))
                       ) : (
-                        <div className="rounded-[1.1rem] border border-dashed border-[#d8dde8] bg-white px-4 py-8 text-center text-sm text-[#9793a0]">
+                        <div className="admin-board-empty rounded-[1.1rem] border border-dashed border-[#d8dde8] bg-white px-4 py-8 text-center text-sm text-[#9793a0]">
                           No opportunities here.
                         </div>
                       )}

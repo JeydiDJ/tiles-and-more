@@ -113,7 +113,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
         <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 lg:grid-cols-[1.25fr_0.7fr_0.7fr_auto] lg:items-end">
           <label className="grid gap-2">
             <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Search</span>
-            <div className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+            <div className="admin-search-surface flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
               <span className="text-[var(--muted)]">
                 <SearchIcon />
               </span>
@@ -121,7 +121,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search by name, code, brand, family, material, or finish"
-                className="w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[#8f8b85]"
+                className="admin-search-input w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[#8f8b85]"
               />
             </div>
           </label>

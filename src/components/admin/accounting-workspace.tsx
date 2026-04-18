@@ -77,10 +77,10 @@ function MetricCard({
 }) {
   const toneClassName =
     tone === "positive"
-      ? "border-[#d8efe0] bg-[#f4fbf6]"
+      ? "admin-accounting-metric admin-accounting-metric-positive border-[#d8efe0] bg-[#f4fbf6]"
       : tone === "negative"
-        ? "border-[#f5d8dc] bg-[#fff7f8]"
-        : "border-[#e7e9f2] bg-white";
+        ? "admin-accounting-metric admin-accounting-metric-negative border-[#f5d8dc] bg-[#fff7f8]"
+        : "admin-accounting-metric admin-accounting-metric-neutral border-[#e7e9f2] bg-white";
 
   return (
     <div className={`rounded-[1.4rem] border p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] ${toneClassName}`}>
@@ -143,16 +143,16 @@ function AmountField({
 }) {
   const accentClassName =
     accent === "positive"
-      ? "border-[#d8efe0] bg-[#fbfefb]"
+      ? "admin-accounting-amount admin-accounting-amount-positive border-[#d8efe0] bg-[#fbfefb]"
       : accent === "negative"
-        ? "border-[#f2e1e3] bg-[#fffdfd]"
-        : "border-[#e1e5ee]";
+        ? "admin-accounting-amount admin-accounting-amount-negative border-[#f2e1e3] bg-[#fffdfd]"
+        : "admin-accounting-amount admin-accounting-amount-neutral border-[#e1e5ee]";
 
   return (
     <label className="grid gap-2">
       <span className="text-sm text-[#6f6a75]">{label}</span>
       <div className="relative">
-        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-[#8d8896]">PHP</span>
+        <span className="admin-accounting-prefix pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-[#8d8896]">PHP</span>
         <Input
           type="number"
           name={name}
@@ -261,7 +261,7 @@ function AccountingPeriodEditor({ period }: { period: AccountingPeriod }) {
                 </div>
               </div>
 
-              <div className="grid gap-4 rounded-[1.3rem] border border-[#d8efe0] bg-[#f9fdf9] p-4">
+              <div className="admin-accounting-section admin-accounting-section-positive grid gap-4 rounded-[1.3rem] border border-[#d8efe0] bg-[#f9fdf9] p-4">
                 <SectionHeader title="Cash In" subtitle="Money received during this period." />
                 <div className="grid gap-3 md:grid-cols-3">
                   {inflowFields.map((field) => (
@@ -270,7 +270,7 @@ function AccountingPeriodEditor({ period }: { period: AccountingPeriod }) {
                 </div>
               </div>
 
-              <div className="grid gap-4 rounded-[1.3rem] border border-[#f3e1e3] bg-[#fffdfd] p-4">
+              <div className="admin-accounting-section admin-accounting-section-negative grid gap-4 rounded-[1.3rem] border border-[#f3e1e3] bg-[#fffdfd] p-4">
                 <SectionHeader title="Cash Out" subtitle="Direct costs, operating spend, and other outgoing cash." />
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {outflowFields.map((field) => (
@@ -419,7 +419,7 @@ function CreateAccountingPeriodForm() {
           </div>
         </div>
 
-        <div className="rounded-[1.3rem] border border-[#d8efe0] bg-[#f9fdf9] p-4">
+        <div className="admin-accounting-section admin-accounting-section-positive rounded-[1.3rem] border border-[#d8efe0] bg-[#f9fdf9] p-4">
           <SectionHeader title="Cash In" subtitle="Received money for the selected period." />
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {inflowFields.map((field) => (
@@ -428,7 +428,7 @@ function CreateAccountingPeriodForm() {
           </div>
         </div>
 
-        <div className="rounded-[1.3rem] border border-[#f3e1e3] bg-[#fffdfd] p-4">
+        <div className="admin-accounting-section admin-accounting-section-negative rounded-[1.3rem] border border-[#f3e1e3] bg-[#fffdfd] p-4">
           <SectionHeader title="Cash Out" subtitle="Outgoing cash for operations, debt, taxes, and capital spend." />
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {outflowFields.map((field) => (
@@ -548,10 +548,10 @@ export function AccountingWorkspace({
           <button
             type="button"
             onClick={() => setActiveTab("periods")}
-            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
               activeTab === "periods"
-                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
             }`}
           >
             Periods
@@ -559,10 +559,10 @@ export function AccountingWorkspace({
           <button
             type="button"
             onClick={() => setActiveTab("journal")}
-            className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
               activeTab === "journal"
-                ? "bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-                : "border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
             }`}
           >
             Journal

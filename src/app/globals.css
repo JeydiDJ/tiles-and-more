@@ -137,3 +137,246 @@ input[type="search"]::-webkit-search-results-decoration {
     );
   opacity: 0.9;
 }
+
+html[data-admin-theme="dark"] body {
+  background: linear-gradient(180deg, #090b0f 0%, #0d1117 58%, #11161d 100%);
+  color: #eef2f7;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root {
+  --surface: #151b24;
+  --foreground: #eef2f7;
+  --muted: #aeb7c5;
+  --border: #303b4a;
+  background: linear-gradient(180deg, #0b0e13 0%, #11161d 100%) !important;
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root aside,
+html[data-admin-theme="dark"] .admin-theme-root main,
+html[data-admin-theme="dark"] .admin-theme-root section,
+html[data-admin-theme="dark"] .admin-theme-root article,
+html[data-admin-theme="dark"] .admin-theme-root form,
+html[data-admin-theme="dark"] .admin-theme-root table,
+html[data-admin-theme="dark"] .admin-theme-root thead,
+html[data-admin-theme="dark"] .admin-theme-root tbody {
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root aside,
+html[data-admin-theme="dark"] .admin-theme-root section,
+html[data-admin-theme="dark"] .admin-theme-root article,
+html[data-admin-theme="dark"] .admin-theme-root form,
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-white"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-[#faf"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-[#f8"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-[#f7"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-[#f6"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-[#fc"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="bg-[#fff"] {
+  background: #151b24 !important;
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root [class*="border-[#e"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="border-[#f"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="border-[var(--border)]"] {
+  border-color: #283241 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#17141a]"] {
+  color: #f4f7fb !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#6f6a75]"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#9793a0]"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#8a8793]"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#68636f]"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#7c7784]"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#8d8896]"],
+html[data-admin-theme="dark"] .admin-theme-root [class*="text-[#5b5763]"] {
+  color: #aeb7c5 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root input,
+html[data-admin-theme="dark"] .admin-theme-root textarea,
+html[data-admin-theme="dark"] .admin-theme-root select {
+  background: #0f141b !important;
+  border-color: #303b4a !important;
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root input::placeholder,
+html[data-admin-theme="dark"] .admin-theme-root textarea::placeholder {
+  color: #7f8a9b !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root button[variant="secondary"],
+html[data-admin-theme="dark"] .admin-theme-root button,
+html[data-admin-theme="dark"] .admin-theme-root a[class*="border "] {
+  border-color: #303b4a;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root img {
+  opacity: 0.98;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-search-surface {
+  background: #0f141b !important;
+  border-color: #303b4a !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-search-input {
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-search-input::placeholder {
+  color: #7f8a9b !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-account-summary-card {
+  background: linear-gradient(180deg, #17202b 0%, #131b25 100%) !important;
+  border-color: #2c3746 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-account-summary-title {
+  color: #f4f7fb !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-account-summary-badge {
+  background: #111923 !important;
+  border-color: #2f3a49 !important;
+  color: #aeb7c5 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-account-summary-meta {
+  background: #1a2330 !important;
+  color: #aeb7c5 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-metric {
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-metric-neutral {
+  background: #151b24 !important;
+  border-color: #283241 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-metric-positive {
+  background: rgba(15, 138, 67, 0.14) !important;
+  border-color: rgba(66, 183, 115, 0.34) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-metric-negative {
+  background: rgba(209, 57, 77, 0.14) !important;
+  border-color: rgba(230, 106, 123, 0.34) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-section {
+  color: #eef2f7 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-section-positive {
+  background: rgba(15, 138, 67, 0.12) !important;
+  border-color: rgba(66, 183, 115, 0.28) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-section-negative {
+  background: rgba(209, 57, 77, 0.12) !important;
+  border-color: rgba(230, 106, 123, 0.28) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-amount-positive {
+  background: rgba(15, 138, 67, 0.08) !important;
+  border-color: rgba(66, 183, 115, 0.28) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-amount-negative {
+  background: rgba(209, 57, 77, 0.08) !important;
+  border-color: rgba(230, 106, 123, 0.28) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-amount-neutral {
+  background: #0f141b !important;
+  border-color: #303b4a !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-accounting-prefix {
+  color: #aeb7c5 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-internal-tab {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-internal-tab-idle {
+  background: #111923 !important;
+  border-color: #2f3a49 !important;
+  color: #b8c4d3 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-internal-tab-idle:hover {
+  background: #1a2430 !important;
+  border-color: #465467 !important;
+  color: #f4f7fb !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-internal-tab-active {
+  background: #eef2f7 !important;
+  border-color: #eef2f7 !important;
+  color: #11161d !important;
+  box-shadow: 0 10px 20px rgba(3, 8, 15, 0.22) !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-lane {
+  background: #151b24 !important;
+  border-color: #283241 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-lane-body {
+  background: #111923 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-lane-count {
+  background: rgba(9, 14, 20, 0.34) !important;
+  color: #f4f7fb !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-card {
+  background: #18212c !important;
+  border-color: #2d3a49 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-card-action-primary {
+  background: #202b38 !important;
+  border-color: #344456 !important;
+  color: #f4f7fb !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-card-action-primary:hover {
+  background: #253243 !important;
+  border-color: #465467 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-card-action-secondary {
+  background: #151d27 !important;
+  border-color: #303d4c !important;
+  color: #b8c4d3 !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-card-action-secondary:hover {
+  background: #1b2632 !important;
+  border-color: #465467 !important;
+  color: #f4f7fb !important;
+}
+
+html[data-admin-theme="dark"] .admin-theme-root .admin-board-empty {
+  background: #18212c !important;
+  border-color: #344456 !important;
+  color: #9ba8ba !important;
+}

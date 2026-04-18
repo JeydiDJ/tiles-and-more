@@ -137,6 +137,22 @@ function AccountingIcon() {
   );
 }
 
+function PreferencesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
+      <circle cx="12" cy="12" r="3.2" strokeWidth="1.7" />
+      <path d="M12 3.8v2.1" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M12 18.1v2.1" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="m18.2 5.8-1.5 1.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="m7.3 16.7-1.5 1.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M20.2 12h-2.1" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M5.9 12H3.8" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="m18.2 18.2-1.5-1.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="m7.3 7.3-1.5-1.5" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function getNavIcon(label: string) {
   switch (label) {
     case "Dashboard":
@@ -153,6 +169,8 @@ function getNavIcon(label: string) {
       return <CalendarIcon />;
     case "Accounting":
       return <AccountingIcon />;
+    case "Preferences":
+      return <PreferencesIcon />;
     case "Collections":
       return <CollectionIcon />;
     case "Gallery":
@@ -172,15 +190,17 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
   const isDesktopExpanded = !collapsed || isDesktopHoveringNav;
 
   useEffect(() => {
-    setMobileNavOpen(false);
-    setCollapsed(true);
-    setIsDesktopHoveringNav(false);
+    window.setTimeout(() => {
+      setMobileNavOpen(false);
+      setCollapsed(true);
+      setIsDesktopHoveringNav(false);
+    }, 0);
   }, [pathname]);
 
   return (
     <div
       className={cn(
-        "min-h-screen bg-[#f6f7fb] lg:grid lg:transition-[grid-template-columns] lg:duration-300 lg:ease-out",
+        "admin-theme-root min-h-screen bg-[#f6f7fb] lg:grid lg:transition-[grid-template-columns] lg:duration-300 lg:ease-out",
         isDesktopExpanded ? "lg:grid-cols-[292px_1fr]" : "lg:grid-cols-[104px_1fr]",
       )}
     >

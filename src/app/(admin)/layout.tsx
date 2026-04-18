@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminThemeProvider } from "@/components/admin/admin-theme-provider";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { createPageMetadata } from "@/lib/seo";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
@@ -27,5 +28,9 @@ export default async function AdminLayout({
     userEmail = user?.email;
   }
 
-  return <AdminShell userEmail={userEmail}>{children}</AdminShell>;
+  return (
+    <AdminThemeProvider>
+      <AdminShell userEmail={userEmail}>{children}</AdminShell>
+    </AdminThemeProvider>
+  );
 }
