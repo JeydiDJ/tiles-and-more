@@ -6,11 +6,11 @@ import { createPageMetadata, siteUrl } from "@/lib/seo";
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   applicationName: siteConfig.name,
+  ...createPageMetadata(),
   title: {
     default: "TILES & MORE",
     template: `%s | TILES & MORE`,
   },
-  ...createPageMetadata(),
   referrer: "origin-when-cross-origin",
   category: "Construction and home improvement",
   authors: [{ name: siteConfig.name }],
