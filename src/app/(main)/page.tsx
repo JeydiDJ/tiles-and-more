@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Script from "next/script";
 import { getCategories } from "@/services/category.service";
 import { Hero } from "@/components/sections/hero";
@@ -6,19 +7,24 @@ import { ProjectsSection } from "@/components/sections/collections";
 import { siteConfig } from "@/config/site";
 import { absoluteUrl, createPageMetadata, defaultOgImagePath } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  description:
-    "Explore Tiles & More for tile, quartz slab, decorative surface, flooring, and sanitary product selections backed by project-ready support in Central Luzon.",
-  path: "/",
-  image: defaultOgImagePath,
-  keywords: [
-    "tiles pampanga",
-    "tiles central luzon",
-    "quartz slabs philippines",
-    "sanitary ware pampanga",
-    "tile showroom mexico pampanga",
-  ],
-});
+export const metadata: Metadata = {
+  ...createPageMetadata({
+    description:
+      "Explore Tiles & More for tile, quartz slab, decorative surface, flooring, and sanitary product selections backed by project-ready support in Central Luzon.",
+    path: "/",
+    image: defaultOgImagePath,
+    keywords: [
+      "tiles pampanga",
+      "tiles central luzon",
+      "quartz slabs philippines",
+      "sanitary ware pampanga",
+      "tile showroom mexico pampanga",
+    ],
+  }),
+  title: {
+    absolute: "TILES & MORE",
+  },
+};
 
 export default async function HomePage() {
   const categories = await getCategories();
