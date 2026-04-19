@@ -218,9 +218,9 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="grid gap-4 border-b border-[var(--border)] px-5 py-5 transition hover:bg-[#fcfcfe] last:border-b-0 lg:grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] lg:items-start"
+                className="grid gap-3 border-b border-[var(--border)] px-4 py-4 transition hover:bg-[#fcfcfe] last:border-b-0 sm:px-5 lg:grid-cols-[auto_1.45fr_0.75fr_0.8fr_0.8fr_0.7fr_auto] lg:items-start lg:gap-4 lg:py-5"
               >
-                <label className="flex items-center">
+                <label className="flex items-center lg:self-center">
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(product.id)}
@@ -234,8 +234,8 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                   <Link href={getAdminRoute(`/products/${product.id}`)} className="font-medium text-[#231f20] transition hover:text-[var(--brand)]">
                     {product.name}
                   </Link>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
-                    <span>{product.productFamily}</span>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-sm text-[var(--muted)]">
+                    <span className="min-w-0 truncate">{product.productFamily}</span>
                     <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
                       {product.imageUrl ? "Image ready" : "No image"}
                     </span>
@@ -262,10 +262,29 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
                   {product.finish ?? "-"}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
+                <div className="grid gap-2 sm:grid-cols-2 lg:hidden">
+                  <div className="rounded-lg border border-[#edf0f6] bg-[#fafbfe] px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Code</p>
+                    <p className="mt-1 text-sm text-[#3e3944]">{product.productCode}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#edf0f6] bg-[#fafbfe] px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Brand</p>
+                    <p className="mt-1 text-sm text-[#3e3944]">{product.brandName}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#edf0f6] bg-[#fafbfe] px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Category</p>
+                    <p className="mt-1 text-sm text-[#3e3944]">{product.category}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#edf0f6] bg-[#fafbfe] px-3 py-2.5">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Finish</p>
+                    <p className="mt-1 text-sm text-[#3e3944]">{product.finish ?? "-"}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 lg:justify-end">
                   <Link
                     href={getAdminRoute(`/products/${product.id}`)}
-                    className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#ed2325]/30 hover:text-[var(--brand)]"
+                    className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-3 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#ed2325]/30 hover:text-[var(--brand)] sm:px-4 sm:text-xs"
                   >
                     Edit
                   </Link>

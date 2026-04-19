@@ -67,7 +67,7 @@ export function AdminPreferencesPanel() {
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6a75]">Choose the visual theme that feels best for daily admin work. This preference is saved on this browser.</p>
         </div>
 
-        <div className="grid gap-5 px-5 py-5 sm:px-6 xl:grid-cols-2">
+        <div className="grid gap-5 px-4 py-4 sm:px-6 sm:py-5 xl:grid-cols-2">
           <ThemeCard
             title="Dark"
             description="Lower glare with darker surfaces for longer CRM, accounting, and admin sessions."
@@ -91,11 +91,11 @@ export function AdminPreferencesPanel() {
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Current Setting</p>
             <p className="mt-2 text-lg font-semibold tracking-tight text-[#17141a]">{theme === "dark" ? "Dark theme enabled" : "Light theme enabled"}</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant={theme === "dark" ? "primary" : "secondary"} className="rounded-xl px-4 py-2.5 normal-case tracking-normal" onClick={() => setTheme("dark")}>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button variant={theme === "dark" ? "primary" : "secondary"} className="w-full rounded-xl px-4 py-2.5 normal-case tracking-normal sm:w-auto" onClick={() => setTheme("dark")}>
               Use Dark
             </Button>
-            <Button variant={theme === "light" ? "primary" : "secondary"} className="rounded-xl px-4 py-2.5 normal-case tracking-normal" onClick={() => setTheme("light")}>
+            <Button variant={theme === "light" ? "primary" : "secondary"} className="w-full rounded-xl px-4 py-2.5 normal-case tracking-normal sm:w-auto" onClick={() => setTheme("light")}>
               Use Light
             </Button>
           </div>

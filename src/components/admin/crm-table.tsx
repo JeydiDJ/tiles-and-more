@@ -91,6 +91,21 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
+function MobileMetaField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="grid gap-1 rounded-lg border border-[#edf0f6] bg-[#fafbfe] px-3 py-2.5">
+      <span className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">{label}</span>
+      <span className="text-sm leading-5 text-[#3e3944]">{value}</span>
+    </div>
+  );
+}
+
 export function CrmTable({
   accounts,
   opportunities,
@@ -714,9 +729,9 @@ export function CrmTable({
                             router.push(getAdminRoute(`/crm/${account.id}`));
                           }
                         }}
-                        className="group grid cursor-pointer gap-4 border-b border-[#edf0f6] px-5 py-4 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 lg:grid-cols-[1.45fr_0.8fr_0.95fr_0.95fr_0.7fr_auto] lg:items-start"
+                        className="group grid cursor-pointer gap-3 border-b border-[#edf0f6] px-4 py-3.5 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 sm:px-5 lg:grid-cols-[1.45fr_0.8fr_0.95fr_0.95fr_0.7fr_auto] lg:items-start lg:gap-4 lg:py-4"
                       >
-                        <div className="admin-account-summary-card min-w-0 rounded-[1.1rem] border border-[#edf0f6] bg-[linear-gradient(180deg,#ffffff_0%,#fafbfe_100%)] px-4 py-3 transition hover:border-[#d7dce8] hover:shadow-[0_10px_20px_rgba(35,31,32,0.06)] lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:hover:shadow-none">
+                        <div className="admin-account-summary-card min-w-0 rounded-[1rem] border border-[#edf0f6] bg-[linear-gradient(180deg,#ffffff_0%,#fafbfe_100%)] px-3.5 py-3 transition hover:border-[#d7dce8] hover:shadow-[0_10px_20px_rgba(35,31,32,0.06)] lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:hover:shadow-none">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <span className="admin-account-summary-title block font-medium text-[#17141a] transition group-hover:text-[var(--brand)]">
@@ -728,7 +743,7 @@ export function CrmTable({
                               Account
                             </span>
                           </div>
-                          <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="mt-2 flex flex-wrap gap-2">
                             <span className="admin-account-summary-meta inline-flex rounded-full bg-[#f4f6fb] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
                               Updated {formatDate(account.updatedAt)}
                             </span>
@@ -739,24 +754,24 @@ export function CrmTable({
                             ) : null}
                           </div>
                         </div>
-                        <div className="rounded-[1rem] bg-[#fafbfe] px-3 py-3 text-sm text-[#3e3944] lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                        <div className="hidden rounded-[1rem] bg-[#fafbfe] px-3 py-3 text-sm text-[#3e3944] lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                           <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Industry</p>
                           <p className="mt-1 lg:mt-0">{account.industry || "Not set yet"}</p>
                         </div>
-                        <div className="rounded-[1rem] bg-[#fafbfe] px-3 py-3 text-sm text-[#3e3944] lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                        <div className="hidden rounded-[1rem] bg-[#fafbfe] px-3 py-3 text-sm text-[#3e3944] lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                           <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Location</p>
                           <p className="mt-1 lg:mt-0">{location || "Not set yet"}</p>
                         </div>
-                        <div className="rounded-[1rem] bg-[#fafbfe] px-3 py-3 text-sm text-[#3e3944] lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                        <div className="hidden rounded-[1rem] bg-[#fafbfe] px-3 py-3 text-sm text-[#3e3944] lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                           <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Contact</p>
                           <p className="mt-1 lg:mt-0">{contactLine}</p>
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2 lg:block">
                           <span className="inline-flex rounded-full border border-[#dbe2ef] bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#465064] shadow-[0_4px_10px_rgba(35,31,32,0.04)]">
                             {count} opportunit{count === 1 ? "y" : "ies"}
                           </span>
                         </div>
-                        <div className="flex items-center justify-end gap-3">
+                        <div className="flex items-center justify-end gap-3 lg:justify-end">
                           <button
                             type="button"
                             onClick={(event) => {
@@ -769,18 +784,11 @@ export function CrmTable({
                           </button>
                         </div>
 
-                        <div className="grid gap-3 lg:hidden">
-                          <div className="grid gap-1 rounded-xl border border-[#edf0f6] bg-[#fafbfe] px-4 py-3">
-                            <span className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Industry</span>
-                            <span className="text-sm text-[#3e3944]">{account.industry || "Not set yet"}</span>
-                          </div>
-                          <div className="grid gap-1 rounded-xl border border-[#edf0f6] bg-[#fafbfe] px-4 py-3">
-                            <span className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Location</span>
-                            <span className="text-sm text-[#3e3944]">{location || "Not set yet"}</span>
-                          </div>
-                          <div className="grid gap-1 rounded-xl border border-[#edf0f6] bg-[#fafbfe] px-4 py-3">
-                            <span className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">Contact</span>
-                            <span className="text-sm text-[#3e3944]">{contactLine}</span>
+                        <div className="grid gap-2 sm:grid-cols-2 lg:hidden">
+                          <MobileMetaField label="Industry" value={account.industry || "Not set yet"} />
+                          <MobileMetaField label="Location" value={location || "Not set yet"} />
+                          <div className="sm:col-span-2">
+                            <MobileMetaField label="Contact" value={contactLine} />
                           </div>
                         </div>
                       </div>
@@ -909,7 +917,7 @@ export function CrmTable({
                       router.push(getAdminRoute(`/crm/opportunities/${opportunity.id}`));
                     }
                   }}
-                  className="group grid cursor-pointer gap-4 border-b border-[#edf0f6] px-5 py-4 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 lg:grid-cols-[1.2fr_1fr_0.9fr_0.95fr_0.9fr_0.9fr_auto] lg:items-start"
+                  className="group grid cursor-pointer gap-3 border-b border-[#edf0f6] px-4 py-3.5 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 sm:px-5 lg:grid-cols-[1.2fr_1fr_0.9fr_0.95fr_0.9fr_0.9fr_auto] lg:items-start lg:gap-4 lg:py-4"
                 >
                   <div className="min-w-0">
                     <span className="font-medium text-[#17141a] transition group-hover:text-[var(--brand)]">
@@ -917,7 +925,7 @@ export function CrmTable({
                     </span>
                     <p className="mt-1 text-sm text-[#6f6a75]">{opportunity.location || "No location"}</p>
                   </div>
-                  <span className="text-sm text-[#6f6a75]">
+                  <span className="hidden text-sm text-[#6f6a75] lg:block">
                     {opportunity.accountName}
                   </span>
                   <div className="lg:flex lg:min-h-[2.5rem] lg:items-center">
@@ -925,7 +933,7 @@ export function CrmTable({
                       {formatStageLabel(opportunity.stage)}
                     </span>
                   </div>
-                  <div className="rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
+                  <div className="hidden rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Quotation</p>
                     <div className="mt-1 lg:mt-0">
                       <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium ${getQuotationTone(opportunity.quotationFinished)}`}>
@@ -933,15 +941,15 @@ export function CrmTable({
                       </span>
                     </div>
                   </div>
-                  <div className="rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
+                  <div className="hidden rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Primary Contact</p>
                     <p className="mt-1 lg:mt-0">{opportunity.primaryContactName || "-"}</p>
                   </div>
-                  <div className="rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm font-medium text-[#17141a] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
+                  <div className="hidden rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm font-medium text-[#17141a] lg:flex lg:min-h-[2.5rem] lg:items-center lg:bg-transparent lg:px-0 lg:py-0">
                     <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#9793a0] lg:hidden">Value</p>
                     <p className="mt-1 lg:mt-0">{formatCurrency(opportunity.estimatedValue)}</p>
                   </div>
-                  <div className="flex items-center justify-end gap-3">
+                  <div className="flex items-center justify-end gap-3 lg:justify-end">
                     <button
                       type="button"
                       onClick={(event) => {
@@ -952,6 +960,12 @@ export function CrmTable({
                     >
                       Delete
                     </button>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:hidden">
+                    <MobileMetaField label="Account" value={opportunity.accountName} />
+                    <MobileMetaField label="Quotation" value={opportunity.quotationFinished ? "Sent" : "Pending"} />
+                    <MobileMetaField label="Primary Contact" value={opportunity.primaryContactName || "-"} />
+                    <MobileMetaField label="Value" value={formatCurrency(opportunity.estimatedValue)} />
                   </div>
                 </div>
               ))}

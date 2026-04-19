@@ -166,21 +166,21 @@ function OpportunityPartyCard({
   ];
 
   return (
-    <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
-      <div className="flex items-end justify-between gap-4">
+    <section className="min-w-0 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">{title}</h2>
         {action}
       </div>
       <div className="mt-4 grid gap-4">
         <div className="rounded-[1.1rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
           <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">{organisationLabel}</p>
-          <p className="mt-2 text-sm font-medium text-[#17141a]">{organisation || "-"}</p>
+          <p className="mt-2 break-words text-sm font-medium text-[#17141a]">{organisation || "-"}</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {items.map((item) => (
             <div key={item.label} className="rounded-[1.1rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
               <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">{item.label}</p>
-              <p className="mt-2 text-sm text-[#17141a]">{item.value || "-"}</p>
+              <p className="mt-2 break-words text-sm text-[#17141a]">{item.value || "-"}</p>
             </div>
           ))}
         </div>
@@ -210,7 +210,7 @@ function OpportunityOverviewForm({
   }, [onClose, router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid gap-5 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+    <form action={formAction} className="crm-popover-form grid min-w-0 gap-5 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
       <input type="hidden" name="opportunityId" value={opportunity.id} />
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Opportunity Name">
@@ -259,12 +259,12 @@ function OpportunityOverviewForm({
         </Field>
       </div>
       {state.error ? <p className="text-sm text-[#8f1d1d]">{state.error}</p> : null}
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         <ActionButton label="Cancel" onClick={onClose} />
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex min-w-36 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-36 sm:w-auto"
         >
           {isPending ? "Updating..." : "Save Overview"}
         </button>
@@ -299,7 +299,7 @@ function OpportunityPartyForm({
   }, [onClose, router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid gap-5 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+    <form action={formAction} className="crm-popover-form grid min-w-0 gap-5 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
       <input type="hidden" name="opportunityId" value={opportunityId} />
       <div className="grid gap-5 md:grid-cols-2">
         {fields.map((field, index) => (
@@ -309,12 +309,12 @@ function OpportunityPartyForm({
         ))}
       </div>
       {state.error ? <p className="text-sm text-[#8f1d1d]">{state.error}</p> : null}
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         <ActionButton label="Cancel" onClick={onClose} />
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex min-w-32 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
         >
           {isPending ? "Updating..." : submitLabel}
         </button>
@@ -361,13 +361,13 @@ export function CrmOpportunityDetail({
 
   return (
     <div className="grid gap-6">
-      <section className="overflow-hidden rounded-[1.75rem] border border-[#e7e9f2] bg-white shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
-        <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-6 py-6 sm:px-7">
+      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-[#e7e9f2] bg-white shadow-[0_14px_30px_rgba(35,31,32,0.04)]">
+        <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-4 py-5 sm:px-7 sm:py-6">
           <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="text-[11px] uppercase tracking-[0.24em] text-[#9793a0]">Opportunity</p>
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#17141a] sm:text-[2.6rem]">{opportunity.name}</h1>
-              <p className="mt-3 text-sm text-[#6f6a75]">{opportunity.accountName} - {formatStageLabel(opportunity.stage)}</p>
+              <h1 className="mt-3 break-words text-[2rem] font-semibold tracking-tight text-[#17141a] sm:text-[2.6rem]">{opportunity.name}</h1>
+              <p className="mt-3 break-words text-sm text-[#6f6a75]">{opportunity.accountName} - {formatStageLabel(opportunity.stage)}</p>
             </div>
             <BackLink href={getAdminRoute(`/crm/${opportunity.accountId}`)} label="Back to Account" />
           </div>
@@ -375,8 +375,8 @@ export function CrmOpportunityDetail({
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="grid gap-6">
-          <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+        <div className="grid min-w-0 gap-6">
+          <section className="min-w-0 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
             <div className="flex flex-wrap items-center gap-3 border-b border-[#eef0f6] pb-5">
               <ActionButton
                 label={overviewPanel === "edit-overview" ? "Close" : "Edit overview"}
@@ -393,7 +393,7 @@ export function CrmOpportunityDetail({
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div className="rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-[#9793a0]">Overview</p>
-                <div className="mt-3 grid gap-2 text-sm text-[#6f6a75]">
+                <div className="mt-3 grid gap-2 text-sm break-words text-[#6f6a75]">
                   <p><span className="font-medium text-[#17141a]">Location:</span> {opportunity.location || "-"}</p>
                   <p><span className="font-medium text-[#17141a]">Stage:</span> {formatStageLabel(opportunity.stage)}</p>
                   <p><span className="font-medium text-[#17141a]">Source:</span> {opportunity.source || "-"}</p>
@@ -402,7 +402,7 @@ export function CrmOpportunityDetail({
               </div>
               <div className="rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-[#9793a0]">Commercial</p>
-                <div className="mt-3 grid gap-2 text-sm text-[#6f6a75]">
+                <div className="mt-3 grid gap-2 text-sm break-words text-[#6f6a75]">
                   <p><span className="font-medium text-[#17141a]">Account:</span> {opportunity.accountName}</p>
                   <p><span className="font-medium text-[#17141a]">Primary Contact:</span> {opportunity.primaryContactName || "-"}</p>
                   <p><span className="font-medium text-[#17141a]">Estimated Value:</span> {formatCurrency(opportunity.estimatedValue)}</p>
@@ -413,7 +413,7 @@ export function CrmOpportunityDetail({
 
             <div className="mt-4 rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
               <p className="text-[11px] uppercase tracking-[0.16em] text-[#9793a0]">Opportunity Notes</p>
-              <p className="mt-3 text-sm leading-7 text-[#6f6a75]">{opportunity.notes || "No opportunity notes yet."}</p>
+              <p className="mt-3 break-words text-sm leading-7 text-[#6f6a75]">{opportunity.notes || "No opportunity notes yet."}</p>
             </div>
 
             <AnimatedPresence open={overviewPanel === "edit-overview"} spaced>
@@ -511,9 +511,9 @@ export function CrmOpportunityDetail({
           </OpportunityPartyCard>
         </div>
 
-        <div className="grid gap-6">
-          <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
-            <div className="flex items-end justify-between gap-4">
+        <div className="grid min-w-0 gap-6">
+          <section className="min-w-0 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Notes</h2>
               <ActionButton label={notePanel ? "Close" : "Add note"} active={notePanel} onClick={() => setNotePanel((current) => !current)} />
             </div>
@@ -525,11 +525,11 @@ export function CrmOpportunityDetail({
                   <Textarea name="note" className="mt-3 min-h-28" placeholder="Add negotiation updates, bid notes, client feedback, or next actions..." />
                 </div>
                 {noteState.error ? <p className="text-sm text-[#8f1d1d]">{noteState.error}</p> : null}
-                <div className="flex justify-end">
+                <div className="flex">
                   <button
                     type="submit"
                     disabled={isSavingNote}
-                    className="inline-flex min-w-32 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
                   >
                     {isSavingNote ? "Saving..." : "Save Note"}
                   </button>
@@ -541,7 +541,7 @@ export function CrmOpportunityDetail({
                 activity.map((item) => (
                   <div key={item.id} className="border-b border-[#eef0f6] py-4 last:border-b-0">
                     <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">{item.activityType.replaceAll("_", " ")}</p>
-                    <p className="mt-2 text-sm leading-6 text-[#17141a]">{item.content}</p>
+                    <p className="mt-2 break-words text-sm leading-6 text-[#17141a]">{item.content}</p>
                     <p className="mt-2 text-xs text-[#6f6a75]">{formatDate(item.createdAt)}</p>
                   </div>
                 ))
@@ -551,7 +551,7 @@ export function CrmOpportunityDetail({
             </div>
           </section>
 
-          <section className="rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+          <section className="min-w-0 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
             <h2 className="text-[11px] uppercase tracking-[0.2em] text-[#9793a0]">Files</h2>
             {attachments.length > 0 ? (
               <div className="mt-4 grid gap-3">
@@ -563,10 +563,10 @@ export function CrmOpportunityDetail({
                     rel="noreferrer"
                     className="rounded-[1.1rem] border border-[#e7e9f2] bg-[#fafbfe] p-4 transition hover:border-[#cfd5e2] hover:bg-white"
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-[#17141a]">{attachment.fileName}</p>
-                        <p className="mt-1 text-sm text-[#6f6a75]">
+                        <p className="break-all font-medium text-[#17141a]">{attachment.fileName}</p>
+                        <p className="mt-1 break-words text-sm text-[#6f6a75]">
                           {[attachment.fileType, formatFileSize(attachment.fileSize)].filter(Boolean).join(" - ") || "Attachment"}
                         </p>
                       </div>
@@ -580,7 +580,7 @@ export function CrmOpportunityDetail({
             )}
           </section>
 
-          <section className="self-start rounded-[1.3rem] border border-[#f1d0d0] bg-[#fffafa] p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+          <section className="min-w-0 self-start rounded-[1.3rem] border border-[#f1d0d0] bg-[#fffafa] p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
             <p className="text-[11px] uppercase tracking-[0.2em] text-[#b42318]">Danger Zone</p>
             <p className="mt-2 text-sm leading-5 text-[#6f6a75]">
               Delete this opportunity only if it was created by mistake or should be removed permanently from the CRM history.
@@ -601,19 +601,19 @@ export function CrmOpportunityDetail({
         <form action={deleteFormAction} className="grid gap-4">
           <input type="hidden" name="opportunityId" value={opportunity.id} />
           {deleteState.error ? <p className="text-sm text-[#b42318]">{deleteState.error}</p> : null}
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
             <button
               type="button"
               onClick={() => setDeleteOpen(false)}
               disabled={isDeleting}
-              className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/25 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isDeleting}
-              className="inline-flex items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-sm bg-[#b42318] px-4 py-2 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[#7a1b14] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
               {isDeleting ? "Deleting..." : "Delete Opportunity"}
             </button>

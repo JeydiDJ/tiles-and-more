@@ -130,6 +130,23 @@ function SectionHeader({
   );
 }
 
+function MobileLedgerCard({
+  items,
+}: {
+  items: Array<{ label: string; value: string; valueClassName?: string }>;
+}) {
+  return (
+    <div className="grid gap-2 rounded-[1.2rem] border border-[#eef0f6] bg-white p-4">
+      {items.map((item) => (
+        <div key={item.label} className="flex items-start justify-between gap-4 text-sm">
+          <span className="text-[#6f6a75]">{item.label}</span>
+          <span className={`text-right font-medium text-[#17141a] ${item.valueClassName ?? ""}`}>{item.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function AmountField({
   name,
   label,
@@ -220,25 +237,25 @@ function AccountingPeriodEditor({ period }: { period: AccountingPeriod }) {
               {period.notes ? <p className="mt-4 max-w-3xl text-sm leading-6 text-[#6f6a75]">{period.notes}</p> : null}
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Button
-                type="button"
-                variant="secondary"
-                className="rounded-xl px-4 py-2.5 normal-case tracking-normal"
-                onClick={() => setIsExpanded((current) => !current)}
-              >
-                {isExpanded ? "Hide details" : "Edit details"}
+      <div className="flex flex-wrap gap-2 sm:gap-3">
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full rounded-xl px-4 py-2.5 normal-case tracking-normal sm:w-auto"
+          onClick={() => setIsExpanded((current) => !current)}
+        >
+          {isExpanded ? "Hide details" : "Edit details"}
               </Button>
             </div>
           </div>
         </div>
 
         {isExpanded ? (
-          <div className="grid gap-6 px-5 py-5 sm:px-6 xl:grid-cols-[1.2fr_0.8fr_320px]">
+          <div className="grid gap-6 px-4 py-4 sm:px-6 sm:py-5 xl:grid-cols-[1.2fr_0.8fr_320px]">
             <div className="grid gap-6">
               <div className="grid gap-4 rounded-[1.3rem] border border-[#eef0f6] bg-[#fcfcfe] p-4">
                 <SectionHeader title="Period Setup" subtitle="Label, date range, and opening balance." />
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <label className="grid gap-2">
                     <span className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Period label</span>
                     <Input name="label" defaultValue={period.label} className="rounded-xl border-[#e1e5ee] bg-white" required />
@@ -263,7 +280,7 @@ function AccountingPeriodEditor({ period }: { period: AccountingPeriod }) {
 
               <div className="admin-accounting-section admin-accounting-section-positive grid gap-4 rounded-[1.3rem] border border-[#d8efe0] bg-[#f9fdf9] p-4">
                 <SectionHeader title="Cash In" subtitle="Money received during this period." />
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {inflowFields.map((field) => (
                     <AmountField key={field.name} name={field.name} label={field.label} defaultValue={Number(period[field.name] ?? 0)} accent="positive" />
                   ))}
@@ -272,7 +289,7 @@ function AccountingPeriodEditor({ period }: { period: AccountingPeriod }) {
 
               <div className="admin-accounting-section admin-accounting-section-negative grid gap-4 rounded-[1.3rem] border border-[#f3e1e3] bg-[#fffdfd] p-4">
                 <SectionHeader title="Cash Out" subtitle="Direct costs, operating spend, and other outgoing cash." />
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {outflowFields.map((field) => (
                     <AmountField key={field.name} name={field.name} label={field.label} defaultValue={Number(period[field.name] ?? 0)} accent="negative" />
                   ))}
@@ -358,11 +375,11 @@ function AccountingPeriodEditor({ period }: { period: AccountingPeriod }) {
               <div className="rounded-[1.25rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
                 <p className="text-sm font-medium text-[#17141a]">Ready to save?</p>
                 <p className="mt-2 text-sm leading-6 text-[#6f6a75]">Save updates for this period or collapse the editor.</p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Button type="submit" className="rounded-xl px-4 py-2.5 normal-case tracking-normal" disabled={isPending}>
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Button type="submit" className="w-full rounded-xl px-4 py-2.5 normal-case tracking-normal sm:w-auto" disabled={isPending}>
                     {isPending ? "Saving..." : "Save period changes"}
                   </Button>
-                  <Button type="button" variant="secondary" className="rounded-xl px-4 py-2.5 normal-case tracking-normal" onClick={() => setIsExpanded(false)}>
+                  <Button type="button" variant="secondary" className="w-full rounded-xl px-4 py-2.5 normal-case tracking-normal sm:w-auto" onClick={() => setIsExpanded(false)}>
                     Collapse editor
                   </Button>
                 </div>
@@ -396,7 +413,7 @@ function CreateAccountingPeriodForm() {
 
         <div className="rounded-[1.3rem] border border-[#eef0f6] bg-[#fcfcfe] p-4">
           <SectionHeader title="Period Setup" subtitle="Label, date range, and opening balance." />
-          <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,260px)_repeat(2,minmax(0,180px))] xl:grid-cols-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <label className="grid gap-2">
               <span className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Period label</span>
               <Input name="label" placeholder="April 2026" className="rounded-xl border-[#e1e5ee]" required />
@@ -421,7 +438,7 @@ function CreateAccountingPeriodForm() {
 
         <div className="admin-accounting-section admin-accounting-section-positive rounded-[1.3rem] border border-[#d8efe0] bg-[#f9fdf9] p-4">
           <SectionHeader title="Cash In" subtitle="Received money for the selected period." />
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {inflowFields.map((field) => (
               <AmountField key={field.name} name={field.name} label={field.label} defaultValue={0} accent="positive" />
             ))}
@@ -430,7 +447,7 @@ function CreateAccountingPeriodForm() {
 
         <div className="admin-accounting-section admin-accounting-section-negative rounded-[1.3rem] border border-[#f3e1e3] bg-[#fffdfd] p-4">
           <SectionHeader title="Cash Out" subtitle="Outgoing cash for operations, debt, taxes, and capital spend." />
-          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {outflowFields.map((field) => (
               <AmountField key={field.name} name={field.name} label={field.label} defaultValue={0} accent="negative" />
             ))}
@@ -493,7 +510,7 @@ export function AccountingWorkspace({
           </div>
         </div>
 
-        <div className="grid gap-4 border-b border-[#edf0f6] px-5 py-5 sm:px-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-6 sm:py-5 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard
             label="Net cash flow"
             value={formatAccountingCurrency(totals.totalNetCashFlow)}
@@ -510,7 +527,7 @@ export function AccountingWorkspace({
           <MetricCard label="Cash out" value={formatAccountingCurrency(totals.totalCashOut)} note="Operations, tax, debt, owner withdrawals, and capex." />
         </div>
 
-        <div className="grid gap-4 border-b border-[#edf0f6] px-5 py-5 sm:px-6 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-6 sm:py-5 md:grid-cols-2 xl:grid-cols-5">
           <div className="rounded-[1.25rem] border border-[#eef0f6] bg-white p-4">
             <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Periods saved</p>
             <p className="mt-2 text-2xl font-semibold tracking-tight text-[#17141a]">{periods.length}</p>
@@ -544,11 +561,11 @@ export function AccountingWorkspace({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3 px-5 py-4 sm:px-6">
+        <div className="flex flex-wrap gap-2 px-4 py-4 sm:px-6 sm:gap-3">
           <button
             type="button"
             onClick={() => setActiveTab("periods")}
-            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex flex-1 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition sm:flex-none ${
               activeTab === "periods"
                 ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
                 : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
@@ -559,7 +576,7 @@ export function AccountingWorkspace({
           <button
             type="button"
             onClick={() => setActiveTab("journal")}
-            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+            className={`admin-internal-tab inline-flex flex-1 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition sm:flex-none ${
               activeTab === "journal"
                 ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
                 : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
@@ -596,7 +613,7 @@ export function AccountingWorkspace({
                 <div className="border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-4 sm:px-6">
                   <h2 className="text-[11px] uppercase tracking-[0.22em] text-[#9793a0]">Ledger View</h2>
                 </div>
-                <div className="overflow-x-auto px-5 py-5 sm:px-6">
+                <div className="hidden overflow-x-auto px-5 py-5 sm:px-6 md:block">
                   <table className="min-w-full border-separate border-spacing-0">
                     <thead>
                       <tr>
@@ -623,6 +640,25 @@ export function AccountingWorkspace({
                     </tbody>
                   </table>
                 </div>
+                <div className="grid gap-3 px-4 py-4 sm:px-6 md:hidden">
+                  {rows.map((period) => (
+                    <MobileLedgerCard
+                      key={`${period.id}-mobile`}
+                      items={[
+                        { label: "Period", value: period.label },
+                        { label: "Cash in", value: formatAccountingCurrency(period.cashIn) },
+                        { label: "Cash out", value: formatAccountingCurrency(period.cashOut) },
+                        {
+                          label: "Net flow",
+                          value: formatAccountingCurrency(period.netCashFlow),
+                          valueClassName: period.netCashFlow >= 0 ? "text-[#0f8a43]" : "text-[#d1394d]",
+                        },
+                        { label: "Opening", value: formatAccountingCurrency(period.openingBalance) },
+                        { label: "Closing", value: formatAccountingCurrency(period.closingBalance) },
+                      ]}
+                    />
+                  ))}
+                </div>
               </section>
             </>
           ) : (
@@ -645,44 +681,62 @@ export function AccountingWorkspace({
           </div>
 
           {journalLines.length > 0 ? (
-            <div className="overflow-x-auto px-5 py-5 sm:px-6">
-              <table className="min-w-full border-separate border-spacing-0">
-                <thead>
-                  <tr>
-                    {["Date", "Period", "Account", "Entry", "Debit", "Credit", "Notes"].map((label) => (
-                      <th key={label} className="border-b border-[#edf0f6] px-3 py-3 text-left text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">
-                        {label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {journalLines.map((line) => (
-                    <tr key={line.id}>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#6f6a75]">{line.entryDate ?? "-"}</td>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">{line.periodLabel}</td>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#17141a]">{line.account}</td>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm">
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${
-                            line.side === "debit" ? "bg-[#f4fbf6] text-[#0f8a43]" : "bg-[#fff7f8] text-[#d1394d]"
-                          }`}
-                        >
-                          {line.side}
-                        </span>
-                      </td>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">
-                        {line.side === "debit" ? formatAccountingCurrency(line.amount) : "-"}
-                      </td>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">
-                        {line.side === "credit" ? formatAccountingCurrency(line.amount) : "-"}
-                      </td>
-                      <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#6f6a75]">{line.note}</td>
+            <>
+              <div className="hidden overflow-x-auto px-5 py-5 sm:px-6 md:block">
+                <table className="min-w-full border-separate border-spacing-0">
+                  <thead>
+                    <tr>
+                      {["Date", "Period", "Account", "Entry", "Debit", "Credit", "Notes"].map((label) => (
+                        <th key={label} className="border-b border-[#edf0f6] px-3 py-3 text-left text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">
+                          {label}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {journalLines.map((line) => (
+                      <tr key={line.id}>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#6f6a75]">{line.entryDate ?? "-"}</td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">{line.periodLabel}</td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#17141a]">{line.account}</td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${
+                              line.side === "debit" ? "bg-[#f4fbf6] text-[#0f8a43]" : "bg-[#fff7f8] text-[#d1394d]"
+                            }`}
+                          >
+                            {line.side}
+                          </span>
+                        </td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">
+                          {line.side === "debit" ? formatAccountingCurrency(line.amount) : "-"}
+                        </td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm font-medium text-[#17141a]">
+                          {line.side === "credit" ? formatAccountingCurrency(line.amount) : "-"}
+                        </td>
+                        <td className="border-b border-[#f0f2f7] px-3 py-4 text-sm text-[#6f6a75]">{line.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="grid gap-3 px-4 py-4 sm:px-6 md:hidden">
+                {journalLines.map((line) => (
+                  <MobileLedgerCard
+                    key={line.id}
+                    items={[
+                      { label: "Date", value: line.entryDate ?? "-" },
+                      { label: "Period", value: line.periodLabel },
+                      { label: "Account", value: line.account },
+                      { label: "Entry", value: line.side.toUpperCase(), valueClassName: line.side === "debit" ? "text-[#0f8a43]" : "text-[#d1394d]" },
+                      { label: "Debit", value: line.side === "debit" ? formatAccountingCurrency(line.amount) : "-" },
+                      { label: "Credit", value: line.side === "credit" ? formatAccountingCurrency(line.amount) : "-" },
+                      { label: "Notes", value: line.note },
+                    ]}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <div className="px-5 py-6 sm:px-6">
               <p className="text-sm font-semibold text-[#17141a]">No journal lines yet</p>
