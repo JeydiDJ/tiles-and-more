@@ -20,8 +20,12 @@ export async function middleware(request: NextRequest) {
   const isInternalAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
   const isInternalLoginPath = pathname === "/admin-login";
 
-  if (isDefaultAdminPath(pathname) || isInternalLoginPath) {
+  if (isDefaultAdminPath(pathname)) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (isInternalLoginPath) {
+    return NextResponse.redirect(new URL(adminLoginPath, request.url));
   }
 
   if (isSecretAdminPath || isInternalAdminPath) {

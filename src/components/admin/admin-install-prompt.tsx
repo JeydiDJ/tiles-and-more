@@ -18,7 +18,9 @@ export function AdminInstallPrompt() {
       return;
     }
 
-    navigator.serviceWorker.register("/admin-sw.js", { scope: "/admin" }).catch(() => {
+    const adminScope = `/${window.location.pathname.split("/").filter(Boolean)[0] ?? ""}`.replace(/\/+$/, "");
+
+    navigator.serviceWorker.register("/admin-sw.js", { scope: adminScope }).catch(() => {
       return undefined;
     });
 
@@ -98,7 +100,7 @@ export function AdminInstallPrompt() {
           {installState === "accepted" ? "Installed" : isInstalling ? "Installing..." : "Install App"}
         </button>
 
-        <span className="text-xs uppercase tracking-[0.18em] text-[#9793a0]">Start URL: /admin</span>
+        <span className="text-xs uppercase tracking-[0.18em] text-[#9793a0]">Admin-only install</span>
       </div>
     </div>
   );

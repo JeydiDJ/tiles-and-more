@@ -214,7 +214,9 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
       return;
     }
 
-    navigator.serviceWorker.register("/admin-sw.js", { scope: "/admin" }).catch(() => {
+    const adminScope = `/${window.location.pathname.split("/").filter(Boolean)[0] ?? ""}`.replace(/\/+$/, "");
+
+    navigator.serviceWorker.register("/admin-sw.js", { scope: adminScope }).catch(() => {
       return undefined;
     });
   }, []);
