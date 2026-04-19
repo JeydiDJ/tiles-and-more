@@ -25,8 +25,12 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         {
+          source: `/${adminSegment}/manifest`,
+          destination: "/manifest",
+        },
+        {
           source: `/${adminSegment}/login`,
-          destination: "/admin/login",
+          destination: "/login",
         },
         {
           source: `/${adminSegment}`,

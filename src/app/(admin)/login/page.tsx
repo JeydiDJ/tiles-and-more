@@ -10,7 +10,7 @@ export const metadata: Metadata = createPageMetadata({
   noIndex: true,
 });
 
-metadata.manifest = "/admin.webmanifest";
+metadata.manifest = getAdminRoute("/manifest");
 metadata.appleWebApp = {
   capable: true,
   title: "TILES & MORE Admin",

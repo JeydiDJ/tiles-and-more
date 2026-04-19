@@ -28,6 +28,7 @@ export function GET() {
     {
       headers: {
         "Content-Type": "application/manifest+json",
+        "Cache-Control": "no-store",
       },
     },
   );

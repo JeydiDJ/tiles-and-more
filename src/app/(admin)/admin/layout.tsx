@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { getAdminRoute } from "@/lib/admin-path";
 import { createPageMetadata } from "@/lib/seo";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -7,11 +8,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export const metadata: Metadata = createPageMetadata({
   title: "Admin",
   description: "Private admin area.",
-  path: "/admin",
+  path: getAdminRoute(),
   noIndex: true,
 });
 
-metadata.manifest = "/admin.webmanifest";
+metadata.manifest = getAdminRoute("/manifest");
 metadata.appleWebApp = {
   capable: true,
   title: "TILES & MORE Admin",
