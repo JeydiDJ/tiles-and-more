@@ -187,15 +187,37 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isDesktopHoveringNav, setIsDesktopHoveringNav] = useState(false);
-  const isDesktopExpanded = !collapsed || isDesktopHoveringNav;
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const isDesktopExpanded = isLargeScreen ? !collapsed || isDesktopHoveringNav : true;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const updateScreenSize = (event?: MediaQueryListEvent) => {
+      const matches = event?.matches ?? mediaQuery.matches;
+
+      setIsLargeScreen(matches);
+      setMobileNavOpen(false);
+      setIsDesktopHoveringNav(false);
+      setCollapsed(matches);
+    };
+
+    updateScreenSize();
+    mediaQuery.addEventListener("change", updateScreenSize);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateScreenSize);
+    };
+  }, []);
 
   useEffect(() => {
     window.setTimeout(() => {
       setMobileNavOpen(false);
-      setCollapsed(true);
+      if (isLargeScreen) {
+        setCollapsed(true);
+      }
       setIsDesktopHoveringNav(false);
     }, 0);
-  }, [pathname]);
+  }, [isLargeScreen, pathname]);
 
   return (
     <div
@@ -205,17 +227,17 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
       )}
     >
       <div className="sticky top-0 z-30 border-b border-[#e7e9f2] bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
-        <div className="flex items-center justify-between gap-3">
+        <div className="relative flex min-h-11 items-center justify-center">
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
             aria-label="Open menu"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#5b5763] transition hover:border-[#d8dce8] hover:bg-white"
+            className="absolute left-0 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#5b5763] transition hover:border-[#d8dce8] hover:bg-white"
           >
             <CollapseIcon />
           </button>
-          <Link href={getAdminRoute()} className="min-w-0 flex-1">
-            <div className="flex items-center justify-center gap-3">
+          <Link href={getAdminRoute()} className="mx-auto min-w-0 max-w-[calc(100%-4rem)]">
+            <div className="flex items-center justify-center gap-3 text-center">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc]">
                 <Image src="/logo/tilesandmore-logo.png" alt="Tiles and More logo" width={34} height={34} className="h-8 w-8 object-contain" priority />
               </div>
@@ -240,16 +262,16 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-[320px] flex-col border-r border-[#e7e9f2] bg-[#ffffff] px-5 py-6 text-[#231f20] transition-transform duration-200 sm:px-6 lg:static lg:min-h-full lg:w-auto lg:max-w-none lg:translate-x-0",
           mobileNavOpen ? "translate-x-0" : "-translate-x-full",
-          collapsed && "cursor-e-resize",
+          isLargeScreen && collapsed && "cursor-e-resize",
         )}
-        onClick={collapsed ? () => setCollapsed(false) : undefined}
+        onClick={isLargeScreen && collapsed ? () => setCollapsed(false) : undefined}
         onMouseEnter={() => {
-          if (collapsed) {
+          if (isLargeScreen && collapsed) {
             setIsDesktopHoveringNav(true);
           }
         }}
         onMouseLeave={() => {
-          if (collapsed) {
+          if (isLargeScreen && collapsed) {
             setIsDesktopHoveringNav(false);
           }
         }}
@@ -303,12 +325,14 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                title={!isDesktopExpanded ? item.label : undefined}
+                title={isLargeScreen && !isDesktopExpanded ? item.label : undefined}
                 onClick={(event) => {
-                  if (!isDesktopExpanded) {
+                  if (isLargeScreen && !isDesktopExpanded) {
                     event.stopPropagation();
                   }
-                  setCollapsed(true);
+                  if (isLargeScreen) {
+                    setCollapsed(true);
+                  }
                   setIsDesktopHoveringNav(false);
                   setMobileNavOpen(false);
                 }}
@@ -351,7 +375,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
         </div>
 
         <div className="mt-auto border-t border-[#edf0f6] pt-5">
-          <AdminSessionBar email={userEmail} compact={!isDesktopExpanded} />
+          <AdminSessionBar email={userEmail} compact={isLargeScreen && !isDesktopExpanded} />
         </div>
       </aside>
 
