@@ -15,13 +15,13 @@ export function AdminLoginForm() {
     <form action={formAction} className="mx-auto w-full max-w-md">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--brand)]">Private Access</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)]">Admin sign in</h1>
-          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            Use your Supabase Auth credentials to enter the private Tiles & More management workspace.
+          <p className="text-[11px] uppercase tracking-[0.22em] text-[#9793a0]">Private Access</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#17141a]">Admin sign in</h1>
+          <p className="mt-3 text-sm leading-6 text-[#6f6a75]">
+            Use your Supabase Auth credentials to enter the private Tiles & More operations workspace.
           </p>
         </div>
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#231f20]/8 bg-[#f7f4ef] text-[var(--foreground)]">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#eceef5] bg-[#f7f8fc] text-[#17141a]">
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.7">
             <path d="M12 3.75 5.25 6.75v5.7c0 4.28 2.89 8.18 6.75 9.8 3.86-1.62 6.75-5.52 6.75-9.8v-5.7L12 3.75Z" />
             <path d="m9.75 12 1.5 1.5 3-3.75" strokeLinecap="round" strokeLinejoin="round" />
@@ -30,8 +30,22 @@ export function AdminLoginForm() {
       </div>
 
       <div className="mt-6 grid gap-4">
-        <Input name="email" type="email" placeholder="Email address" autoComplete="email" required />
-        <Input name="password" type="password" placeholder="Password" autoComplete="current-password" required />
+        <Input
+          name="email"
+          type="email"
+          placeholder="Email address"
+          autoComplete="email"
+          required
+          className="rounded-xl border-[#e3e7f0] bg-[#fafbfe] px-4 py-3.5 hover:border-[#d2d8e4]"
+        />
+        <Input
+          name="password"
+          type="password"
+          placeholder="Password"
+          autoComplete="current-password"
+          required
+          className="rounded-xl border-[#e3e7f0] bg-[#fafbfe] px-4 py-3.5 hover:border-[#d2d8e4]"
+        />
       </div>
 
       {state.error ? (
@@ -40,7 +54,7 @@ export function AdminLoginForm() {
         </p>
       ) : null}
 
-      <div className="mt-6 rounded-[1rem] border border-[#231f20]/8 bg-[#f7f4ef] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[var(--muted)]">
+      <div className="mt-6 rounded-[1rem] border border-[#e3e7f0] bg-[#fafbfe] px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#6f6a75]">
         Authorized personnel only
       </div>
 

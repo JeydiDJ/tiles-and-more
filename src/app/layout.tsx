@@ -30,11 +30,6 @@ export const metadata: Metadata = {
     apple: [{ url: "/favicon/apple-touch-icon.png" }],
     shortcut: ["/favicon/favicon.ico"],
   },
-  manifest: "/favicon/site.webmanifest",
-  appleWebApp: {
-    capable: true,
-    title: siteConfig.name,
-  },
   other: {
     "theme-color": "#231f20",
   },

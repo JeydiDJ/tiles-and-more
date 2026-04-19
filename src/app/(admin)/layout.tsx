@@ -12,6 +12,13 @@ export const metadata: Metadata = createPageMetadata({
   noIndex: true,
 });
 
+metadata.manifest = "/admin.webmanifest";
+metadata.appleWebApp = {
+  capable: true,
+  title: "TILES & MORE Admin",
+  statusBarStyle: "default",
+};
+
 export default async function AdminLayout({
   children,
 }: Readonly<{

@@ -210,6 +210,16 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
   }, []);
 
   useEffect(() => {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    navigator.serviceWorker.register("/admin-sw.js", { scope: "/admin" }).catch(() => {
+      return undefined;
+    });
+  }, []);
+
+  useEffect(() => {
     window.setTimeout(() => {
       setMobileNavOpen(false);
       if (isLargeScreen) {
