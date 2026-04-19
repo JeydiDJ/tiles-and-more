@@ -260,7 +260,7 @@ export function Hero() {
                           : slide.id === "geotiles"
                             ? "w-[min(88vw,38rem)]"
                             : slide.id === "roca"
-                            ? "w-[min(88vw,40rem)]"
+                            ? "w-[min(76vw,28rem)]"
                             : "w-[min(82vw,34rem)]"
                       }`}
                       priority
@@ -268,7 +268,7 @@ export function Hero() {
                     <div
                       className={`flex flex-col items-center ${
                         slide.id === "roca"
-                          ? "-mt-24 gap-4 sm:-mt-28"
+                          ? "-mt-4 gap-4 sm:-mt-8"
                           : slide.id === "sonite"
                             ? "-mt-12 gap-5 sm:-mt-36"
                             : "gap-8"
