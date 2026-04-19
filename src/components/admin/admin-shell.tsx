@@ -234,7 +234,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
   return (
     <div
       className={cn(
-        "admin-theme-root min-h-screen bg-[#f6f7fb] lg:grid lg:transition-[grid-template-columns] lg:duration-300 lg:ease-out",
+        "admin-theme-root min-h-screen bg-[#f6f7fb] lg:grid lg:h-screen lg:overflow-hidden lg:transition-[grid-template-columns] lg:duration-300 lg:ease-out",
         isDesktopExpanded ? "lg:grid-cols-[292px_1fr]" : "lg:grid-cols-[104px_1fr]",
       )}
     >
@@ -272,7 +272,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-[320px] flex-col border-r border-[#e7e9f2] bg-[#ffffff] px-5 py-6 text-[#231f20] transition-transform duration-200 sm:px-6 lg:static lg:min-h-full lg:w-auto lg:max-w-none lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-[320px] flex-col border-r border-[#e7e9f2] bg-[#ffffff] px-5 py-6 text-[#231f20] transition-transform duration-200 sm:px-6 lg:static lg:min-h-full lg:w-auto lg:max-w-none lg:translate-x-0 lg:overflow-y-auto",
           mobileNavOpen ? "translate-x-0" : "-translate-x-full",
           isLargeScreen && collapsed && "cursor-e-resize",
         )}
@@ -391,7 +391,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
         </div>
       </aside>
 
-      <main className="p-4 sm:p-5 lg:p-8">
+      <main className="min-h-0 overflow-y-auto p-4 sm:p-5 lg:p-8">
         <div className="mx-auto max-w-[1500px]">{children}</div>
       </main>
     </div>
