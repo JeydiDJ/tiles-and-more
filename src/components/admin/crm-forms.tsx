@@ -19,6 +19,13 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
+type EditablePhoneRow = {
+  id: string;
+  label: string;
+  phoneNumber: string;
+  isPrimary: boolean;
+};
+
 const initialState: CrmFormState = {
   error: null,
   entityId: null,
@@ -43,6 +50,37 @@ function Field({
 
 function formatStageLabel(value: string) {
   return value.replaceAll("_", " ");
+}
+
+function buildInitialPhoneRows(contact?: CrmContact | null) {
+  if (contact?.phoneNumbers.length) {
+    return contact.phoneNumbers.map((item, index) => ({
+      id: item.id || `phone-${index}`,
+      label: item.label ?? "",
+      phoneNumber: item.phoneNumber,
+      isPrimary: item.isPrimary,
+    }));
+  }
+
+  if (contact?.phone) {
+    return [
+      {
+        id: "legacy-primary-phone",
+        label: "Main",
+        phoneNumber: contact.phone,
+        isPrimary: true,
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "phone-0",
+      label: "Main",
+      phoneNumber: "",
+      isPrimary: true,
+    },
+  ];
 }
 
 export function CrmAccountForm({
@@ -112,11 +150,18 @@ export function CrmAccountForm({
                 <Field label="Job Title">
                   <Input name="initialContactJobTitle" placeholder="Enter the contact's job title" />
                 </Field>
-                <Field label="Phone">
-                  <Input name="initialContactPhone" placeholder="Enter the direct contact number" />
+                <Field label="Primary Phone">
+                  <Input name="initialContactphoneNumber_0" placeholder="Enter the direct contact number" />
+                  <input type="hidden" name="initialContactphoneLabel_0" value="Main" />
+                  <input type="hidden" name="initialContactphoneCount" value="1" />
+                  <input type="hidden" name="initialContactphonePrimary" value="0" />
                 </Field>
-                <Field label="Email">
-                  <Input name="initialContactEmail" type="email" placeholder="Enter the contact email address" />
+                <Field label="Work Email">
+                  <Input name="initialContactworkEmail" type="email" placeholder="Enter the contact work email address" />
+                  <input type="hidden" name="initialContactprimaryEmailType" value="work" />
+                </Field>
+                <Field label="Personal Email">
+                  <Input name="initialContactpersonalEmail" type="email" placeholder="Optional personal email address" />
                 </Field>
               </div>
             </section>
@@ -187,6 +232,13 @@ export function CrmContactFormInner({
   const isEditMode = mode === "edit";
   const [state, formAction, isPending] = useActionState(isEditMode ? updateCrmContactAction : createCrmContactAction, initialState);
   const router = useRouter();
+  const [phoneRows, setPhoneRows] = useState<EditablePhoneRow[]>(() => buildInitialPhoneRows(initialContact));
+  const [workEmail, setWorkEmail] = useState(initialContact?.workEmail ?? (initialContact?.email ?? ""));
+  const [personalEmail, setPersonalEmail] = useState(initialContact?.personalEmail ?? "");
+  const [primaryEmailType, setPrimaryEmailType] = useState<"work" | "personal">(
+    initialContact?.emails.find((item) => item.isPrimary)?.emailType ??
+      (initialContact?.personalEmail && !initialContact?.workEmail ? "personal" : "work"),
+  );
 
   useEffect(() => {
     if (state.entityId) {
@@ -199,6 +251,7 @@ export function CrmContactFormInner({
     <form action={formAction} className="crm-popover-form grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
       <input type="hidden" name="accountId" value={accountId} />
       {isEditMode && initialContact ? <input type="hidden" name="contactId" value={initialContact.id} /> : null}
+      <input type="hidden" name="phoneCount" value={phoneRows.length} />
       <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Edit Contact" : "Add Contact"}</p>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Full Name">
@@ -207,11 +260,136 @@ export function CrmContactFormInner({
         <Field label="Job Title">
           <Input name="jobTitle" placeholder="Enter the contact's role or title" defaultValue={initialContact?.jobTitle ?? ""} />
         </Field>
-        <Field label="Phone">
-          <Input name="phone" placeholder="Enter the contact phone number" defaultValue={initialContact?.phone ?? ""} />
+        <div className="grid gap-4 md:col-span-2">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">Phone Numbers</span>
+            <button
+              type="button"
+              onClick={() =>
+                setPhoneRows((current) => [
+                  ...current,
+                  {
+                    id: `phone-${current.length + 1}`,
+                    label: "",
+                    phoneNumber: "",
+                    isPrimary: current.length === 0,
+                  },
+                ])
+              }
+              className="inline-flex items-center justify-center rounded-sm border border-[var(--border)] px-3 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
+            >
+              Add Phone
+            </button>
+          </div>
+          <div className="grid gap-3">
+            {phoneRows.map((phone, index) => (
+              <div key={phone.id} className="grid gap-3 rounded-[1rem] border border-[#eef0f6] bg-[#fafbfe] p-3 md:grid-cols-[0.9fr_1.4fr_auto_auto] md:items-end">
+                <Field label="Label">
+                  <Input
+                    name={`phoneLabel_${index}`}
+                    placeholder="Main, Mobile, Office"
+                    value={phone.label}
+                    onChange={(event) =>
+                      setPhoneRows((current) =>
+                        current.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, label: event.target.value } : item,
+                        ),
+                      )
+                    }
+                  />
+                </Field>
+                <Field label="Phone Number">
+                  <Input
+                    name={`phoneNumber_${index}`}
+                    placeholder="Enter the contact number"
+                    value={phone.phoneNumber}
+                    onChange={(event) =>
+                      setPhoneRows((current) =>
+                        current.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, phoneNumber: event.target.value } : item,
+                        ),
+                      )
+                    }
+                  />
+                </Field>
+                <label className="flex items-center gap-2 pb-1 text-xs font-medium uppercase tracking-[0.12em] text-[#6f6a75]">
+                  <input
+                    type="radio"
+                    name="phonePrimary"
+                    value={index}
+                    checked={phoneRows.findIndex((item) => item.isPrimary) === index}
+                    onChange={() =>
+                      setPhoneRows((current) =>
+                        current.map((item, itemIndex) => ({
+                          ...item,
+                          isPrimary: itemIndex === index,
+                        })),
+                      )
+                    }
+                    className="h-4 w-4 accent-[var(--brand)]"
+                  />
+                  Primary
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPhoneRows((current) => {
+                      const next = current.filter((_, itemIndex) => itemIndex !== index);
+                      if (next.length === 0) {
+                        return [
+                          {
+                            id: "phone-0",
+                            label: "Main",
+                            phoneNumber: "",
+                            isPrimary: true,
+                          },
+                        ];
+                      }
+
+                      if (!next.some((item) => item.isPrimary)) {
+                        next[0] = { ...next[0], isPrimary: true };
+                      }
+
+                      return next;
+                    })
+                  }
+                  disabled={phoneRows.length === 1}
+                  className="inline-flex items-center justify-center rounded-sm border border-[#f1d0d0] bg-[#fff5f5] px-3 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#b42318] transition hover:border-[#d8aaaa] hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Field label="Work Email">
+          <Input
+            name="workEmail"
+            type="email"
+            placeholder="Enter the work email address"
+            value={workEmail}
+            onChange={(event) => setWorkEmail(event.target.value)}
+          />
         </Field>
-        <Field label="Email">
-          <Input name="email" type="email" placeholder="Enter the contact email address" defaultValue={initialContact?.email ?? ""} />
+        <Field label="Personal Email">
+          <Input
+            name="personalEmail"
+            type="email"
+            placeholder="Enter the personal email address"
+            value={personalEmail}
+            onChange={(event) => setPersonalEmail(event.target.value)}
+          />
+        </Field>
+        <Field label="Primary Email" className="md:col-span-2">
+          <Select
+            name="primaryEmailType"
+            value={primaryEmailType}
+            onChange={(event) => setPrimaryEmailType(event.target.value as "work" | "personal")}
+            className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]"
+          >
+            <option value="work">Work Email</option>
+            <option value="personal">Personal Email</option>
+          </Select>
         </Field>
         <Field label="Notes" className="md:col-span-2">
           <Textarea name="notes" className="min-h-24" placeholder="Add relationship notes or communication preferences" defaultValue={initialContact?.notes ?? ""} />

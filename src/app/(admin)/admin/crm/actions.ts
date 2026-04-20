@@ -35,6 +35,59 @@ function normalizeOptional(value: FormDataEntryValue | null) {
   return normalized.length > 0 ? normalized : null;
 }
 
+function parseContactPhoneNumbers(formData: FormData, prefix = "") {
+  const count = Number(String(formData.get(`${prefix}phoneCount`) ?? "0"));
+  const phoneNumbers: Array<{
+    label: string | null;
+    phoneNumber: string;
+    isPrimary: boolean;
+  }> = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const phoneNumber = String(formData.get(`${prefix}phoneNumber_${index}`) ?? "").trim();
+    if (!phoneNumber) {
+      continue;
+    }
+
+    phoneNumbers.push({
+      label: normalizeOptional(formData.get(`${prefix}phoneLabel_${index}`)),
+      phoneNumber,
+      isPrimary: String(formData.get(`${prefix}phonePrimary`)) === String(index),
+    });
+  }
+
+  return phoneNumbers;
+}
+
+function parseContactEmails(formData: FormData, prefix = "") {
+  const workEmail = normalizeOptional(formData.get(`${prefix}workEmail`));
+  const personalEmail = normalizeOptional(formData.get(`${prefix}personalEmail`));
+  const primaryEmailType = String(formData.get(`${prefix}primaryEmailType`) ?? "").trim();
+  const emails: Array<{
+    email: string;
+    emailType: "personal" | "work";
+    isPrimary: boolean;
+  }> = [];
+
+  if (workEmail) {
+    emails.push({
+      email: workEmail,
+      emailType: "work",
+      isPrimary: primaryEmailType ? primaryEmailType === "work" : !personalEmail,
+    });
+  }
+
+  if (personalEmail) {
+    emails.push({
+      email: personalEmail,
+      emailType: "personal",
+      isPrimary: primaryEmailType ? primaryEmailType === "personal" : !workEmail,
+    });
+  }
+
+  return emails;
+}
+
 function parseAccountInput(formData: FormData) {
   return {
     name: String(formData.get("name") ?? "").trim(),
@@ -53,8 +106,8 @@ function parseContactInput(formData: FormData) {
     accountId: String(formData.get("accountId") ?? "").trim(),
     fullName: String(formData.get("fullName") ?? "").trim(),
     jobTitle: normalizeOptional(formData.get("jobTitle")),
-    phone: normalizeOptional(formData.get("phone")),
-    email: normalizeOptional(formData.get("email")),
+    phoneNumbers: parseContactPhoneNumbers(formData),
+    emails: parseContactEmails(formData),
     notes: normalizeOptional(formData.get("notes")),
   };
 }
@@ -133,8 +186,8 @@ export async function createCrmAccountAction(_: CrmFormState, formData: FormData
         accountId: account.id,
         fullName: initialContactName,
         jobTitle: normalizeOptional(formData.get("initialContactJobTitle")),
-        phone: normalizeOptional(formData.get("initialContactPhone")),
-        email: normalizeOptional(formData.get("initialContactEmail")),
+        phoneNumbers: parseContactPhoneNumbers(formData, "initialContact"),
+        emails: parseContactEmails(formData, "initialContact"),
         notes: null,
       });
     }
@@ -205,6 +258,10 @@ export async function createCrmContactAction(_: CrmFormState, formData: FormData
       return { error: "Account and contact name are required.", entityId: null };
     }
 
+    if (input.phoneNumbers.length === 0 && input.emails.length === 0) {
+      return { error: "Add at least one phone number or one email address.", entityId: null };
+    }
+
     await createCrmContact(input);
     revalidatePath(getAdminRoute(`/crm/${input.accountId}`));
     return { error: null, entityId: input.accountId };
@@ -225,11 +282,15 @@ export async function updateCrmContactAction(_: CrmFormState, formData: FormData
       return { error: "Account, contact, and full name are required.", entityId: null };
     }
 
+    if (input.phoneNumbers.length === 0 && input.emails.length === 0) {
+      return { error: "Add at least one phone number or one email address.", entityId: null };
+    }
+
     await updateCrmContact(contactId, {
       fullName: input.fullName,
       jobTitle: input.jobTitle,
-      phone: input.phone,
-      email: input.email,
+      phoneNumbers: input.phoneNumbers,
+      emails: input.emails,
       notes: input.notes,
     });
     revalidatePath(getAdminRoute(`/crm/${accountId}`));

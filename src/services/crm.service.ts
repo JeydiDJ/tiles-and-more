@@ -2,7 +2,10 @@ import type {
   CrmAccount,
   CrmAccountInput,
   CrmContact,
+  CrmContactEmail,
+  CrmContactEmailType,
   CrmContactInput,
+  CrmContactPhoneNumber,
   CrmOpportunity,
   CrmOpportunityActivity,
   CrmOpportunityAttachment,
@@ -34,7 +37,29 @@ type CrmContactRow = {
   job_title: string | null;
   phone: string | null;
   email: string | null;
+  phone_numbers?: CrmContactPhoneNumberRow[] | null;
+  emails?: CrmContactEmailRow[] | null;
   notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type CrmContactPhoneNumberRow = {
+  id: string;
+  contact_id: string;
+  label: string | null;
+  phone_number: string;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+type CrmContactEmailRow = {
+  id: string;
+  contact_id: string;
+  email: string;
+  email_type: CrmContactEmailType;
+  is_primary: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -115,17 +140,203 @@ function mapAccount(row: CrmAccountRow): CrmAccount {
 }
 
 function mapContact(row: CrmContactRow): CrmContact {
+  const phoneNumbers = mapContactPhoneNumbers(row.phone_numbers, row.id, row.phone);
+  const emails = mapContactEmails(row.emails, row.id, row.email);
+  const primaryPhone = phoneNumbers.find((item) => item.isPrimary)?.phoneNumber ?? phoneNumbers[0]?.phoneNumber ?? null;
+  const primaryEmail = emails.find((item) => item.isPrimary)?.email ?? emails[0]?.email ?? null;
+  const workEmail = emails.find((item) => item.emailType === "work")?.email ?? null;
+  const personalEmail = emails.find((item) => item.emailType === "personal")?.email ?? null;
+
   return {
     id: row.id,
     accountId: row.account_id,
     fullName: row.full_name,
     jobTitle: row.job_title,
-    phone: row.phone,
-    email: row.email,
+    phone: primaryPhone ?? row.phone,
+    email: primaryEmail ?? row.email,
+    phoneNumbers,
+    emails,
+    primaryPhone,
+    primaryEmail,
+    workEmail,
+    personalEmail,
     notes: row.notes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+}
+
+function mapContactPhoneNumbers(
+  rows: CrmContactPhoneNumberRow[] | null | undefined,
+  contactId: string,
+  legacyPhone: string | null,
+): CrmContactPhoneNumber[] {
+  if (rows && rows.length > 0) {
+    return rows.map((row) => ({
+      id: row.id,
+      contactId: row.contact_id,
+      label: row.label,
+      phoneNumber: row.phone_number,
+      isPrimary: row.is_primary,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  }
+
+  if (!legacyPhone) {
+    return [];
+  }
+
+  return [
+    {
+      id: `legacy-phone-${contactId}`,
+      contactId,
+      label: "Main",
+      phoneNumber: legacyPhone,
+      isPrimary: true,
+      createdAt: "",
+      updatedAt: "",
+    },
+  ];
+}
+
+function mapContactEmails(
+  rows: CrmContactEmailRow[] | null | undefined,
+  contactId: string,
+  legacyEmail: string | null,
+): CrmContactEmail[] {
+  if (rows && rows.length > 0) {
+    return rows.map((row) => ({
+      id: row.id,
+      contactId: row.contact_id,
+      email: row.email,
+      emailType: row.email_type,
+      isPrimary: row.is_primary,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  }
+
+  if (!legacyEmail) {
+    return [];
+  }
+
+  return [
+    {
+      id: `legacy-email-${contactId}`,
+      contactId,
+      email: legacyEmail,
+      emailType: "work",
+      isPrimary: true,
+      createdAt: "",
+      updatedAt: "",
+    },
+  ];
+}
+
+function getContactSelect() {
+  return "*, phone_numbers:crm_contact_phone_numbers(*), emails:crm_contact_emails(*)";
+}
+
+async function syncCrmContactDetails(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  contactId: string,
+  input: Pick<CrmContactInput, "phoneNumbers" | "emails">,
+) {
+  const normalizedPhoneNumbers = input.phoneNumbers
+    .map((item) => ({
+      label: item.label,
+      phoneNumber: item.phoneNumber.trim(),
+      isPrimary: item.isPrimary,
+    }))
+    .filter((item) => item.phoneNumber.length > 0);
+
+  const normalizedEmails = input.emails
+    .map((item) => ({
+      email: item.email.trim(),
+      emailType: item.emailType,
+      isPrimary: item.isPrimary,
+    }))
+    .filter((item) => item.email.length > 0);
+
+  const ensuredPhoneNumbers = normalizedPhoneNumbers.map((item, index) => ({
+    ...item,
+    isPrimary: normalizedPhoneNumbers.some((phone) => phone.isPrimary) ? item.isPrimary : index === 0,
+  }));
+
+  const ensuredEmails = normalizedEmails.map((item, index) => ({
+    ...item,
+    isPrimary: normalizedEmails.some((email) => email.isPrimary) ? item.isPrimary : index === 0,
+  }));
+
+  const { error: deletePhonesError } = await supabase.from("crm_contact_phone_numbers").delete().eq("contact_id", contactId);
+  if (deletePhonesError) {
+    throw new Error(deletePhonesError.message);
+  }
+
+  if (ensuredPhoneNumbers.length > 0) {
+    const { error: insertPhonesError } = await supabase.from("crm_contact_phone_numbers").insert(
+      ensuredPhoneNumbers.map((item) => ({
+        contact_id: contactId,
+        label: item.label,
+        phone_number: item.phoneNumber,
+        is_primary: item.isPrimary,
+      })),
+    );
+
+    if (insertPhonesError) {
+      throw new Error(insertPhonesError.message);
+    }
+  }
+
+  const { error: deleteEmailsError } = await supabase.from("crm_contact_emails").delete().eq("contact_id", contactId);
+  if (deleteEmailsError) {
+    throw new Error(deleteEmailsError.message);
+  }
+
+  if (ensuredEmails.length > 0) {
+    const { error: insertEmailsError } = await supabase.from("crm_contact_emails").insert(
+      ensuredEmails.map((item) => ({
+        contact_id: contactId,
+        email: item.email,
+        email_type: item.emailType,
+        is_primary: item.isPrimary,
+      })),
+    );
+
+    if (insertEmailsError) {
+      throw new Error(insertEmailsError.message);
+    }
+  }
+
+  const primaryPhone = ensuredPhoneNumbers.find((item) => item.isPrimary)?.phoneNumber ?? ensuredPhoneNumbers[0]?.phoneNumber ?? null;
+  const primaryEmail = ensuredEmails.find((item) => item.isPrimary)?.email ?? ensuredEmails[0]?.email ?? null;
+
+  const { error: updateLegacyError } = await supabase
+    .from("crm_contacts")
+    .update({
+      phone: primaryPhone,
+      email: primaryEmail,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", contactId);
+
+  if (updateLegacyError) {
+    throw new Error(updateLegacyError.message);
+  }
+}
+
+async function getCrmContactByIdInternal(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  id: string,
+) {
+  const { data, error } = await supabase.from("crm_contacts").select(getContactSelect()).eq("id", id).maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ? mapContact(data as unknown as CrmContactRow) : null;
 }
 
 function mapOpportunity(row: CrmOpportunityRow): CrmOpportunity {
@@ -276,7 +487,7 @@ export async function getCrmContacts(accountId: string) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("crm_contacts")
-    .select("*")
+    .select(getContactSelect())
     .eq("account_id", accountId)
     .order("updated_at", { ascending: false });
 
@@ -284,7 +495,7 @@ export async function getCrmContacts(accountId: string) {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((row) => mapContact(row as CrmContactRow));
+  return (data ?? []).map((row) => mapContact(row as unknown as CrmContactRow));
 }
 
 export async function createCrmContact(input: CrmContactInput) {
@@ -295,8 +506,8 @@ export async function createCrmContact(input: CrmContactInput) {
       account_id: input.accountId,
       full_name: input.fullName,
       job_title: input.jobTitle,
-      phone: input.phone,
-      email: input.email,
+      phone: null,
+      email: null,
       notes: input.notes,
     })
     .select("*")
@@ -306,7 +517,14 @@ export async function createCrmContact(input: CrmContactInput) {
     throw new Error(error.message);
   }
 
-  return mapContact(data as CrmContactRow);
+  const contact = data as unknown as CrmContactRow;
+  await syncCrmContactDetails(supabase, contact.id, input);
+  const hydrated = await getCrmContactByIdInternal(supabase, contact.id);
+  if (!hydrated) {
+    throw new Error("Unable to load the saved contact.");
+  }
+
+  return hydrated;
 }
 
 export async function updateCrmContact(id: string, input: Omit<CrmContactInput, "accountId">) {
@@ -316,8 +534,6 @@ export async function updateCrmContact(id: string, input: Omit<CrmContactInput, 
     .update({
       full_name: input.fullName,
       job_title: input.jobTitle,
-      phone: input.phone,
-      email: input.email,
       notes: input.notes,
       updated_at: new Date().toISOString(),
     })
@@ -326,6 +542,8 @@ export async function updateCrmContact(id: string, input: Omit<CrmContactInput, 
   if (error) {
     throw new Error(error.message);
   }
+
+  await syncCrmContactDetails(supabase, id, input);
 }
 
 export async function deleteCrmContact(id: string) {

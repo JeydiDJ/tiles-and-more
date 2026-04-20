@@ -10,6 +10,13 @@ import { Modal } from "@/components/ui/modal";
 import { getAdminRoute } from "@/lib/admin-path";
 import type { CrmAccount, CrmContact, CrmOpportunity } from "@/types/crm";
 
+function formatContactSummary(contact: CrmContact) {
+  const phones = contact.phoneNumbers.map((item) => item.phoneNumber);
+  const emails = contact.emails.map((item) => item.email);
+  const details = [...phones, ...emails];
+  return details.length > 0 ? details.join(" - ") : "No contact details yet";
+}
+
 function formatCurrency(value: number | null) {
   if (value === null) return "-";
   return new Intl.NumberFormat("en-PH", {
@@ -235,7 +242,13 @@ export function CrmAccountDetail({
                       <ActionButton label="Delete" tone="danger" size="compact" onClick={() => setContactToDelete(contact)} />
                     </div>
                   </div>
-                  <p className="mt-2 break-words text-sm text-[#6f6a75]">{[contact.phone, contact.email].filter(Boolean).join(" - ") || "No contact details yet"}</p>
+                  <p className="mt-2 break-words text-sm text-[#6f6a75]">{formatContactSummary(contact)}</p>
+                  {(contact.workEmail || contact.personalEmail) ? (
+                    <div className="mt-2 grid gap-1 text-xs uppercase tracking-[0.12em] text-[#8d8896]">
+                      {contact.workEmail ? <p>Work: {contact.workEmail}</p> : null}
+                      {contact.personalEmail ? <p>Personal: {contact.personalEmail}</p> : null}
+                    </div>
+                  ) : null}
                   {contact.notes ? <p className="mt-2 break-words text-sm leading-6 text-[#6f6a75]">{contact.notes}</p> : null}
                 </div>
               ))}

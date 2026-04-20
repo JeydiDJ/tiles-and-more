@@ -11,6 +11,28 @@ export const crmOpportunityStages = [
 
 export type CrmOpportunityStage = (typeof crmOpportunityStages)[number];
 
+export type CrmContactPhoneNumber = {
+  id: string;
+  contactId: string;
+  label: string | null;
+  phoneNumber: string;
+  isPrimary: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CrmContactEmailType = "personal" | "work";
+
+export type CrmContactEmail = {
+  id: string;
+  contactId: string;
+  email: string;
+  emailType: CrmContactEmailType;
+  isPrimary: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type CrmAccount = {
   id: string;
   name: string;
@@ -32,6 +54,12 @@ export type CrmContact = {
   jobTitle: string | null;
   phone: string | null;
   email: string | null;
+  phoneNumbers: CrmContactPhoneNumber[];
+  emails: CrmContactEmail[];
+  primaryPhone: string | null;
+  primaryEmail: string | null;
+  workEmail: string | null;
+  personalEmail: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -98,8 +126,16 @@ export type CrmContactInput = {
   accountId: string;
   fullName: string;
   jobTitle: string | null;
-  phone: string | null;
-  email: string | null;
+  phoneNumbers: Array<{
+    label: string | null;
+    phoneNumber: string;
+    isPrimary: boolean;
+  }>;
+  emails: Array<{
+    email: string;
+    emailType: CrmContactEmailType;
+    isPrimary: boolean;
+  }>;
   notes: string | null;
 };
 
