@@ -99,11 +99,11 @@ const STAGE_COLORS: Record<CrmOpportunityStage, string> = {
   negotiation: "#ea580c",
   awarded: "#2563eb",
   ongoing: "#db2777",
-  completed: "#17141a",
+  completed: "#475569",
   lost: "#b91c1c",
 };
 
-const CHART_SERIES_COLORS = ["#ed2325", "#17141a", "#0f8a43", "#7c3aed", "#0f766e", "#ea580c", "#2563eb", "#db2777"];
+const CHART_SERIES_COLORS = ["#ed2325", "#2563eb", "#0f8a43", "#7c3aed", "#0f766e", "#ea580c", "#db2777", "#14b8a6"];
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-PH", {
@@ -256,7 +256,7 @@ function RechartsBarChart({
   items,
   title,
   subtitle,
-  color = "#ed2325",
+  color = "var(--admin-chart-brand)",
   formatValue,
 }: {
   items: RankedItem[];
@@ -310,7 +310,7 @@ function RechartsBarChart({
                     tickLine={false}
                   />
                   <Tooltip
-                    cursor={{ fill: "rgba(237,35,37,0.06)" }}
+                    cursor={{ fill: "var(--admin-chart-cursor)" }}
                     content={<ChartTooltip valueFormatter={formatValue} />}
                   />
                   <Bar dataKey="value" radius={[0, 8, 8, 0]} fill={color} name={title}>
@@ -344,7 +344,7 @@ function RechartsBarChart({
                     name={title}
                     stroke={color}
                     strokeWidth={3}
-                    dot={{ r: 4, strokeWidth: 2, fill: "#ffffff" }}
+                    dot={{ r: 4, strokeWidth: 2, fill: "var(--admin-chart-dot-fill)" }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -553,7 +553,7 @@ function RechartsStageMetricChart({
                     tickLine={false}
                   />
                   <Tooltip
-                    cursor={{ fill: "rgba(237,35,37,0.06)" }}
+                    cursor={{ fill: "var(--admin-chart-cursor)" }}
                     content={<ChartTooltip valueFormatter={metric === "value" ? formatCurrency : undefined} />}
                   />
                   <Bar dataKey="value" radius={[0, 8, 8, 0]} name={metric === "count" ? "Opportunities" : "Pipeline Value"}>
@@ -612,9 +612,9 @@ function RechartsStageMetricChart({
                     type="monotone"
                     dataKey="value"
                     name={metric === "count" ? "Opportunities" : "Pipeline Value"}
-                    stroke="#17141a"
+                    stroke="var(--admin-chart-neutral)"
                     strokeWidth={3}
-                    dot={{ r: 4, strokeWidth: 2, fill: "#ffffff" }}
+                    dot={{ r: 4, strokeWidth: 2, fill: "var(--admin-chart-dot-fill)" }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -693,16 +693,16 @@ function RechartsLineChart({
                     type="monotone"
                     dataKey="closingBalance"
                     name="Closing Balance"
-                    stroke="#0f8a43"
+                    stroke="var(--admin-chart-positive)"
                     strokeWidth={3}
-                    dot={{ r: 4, strokeWidth: 2, fill: "#ffffff" }}
+                    dot={{ r: 4, strokeWidth: 2, fill: "var(--admin-chart-dot-fill)" }}
                     activeDot={{ r: 6 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="netCashFlow"
                     name="Net Cash Flow"
-                    stroke="#17141a"
+                    stroke="var(--admin-chart-neutral)"
                     strokeWidth={2}
                     dot={{ r: 3 }}
                   />
@@ -728,8 +728,8 @@ function RechartsLineChart({
                   />
                   <Tooltip content={<ChartTooltip valueFormatter={formatCurrency} />} />
                   <Legend />
-                  <Bar dataKey="closingBalance" name="Closing Balance" fill="#0f8a43" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="netCashFlow" name="Net Cash Flow" fill="#17141a" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="closingBalance" name="Closing Balance" fill="var(--admin-chart-positive)" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="netCashFlow" name="Net Cash Flow" fill="var(--admin-chart-neutral)" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -906,7 +906,7 @@ export function ReportsWorkspace({ data }: ReportsWorkspaceProps) {
           </ReportPanel>
 
           <ReportPanel title="Category Coverage Chart">
-            <RechartsBarChart items={data.publicSite.categoryCoverage} title="Category Coverage" subtitle="Products mapped to each public category." color="#17141a" />
+            <RechartsBarChart items={data.publicSite.categoryCoverage} title="Category Coverage" subtitle="Products mapped to each public category." color="var(--admin-chart-neutral)" />
           </ReportPanel>
 
           <ReportPanel title="Detailed Catalog Report">
@@ -963,7 +963,7 @@ export function ReportsWorkspace({ data }: ReportsWorkspaceProps) {
 
           <ReportPanel title="Cash Breakdown Chart">
             {data.accounting.ready ? (
-              <RechartsBarChart items={data.accounting.cashBreakdown} title="Cash Breakdown" subtitle="Switch between bar and donut views for the accounting totals." formatValue={formatCurrency} color="#0f8a43" />
+              <RechartsBarChart items={data.accounting.cashBreakdown} title="Cash Breakdown" subtitle="Switch between bar and donut views for the accounting totals." formatValue={formatCurrency} color="var(--admin-chart-positive)" />
             ) : (
               <p className="text-sm text-[#6f6a75]">Accounting reports will appear once accounting periods are available.</p>
             )}
@@ -986,7 +986,7 @@ export function ReportsWorkspace({ data }: ReportsWorkspaceProps) {
           </ReportPanel>
 
           <ReportPanel title="Lead Source Chart">
-            <RechartsBarChart items={data.leads.leadSources} title="Lead Sources" subtitle="Switch between bar and donut views for source distribution." color="#7c3aed" />
+            <RechartsBarChart items={data.leads.leadSources} title="Lead Sources" subtitle="Switch between bar and donut views for source distribution." color="var(--admin-chart-secondary)" />
           </ReportPanel>
 
           <ReportPanel title="Latest Project Leads">
