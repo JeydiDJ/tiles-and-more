@@ -17,6 +17,7 @@ export const legalNav = [
 
 export const adminNav = [
   { href: getAdminRoute(), label: "Dashboard" },
+  { href: getAdminRoute("/reports"), label: "Reports" },
   { href: getAdminRoute("/products"), label: "Products" },
   { href: getAdminRoute("/categories"), label: "Categories" },
   { href: getAdminRoute("/crm"), label: "CRM" },

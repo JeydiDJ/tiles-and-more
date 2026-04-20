@@ -98,6 +98,18 @@ function InquiryIcon() {
   );
 }
 
+function ReportsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
+      <path d="M5 18.5h14" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M7.5 15V10.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M12 15V6.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M16.5 15v-2.5" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="m6.5 11.5 4-4 3 2 4-4" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function CrmIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[1.1rem] w-[1.1rem] fill-none stroke-current">
@@ -157,6 +169,8 @@ function getNavIcon(label: string) {
   switch (label) {
     case "Dashboard":
       return <DashboardIcon />;
+    case "Reports":
+      return <ReportsIcon />;
     case "Products":
       return <ProductIcon />;
     case "Categories":
