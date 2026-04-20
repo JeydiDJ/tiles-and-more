@@ -124,16 +124,39 @@ function Field({
   label,
   children,
   className = "",
+  hint,
 }: {
   label: string;
   children: React.ReactNode;
   className?: string;
+  hint?: string;
 }) {
   return (
     <label className={`grid gap-2 ${className}`}>
       <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>
       {children}
+      {hint ? <span className="text-xs leading-5 text-[#8b8791]">{hint}</span> : null}
     </label>
+  );
+}
+
+function DetailFormShell({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="crm-popover-form overflow-hidden rounded-[1.55rem] border border-[#e3e7f0] bg-white shadow-[0_14px_30px_rgba(35,31,32,0.06)]">
+      <div className="border-b border-[#edf0f6] bg-[linear-gradient(180deg,#fcfcfd_0%,#f7f8fb_100%)] px-4 py-3.5 sm:px-5 sm:py-4">
+        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#9793a0]">{eyebrow}</p>
+        <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-[#17141a]">{title}</h3>
+      </div>
+      <div className="grid gap-5 px-4 py-4 sm:px-5 sm:py-5">{children}</div>
+    </div>
   );
 }
 
@@ -210,8 +233,12 @@ function OpportunityOverviewForm({
   }, [onClose, router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid min-w-0 gap-5 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
+    <form action={formAction}>
       <input type="hidden" name="opportunityId" value={opportunity.id} />
+      <DetailFormShell
+        eyebrow="Edit Overview"
+        title="Update the core opportunity details"
+      >
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Opportunity Name">
           <Input name="name" defaultValue={opportunity.name} required />
@@ -258,17 +285,18 @@ function OpportunityOverviewForm({
           <Textarea name="notes" className="min-h-28" defaultValue={opportunity.notes ?? ""} />
         </Field>
       </div>
-      {state.error ? <p className="text-sm text-[#8f1d1d]">{state.error}</p> : null}
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+      {state.error ? <p className="rounded-[1rem] border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
+      <div className="flex flex-col-reverse gap-3 border-t border-[#edf0f6] pt-4 sm:flex-row sm:items-center sm:justify-end">
         <ActionButton label="Cancel" onClick={onClose} />
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-36 sm:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-36 sm:w-auto"
         >
           {isPending ? "Updating..." : "Save Overview"}
         </button>
       </div>
+      </DetailFormShell>
     </form>
   );
 }
@@ -299,8 +327,12 @@ function OpportunityPartyForm({
   }, [onClose, router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid min-w-0 gap-5 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-4 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-5">
+    <form action={formAction}>
       <input type="hidden" name="opportunityId" value={opportunityId} />
+      <DetailFormShell
+        eyebrow="Edit Party"
+        title={submitLabel}
+      >
       <div className="grid gap-5 md:grid-cols-2">
         {fields.map((field, index) => (
           <Field key={field.name} label={field.label} className={index === 0 ? "md:col-span-2" : ""}>
@@ -308,17 +340,18 @@ function OpportunityPartyForm({
           </Field>
         ))}
       </div>
-      {state.error ? <p className="text-sm text-[#8f1d1d]">{state.error}</p> : null}
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+      {state.error ? <p className="rounded-[1rem] border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
+      <div className="flex flex-col-reverse gap-3 border-t border-[#edf0f6] pt-4 sm:flex-row sm:items-center sm:justify-end">
         <ActionButton label="Cancel" onClick={onClose} />
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
         >
           {isPending ? "Updating..." : submitLabel}
         </button>
       </div>
+      </DetailFormShell>
     </form>
   );
 }
@@ -518,22 +551,73 @@ export function CrmOpportunityDetail({
               <ActionButton label={notePanel ? "Close" : "Add note"} active={notePanel} onClick={() => setNotePanel((current) => !current)} />
             </div>
             <AnimatedPresence open={notePanel} spaced>
-              <form action={noteFormAction} className="crm-popover-form grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+              <form action={noteFormAction}>
                 <input type="hidden" name="opportunityId" value={opportunity.id} />
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Add Note</p>
-                  <Textarea name="note" className="mt-3 min-h-28" placeholder="Add negotiation updates, bid notes, client feedback, or next actions..." />
-                </div>
-                {noteState.error ? <p className="text-sm text-[#8f1d1d]">{noteState.error}</p> : null}
-                <div className="flex">
-                  <button
-                    type="submit"
-                    disabled={isSavingNote}
-                    className="inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
-                  >
-                    {isSavingNote ? "Saving..." : "Save Note"}
-                  </button>
-                </div>
+                <DetailFormShell
+                  eyebrow="Add Note"
+                  title="Capture the latest update"
+                >
+                  <Textarea name="note" className="min-h-28" placeholder="Add negotiation updates, bid notes, client feedback, or next actions..." />
+                  {noteState.error ? <p className="rounded-[1rem] border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{noteState.error}</p> : null}
+                  <div className="flex border-t border-[#edf0f6] pt-4">
+                    <button
+                      type="submit"
+                      disabled={isSavingNote}
+                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
+                    >
+                      {isSavingNote ? "Saving..." : "Save Note"}
+                    </button>
+                  </div>
+                </DetailFormShell>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
               </form>
             </AnimatedPresence>
             <div className="mt-4 grid gap-0">

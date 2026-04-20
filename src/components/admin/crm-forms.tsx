@@ -35,15 +35,18 @@ function Field({
   label,
   children,
   className = "",
+  hint,
 }: {
   label: string;
   children: React.ReactNode;
   className?: string;
+  hint?: string;
 }) {
   return (
     <label className={`grid gap-2 ${className}`}>
       <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>
       {children}
+      {hint ? <span className="text-xs leading-5 text-[#8b8791]">{hint}</span> : null}
     </label>
   );
 }
@@ -83,6 +86,46 @@ function buildInitialPhoneRows(contact?: CrmContact | null) {
   ];
 }
 
+function FormShell({
+  eyebrow,
+  title,
+  children,
+  footer,
+}: {
+  eyebrow: string;
+  title: string;
+  children: React.ReactNode;
+  footer: React.ReactNode;
+}) {
+  return (
+    <div className="crm-popover-form overflow-hidden rounded-[1.65rem] border border-[#e3e7f0] bg-white shadow-[0_16px_36px_rgba(35,31,32,0.06)]">
+      <div className="border-b border-[#edf0f6] bg-[linear-gradient(180deg,#fcfcfd_0%,#f7f8fb_100%)] px-5 py-4 sm:px-6 sm:py-5">
+        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#9793a0]">{eyebrow}</p>
+        <h3 className="mt-2 text-[1.4rem] font-semibold tracking-tight text-[#17141a] sm:text-[1.55rem]">{title}</h3>
+      </div>
+      <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6">{children}</div>
+      <div className="border-t border-[#edf0f6] bg-[#fafbfe] px-5 py-4 sm:px-6">{footer}</div>
+    </div>
+  );
+}
+
+function FormSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-[1.3rem] border border-[#e8ebf3] bg-[#fbfbfd] p-4 sm:p-5">
+      <div className="mb-4 flex flex-col gap-1">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">{title}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export function CrmAccountForm({
   mode = "create",
   initialAccount = null,
@@ -105,12 +148,41 @@ export function CrmAccountForm({
   }, [router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid gap-6 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-6">
+    <form action={formAction}>
       {isEditMode && initialAccount ? <input type="hidden" name="accountId" value={initialAccount.id} /> : null}
-
-      <div className="grid gap-8">
-        <section className="grid gap-5">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">Account</p>
+      <FormShell
+        eyebrow={isEditMode ? "Edit Account" : "New Account"}
+        title={isEditMode ? "Refine account details" : "Create a new account"}
+        footer={
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Ready to update account" : "Ready to create account"}</p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onCancel) {
+                    onCancel();
+                    return;
+                  }
+                  router.push(getAdminRoute("/crm"));
+                }}
+                className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-full border border-[#dfe4ee] bg-white px-5 py-3 text-sm font-medium text-[#231f20] transition hover:-translate-y-0.5 hover:border-[#cfd5e2] hover:text-[var(--brand)]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isPending}
+                className="inline-flex min-w-36 cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Account" : "Create Account"}
+              </button>
+            </div>
+          </div>
+        }
+      >
+        <div className="grid gap-6">
+        <FormSection title="Account">
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Account Name">
               <Input name="name" placeholder="Enter the company name" defaultValue={initialAccount?.name ?? ""} required />
@@ -137,12 +209,11 @@ export function CrmAccountForm({
               <Textarea name="notes" className="min-h-28" placeholder="Add internal notes, commercial context, or account history" defaultValue={initialAccount?.notes ?? ""} />
             </Field>
           </div>
-        </section>
+        </FormSection>
 
         {!isEditMode ? (
           <>
-            <section className="grid gap-5 border-t border-[#eef0f6] pt-5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">Initial Contact</p>
+            <FormSection title="Initial Contact">
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Full Name">
                   <Input name="initialContactName" placeholder="Enter the primary contact name" />
@@ -164,10 +235,9 @@ export function CrmAccountForm({
                   <Input name="initialContactpersonalEmail" type="email" placeholder="Optional personal email address" />
                 </Field>
               </div>
-            </section>
+            </FormSection>
 
-            <section className="grid gap-5 border-t border-[#eef0f6] pt-5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">Initial Opportunity</p>
+            <FormSection title="Initial Opportunity">
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Opportunity Name">
                   <Input name="initialOpportunityName" placeholder="Enter the project or opportunity name" />
@@ -176,38 +246,12 @@ export function CrmAccountForm({
                   <Input name="initialOpportunityLocation" placeholder="Enter the project location" />
                 </Field>
               </div>
-            </section>
+            </FormSection>
           </>
         ) : null}
-      </div>
-
-      {state.error ? <p className="rounded-sm border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
-
-      <div className="flex items-center justify-between gap-4 border-t border-[#eef0f6] pt-5">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Ready to update account" : "Ready to create account"}</p>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (onCancel) {
-                onCancel();
-                return;
-              }
-              router.push(getAdminRoute("/crm"));
-            }}
-            className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="inline-flex min-w-36 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Account" : "Create Account"}
-          </button>
+        {state.error ? <p className="rounded-[1rem] border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
         </div>
-      </div>
+      </FormShell>
     </form>
   );
 }
@@ -248,11 +292,35 @@ export function CrmContactFormInner({
   }, [onSuccess, router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid gap-4 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)]">
+    <form action={formAction}>
       <input type="hidden" name="accountId" value={accountId} />
       {isEditMode && initialContact ? <input type="hidden" name="contactId" value={initialContact.id} /> : null}
       <input type="hidden" name="phoneCount" value={phoneRows.length} />
-      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Edit Contact" : "Add Contact"}</p>
+      <FormShell
+        eyebrow={isEditMode ? "Edit Contact" : "New Contact"}
+        title={isEditMode ? "Keep this contact current" : "Add a contact"}
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            {isEditMode ? (
+              <button
+                type="button"
+                onClick={() => onCancel?.()}
+                className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-full border border-[#dfe4ee] bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:-translate-y-0.5 hover:border-[#cfd5e2] hover:text-[var(--brand)]"
+              >
+                Cancel
+              </button>
+            ) : null}
+            <button
+              type="submit"
+              disabled={isPending}
+              className="inline-flex min-w-32 cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isPending ? "Saving..." : isEditMode ? "Update Contact" : "Add Contact"}
+            </button>
+          </div>
+        }
+      >
+      <FormSection title="Contact Details">
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Full Name">
           <Input name="fullName" placeholder="Enter the contact's full name" defaultValue={initialContact?.fullName ?? ""} required />
@@ -362,7 +430,7 @@ export function CrmContactFormInner({
             ))}
           </div>
         </div>
-        <Field label="Work Email">
+                <Field label="Work Email">
           <Input
             name="workEmail"
             type="email"
@@ -395,25 +463,30 @@ export function CrmContactFormInner({
           <Textarea name="notes" className="min-h-24" placeholder="Add relationship notes or communication preferences" defaultValue={initialContact?.notes ?? ""} />
         </Field>
       </div>
-      {state.error ? <p className="text-sm text-[#8f1d1d]">{state.error}</p> : null}
-      <div className="flex items-center justify-end gap-3">
-        {isEditMode ? (
-          <button
-            type="button"
-            onClick={() => onCancel?.()}
-            className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
-          >
-            Cancel
-          </button>
-        ) : null}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="inline-flex min-w-32 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isPending ? "Saving..." : isEditMode ? "Update Contact" : "Add Contact"}
-        </button>
-      </div>
+      </FormSection>
+      {state.error ? <p className="rounded-[1rem] border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
+      </FormShell>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
     </form>
   );
 }
@@ -446,7 +519,7 @@ export function CrmOpportunityForm({
   }, [isEditMode, router, state.entityId]);
 
   return (
-    <form action={formAction} className="crm-popover-form grid gap-6 rounded-[1.5rem] border border-[#e7e9f2] bg-white p-5 shadow-[0_10px_24px_rgba(35,31,32,0.04)] sm:p-6">
+    <form action={formAction}>
       <input type="hidden" name="accountId" value={accountId} />
       {isEditMode && initialOpportunity ? (
         <>
@@ -454,10 +527,39 @@ export function CrmOpportunityForm({
           <input type="hidden" name="previousStage" value={initialOpportunity.stage} />
         </>
       ) : null}
-
-      <div className="grid gap-8">
-        <section className="grid gap-5">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#9793a0]">{isEditMode ? "Opportunity" : "New Opportunity"}</p>
+      <FormShell
+        eyebrow={isEditMode ? "Edit Opportunity" : "New Opportunity"}
+        title={isEditMode ? "Update opportunity details" : "Create a new opportunity"}
+        footer={
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Ready to update opportunity" : "Ready to add opportunity"}</p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onCancel) {
+                    onCancel();
+                    return;
+                  }
+                  router.push(isEditMode && initialOpportunity ? getAdminRoute(`/crm/${initialOpportunity.accountId}`) : getAdminRoute(`/crm/${accountId}`));
+                }}
+                className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-full border border-[#dfe4ee] bg-white px-5 py-3 text-sm font-medium text-[#231f20] transition hover:-translate-y-0.5 hover:border-[#cfd5e2] hover:text-[var(--brand)]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isPending}
+                className="inline-flex min-w-36 cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Opportunity" : "Add Opportunity"}
+              </button>
+            </div>
+          </div>
+        }
+      >
+      <div className="grid gap-6">
+        <FormSection title={isEditMode ? "Opportunity" : "New Opportunity"}>
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Opportunity Name">
               <Input name="name" placeholder="Enter the opportunity or project name" defaultValue={initialOpportunity?.name ?? ""} required />
@@ -512,14 +614,18 @@ export function CrmOpportunityForm({
                     inputMode="decimal"
                     step="0.01"
                     min="0"
-                placeholder={quotationFinished ? "0.00" : "Can still be added before quotation is complete"}
+                    placeholder={quotationFinished ? "0.00" : "Can still be added before quotation is complete"}
                     defaultValue={initialOpportunity?.estimatedValue?.toFixed(2) ?? ""}
                     className="pl-14"
                   />
                 </div>
-                <p className="text-sm text-[var(--muted)]">Enter the opportunity value in Philippine Peso with centavos when needed.</p>
               </div>
             </Field>
+          </div>
+        </FormSection>
+
+        <FormSection title="Project Parties">
+          <div className="grid gap-5 md:grid-cols-2">
             <Field label="Architect / Designer" className="md:col-span-2">
               <Input
                 name="architectDesignerFirm"
@@ -592,17 +698,21 @@ export function CrmOpportunityForm({
                 defaultValue={initialOpportunity?.ownerEmail ?? ""}
               />
             </Field>
+          </div>
+        </FormSection>
+
+        <FormSection title="Notes & Files">
+          <div className="grid gap-5 md:grid-cols-2">
             <Field label="Opportunity Notes" className="md:col-span-2">
               <Textarea
                 name="notes"
                 className="min-h-28"
                 placeholder="Scope, material requirements, commercial context, next steps..."
-                
                 defaultValue={initialOpportunity?.notes ?? ""}
               />
             </Field>
             {isEditMode ? (
-              <Field label="Attachments" className="md:col-span-2">
+              <Field label="Attachments" className="md:col-span-2" hint="Upload quotation files, drawings, bid documents, or project references.">
                 <div className="grid gap-3">
                   <input
                     type="file"
@@ -610,11 +720,10 @@ export function CrmOpportunityForm({
                     multiple
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp,.txt"
                     onChange={(event) => setAttachmentNames(Array.from(event.target.files ?? []).map((file) => file.name))}
-                    className="w-full cursor-pointer rounded-sm border border-dashed border-[var(--border)] bg-white px-4 py-4 text-[15px] text-[var(--foreground)] file:mr-4 file:cursor-pointer file:rounded-sm file:border-0 file:bg-[var(--brand)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:border-[#bdbabd] focus:outline-none focus:ring-4 focus:ring-[rgba(237,35,37,0.08)]"
+                    className="w-full cursor-pointer rounded-[1rem] border border-dashed border-[#d9deea] bg-white px-4 py-4 text-[15px] text-[var(--foreground)] file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-[var(--brand)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:border-[#bdbabd] focus:outline-none focus:ring-4 focus:ring-[rgba(237,35,37,0.08)]"
                   />
-                  <p className="text-sm text-[var(--muted)]">Upload quotation files, drawings, bid documents, or project references.</p>
                   {attachmentNames.length > 0 ? (
-                    <div className="grid gap-1 text-sm text-[var(--muted)]">
+                    <div className="grid gap-1 rounded-[1rem] border border-[#eef0f6] bg-white px-4 py-3 text-sm text-[var(--muted)]">
                       {attachmentNames.map((name) => (
                         <span key={name}>{name}</span>
                       ))}
@@ -624,36 +733,11 @@ export function CrmOpportunityForm({
               </Field>
             ) : null}
           </div>
-        </section>
-      </div>
+        </FormSection>
 
-      {state.error ? <p className="rounded-sm border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
-
-      <div className="flex items-center justify-between gap-4 border-t border-[#eef0f6] pt-5">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">{isEditMode ? "Ready to update opportunity" : "Ready to add opportunity"}</p>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (onCancel) {
-                onCancel();
-                return;
-              }
-              router.push(isEditMode && initialOpportunity ? getAdminRoute(`/crm/${initialOpportunity.accountId}`) : getAdminRoute(`/crm/${accountId}`));
-            }}
-            className="inline-flex min-w-28 cursor-pointer items-center justify-center rounded-sm border border-[var(--border)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[#231f20] transition hover:border-[#231f20]/20 hover:text-[var(--brand)]"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="inline-flex min-w-36 cursor-pointer items-center justify-center rounded-sm bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isPending ? (isEditMode ? "Updating..." : "Saving...") : isEditMode ? "Update Opportunity" : "Add Opportunity"}
-          </button>
-        </div>
+        {state.error ? <p className="rounded-[1rem] border border-[#ed2325]/20 bg-[#fff5f5] px-4 py-3 text-sm text-[#8f1d1d]">{state.error}</p> : null}
       </div>
+      </FormShell>
     </form>
   );
 }
