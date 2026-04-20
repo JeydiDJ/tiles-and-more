@@ -98,7 +98,7 @@ function ActionButton({
       <button
         type="button"
         onClick={onClick}
-        className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#f1d0d0] bg-[#fff5f5] px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-[#b42318] transition hover:border-[#d8aaaa] hover:bg-white"
+        className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#f1d0d0] bg-[#fff5f5] px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-[#b42318] shadow-[0_6px_16px_rgba(180,35,24,0.06)] transition hover:-translate-y-0.5 hover:border-[#d8aaaa] hover:bg-white hover:shadow-[0_12px_24px_rgba(180,35,24,0.12)]"
       >
         {label}
       </button>
@@ -112,7 +112,7 @@ function ActionButton({
       className={`inline-flex cursor-pointer items-center justify-center rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] transition ${
         active
           ? "border-[#17141a] bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
-          : "border-[#e7e9f2] bg-white text-[#17141a] hover:-translate-y-0.5 hover:border-[#cfd5e2] hover:bg-[#fafbfe] hover:shadow-[0_10px_20px_rgba(35,31,32,0.08)]"
+          : "border-[#e7e9f2] bg-white text-[#17141a] shadow-[0_6px_16px_rgba(35,31,32,0.04)] hover:-translate-y-0.5 hover:border-[#cfd5e2] hover:bg-[#fafbfe] hover:shadow-[0_12px_24px_rgba(35,31,32,0.08)]"
       }`}
     >
       {label}
@@ -150,8 +150,8 @@ function DetailFormShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="crm-popover-form overflow-hidden rounded-[1.55rem] border border-[#e3e7f0] bg-white shadow-[0_14px_30px_rgba(35,31,32,0.06)]">
-      <div className="border-b border-[#edf0f6] bg-[linear-gradient(180deg,#fcfcfd_0%,#f7f8fb_100%)] px-4 py-3.5 sm:px-5 sm:py-4">
+    <div className="crm-popover-form crm-form-shell overflow-hidden rounded-[1.55rem] border border-[#e3e7f0] bg-white shadow-[0_14px_30px_rgba(35,31,32,0.06)]">
+      <div className="crm-form-header border-b border-[#edf0f6] bg-[linear-gradient(180deg,#fcfcfd_0%,#f7f8fb_100%)] px-4 py-3.5 sm:px-5 sm:py-4">
         <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#9793a0]">{eyebrow}</p>
         <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-[#17141a]">{title}</h3>
       </div>
@@ -195,13 +195,13 @@ function OpportunityPartyCard({
         {action}
       </div>
       <div className="mt-4 grid gap-4">
-        <div className="rounded-[1.1rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
+        <div className="crm-form-subcard rounded-[1.1rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
           <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">{organisationLabel}</p>
           <p className="mt-2 break-words text-sm font-medium text-[#17141a]">{organisation || "-"}</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {items.map((item) => (
-            <div key={item.label} className="rounded-[1.1rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
+            <div key={item.label} className="crm-form-subcard rounded-[1.1rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
               <p className="text-[10px] uppercase tracking-[0.14em] text-[#9793a0]">{item.label}</p>
               <p className="mt-2 break-words text-sm text-[#17141a]">{item.value || "-"}</p>
             </div>
@@ -291,7 +291,7 @@ function OpportunityOverviewForm({
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-36 sm:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-36 sm:w-auto"
         >
           {isPending ? "Updating..." : "Save Overview"}
         </button>
@@ -346,7 +346,7 @@ function OpportunityPartyForm({
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:bg-[#c81a1d] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[#c81a1d] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
         >
           {isPending ? "Updating..." : submitLabel}
         </button>
@@ -424,7 +424,7 @@ export function CrmOpportunityDetail({
             </div>
 
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
+              <div className="crm-form-subcard rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-[#9793a0]">Overview</p>
                 <div className="mt-3 grid gap-2 text-sm break-words text-[#6f6a75]">
                   <p><span className="font-medium text-[#17141a]">Location:</span> {opportunity.location || "-"}</p>
@@ -433,7 +433,7 @@ export function CrmOpportunityDetail({
                   <p><span className="font-medium text-[#17141a]">Quotation:</span> {opportunity.quotationFinished ? "Sent" : "Pending"}</p>
                 </div>
               </div>
-              <div className="rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
+              <div className="crm-form-subcard rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-[#9793a0]">Commercial</p>
                 <div className="mt-3 grid gap-2 text-sm break-words text-[#6f6a75]">
                   <p><span className="font-medium text-[#17141a]">Account:</span> {opportunity.accountName}</p>
@@ -444,7 +444,7 @@ export function CrmOpportunityDetail({
               </div>
             </div>
 
-            <div className="mt-4 rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
+            <div className="crm-form-subcard mt-4 rounded-[1.2rem] border border-[#eef0f6] bg-[#fafbfe] p-4">
               <p className="text-[11px] uppercase tracking-[0.16em] text-[#9793a0]">Opportunity Notes</p>
               <p className="mt-3 break-words text-sm leading-7 text-[#6f6a75]">{opportunity.notes || "No opportunity notes yet."}</p>
             </div>
@@ -563,7 +563,7 @@ export function CrmOpportunityDetail({
                     <button
                       type="submit"
                       disabled={isSavingNote}
-                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
+                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--brand)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white shadow-[0_10px_22px_rgba(237,35,37,0.16)] transition hover:-translate-y-0.5 hover:bg-[var(--brand-dark)] hover:shadow-[0_14px_28px_rgba(237,35,37,0.2)] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32 sm:w-auto"
                     >
                       {isSavingNote ? "Saving..." : "Save Note"}
                     </button>
@@ -645,7 +645,7 @@ export function CrmOpportunityDetail({
                     href={attachment.signedUrl ?? "#"}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-[1.1rem] border border-[#e7e9f2] bg-[#fafbfe] p-4 transition hover:border-[#cfd5e2] hover:bg-white"
+                    className="crm-form-subcard rounded-[1.1rem] border border-[#e7e9f2] bg-[#fafbfe] p-4 transition hover:border-[#cfd5e2] hover:bg-white"
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
