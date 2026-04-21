@@ -479,17 +479,22 @@ export async function deleteCrmAccount(id: string) {
   }
 }
 
-export async function getCrmContacts(accountId: string) {
+export async function getCrmContacts(accountId?: string) {
   if (!hasSupabaseEnv()) {
-    return fallbackContacts.filter((item) => item.accountId === accountId);
+    return accountId ? fallbackContacts.filter((item) => item.accountId === accountId) : fallbackContacts;
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("crm_contacts")
     .select(getContactSelect())
-    .eq("account_id", accountId)
     .order("updated_at", { ascending: false });
+
+  if (accountId) {
+    query = query.eq("account_id", accountId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);

@@ -1,5 +1,5 @@
 import { CrmTable } from "@/components/admin/crm-table";
-import { getCrmAccounts, getCrmOpportunities } from "@/services/crm.service";
+import { getCrmAccounts, getCrmContacts, getCrmOpportunities } from "@/services/crm.service";
 
 function CrmMetric({
   label,
@@ -20,7 +20,7 @@ function CrmMetric({
 }
 
 export default async function AdminCrmPage() {
-  const [accounts, opportunities] = await Promise.all([getCrmAccounts(), getCrmOpportunities()]);
+  const [accounts, contacts, opportunities] = await Promise.all([getCrmAccounts(), getCrmContacts(), getCrmOpportunities()]);
   const newLeadCount = opportunities.filter((item) => item.stage === "new_lead").length;
   const bidCount = opportunities.filter((item) => item.stage === "bidding" || item.stage === "negotiation").length;
   const awardedCount = opportunities.filter((item) => item.stage === "awarded" || item.stage === "ongoing").length;
@@ -37,15 +37,16 @@ export default async function AdminCrmPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 px-5 py-5 sm:px-6 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 px-5 py-5 sm:px-6 sm:grid-cols-2 xl:grid-cols-5">
           <CrmMetric label="Accounts" value={String(accounts.length)} note="Contractors, developers, and partner companies under management." />
+          <CrmMetric label="Contacts" value={String(contacts.length)} note="All people in the CRM, searchable across every account." />
           <CrmMetric label="New Leads" value={String(newLeadCount)} note="Fresh opportunities that have just entered the pipeline." />
           <CrmMetric label="Bids / Negotiation" value={String(bidCount)} note="Opportunities in pricing, bidding, or commercial discussion." />
           <CrmMetric label="Awarded / Closed" value={String(awardedCount + completedCount)} note="Work that has advanced beyond the bidding stage." />
         </div>
       </section>
 
-      <CrmTable accounts={accounts} opportunities={opportunities} />
+      <CrmTable accounts={accounts} contacts={contacts} opportunities={opportunities} />
     </div>
   );
 }

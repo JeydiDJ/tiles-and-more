@@ -7,7 +7,7 @@ import { deleteCrmAccountAction, deleteCrmOpportunityAction, type CrmDeleteState
 import { Modal } from "@/components/ui/modal";
 import { Select } from "@/components/ui/select";
 import { getAdminRoute } from "@/lib/admin-path";
-import type { CrmAccount, CrmOpportunity } from "@/types/crm";
+import type { CrmAccount, CrmContact, CrmOpportunity } from "@/types/crm";
 import { crmOpportunityStages } from "@/types/crm";
 
 function formatCurrency(value: number | null) {
@@ -30,6 +30,15 @@ function formatDate(value: string) {
     day: "numeric",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function formatContactSummary(contact: CrmContact) {
+  const details = [
+    ...contact.phoneNumbers.map((item) => item.phoneNumber),
+    ...contact.emails.map((item) => item.email),
+  ].filter(Boolean);
+
+  return details.length > 0 ? details.join(" - ") : "No contact details yet";
 }
 
 function getStageTone(stage: string) {
@@ -108,9 +117,11 @@ function MobileMetaField({
 
 export function CrmTable({
   accounts,
+  contacts,
   opportunities,
 }: {
   accounts: CrmAccount[];
+  contacts: CrmContact[];
   opportunities: CrmOpportunity[];
 }) {
   const [opportunityDeleteState, deleteOpportunityAction, isDeletingOpportunity] = useActionState(deleteCrmOpportunityAction, {
@@ -120,10 +131,12 @@ export function CrmTable({
     error: null,
   } satisfies CrmDeleteState);
   const [layout, setLayout] = useState<"list" | "board">("list");
-  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "opportunities" | "reports">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "contacts" | "opportunities" | "reports">("overview");
   const [accountsExpanded, setAccountsExpanded] = useState(true);
   const [query, setQuery] = useState("");
   const [accountQuery, setAccountQuery] = useState("");
+  const [contactQuery, setContactQuery] = useState("");
+  const [contactAccountId, setContactAccountId] = useState("all");
   const [accountIndustry, setAccountIndustry] = useState("all");
   const [accountActivity, setAccountActivity] = useState("all");
   const [stage, setStage] = useState("all");
@@ -153,10 +166,13 @@ export function CrmTable({
   });
   const deferredQuery = useDeferredValue(query);
   const deferredAccountQuery = useDeferredValue(accountQuery);
+  const deferredContactQuery = useDeferredValue(contactQuery);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const normalizedAccountQuery = deferredAccountQuery.trim().toLowerCase();
+  const normalizedContactQuery = deferredContactQuery.trim().toLowerCase();
   const areAccountsVisible = activeTab === "accounts" ? true : accountsExpanded;
   const router = useRouter();
+  const accountMap = useMemo(() => new Map(accounts.map((account) => [account.id, account])), [accounts]);
 
   useEffect(() => {
     if (wasDeletingOpportunity.current && !isDeletingOpportunity && !opportunityDeleteState.error) {
@@ -225,6 +241,37 @@ export function CrmTable({
       return matchesQuery && matchesIndustry && matchesActivity;
     });
   }, [accountActivity, accountIndustry, accounts, normalizedAccountQuery, opportunities]);
+
+  const filteredContacts = useMemo(() => {
+    return contacts.filter((contact) => {
+      const account = accountMap.get(contact.accountId);
+      const linkedOpportunities = opportunities
+        .filter((opportunity) => opportunity.primaryContactId === contact.id)
+        .map((opportunity) => opportunity.name)
+        .join(" ");
+
+      const matchesQuery = normalizedContactQuery
+        ? [
+            contact.fullName,
+            contact.jobTitle ?? "",
+            contact.primaryPhone ?? "",
+            contact.primaryEmail ?? "",
+            contact.workEmail ?? "",
+            contact.personalEmail ?? "",
+            contact.notes ?? "",
+            account?.name ?? "",
+            linkedOpportunities,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedContactQuery)
+        : true;
+
+      const matchesAccount = contactAccountId === "all" || contact.accountId === contactAccountId;
+
+      return matchesQuery && matchesAccount;
+    });
+  }, [accountMap, contactAccountId, contacts, normalizedContactQuery, opportunities]);
 
   const grouped = useMemo(() => {
     return crmOpportunityStages.map((groupStage) => ({
@@ -410,6 +457,17 @@ export function CrmTable({
             }`}
           >
             Accounts
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("contacts")}
+            className={`admin-internal-tab inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition ${
+              activeTab === "contacts"
+                ? "admin-internal-tab-active bg-[#17141a] text-white shadow-[0_10px_20px_rgba(23,20,26,0.14)]"
+                : "admin-internal-tab-idle border border-[#e4e7ef] bg-white text-[#6f6a75] hover:border-[#d7dce8] hover:text-[#17141a]"
+            }`}
+          >
+            Contacts
           </button>
           <button
             type="button"
@@ -805,6 +863,138 @@ export function CrmTable({
             )}
           </div>
         </div>
+      </section>
+      ) : null}
+
+      {activeTab === "contacts" ? (
+      <section className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
+        <div className="grid gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5 xl:grid-cols-[1.2fr_0.7fr_auto] xl:items-end">
+          <label className="grid gap-2">
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Search</span>
+            <div className="flex items-center gap-3 rounded-xl border border-[#e7e9f2] bg-[#f8f9fc] px-4 py-3 text-[#7d7882]">
+              <SearchIcon />
+              <input
+                value={contactQuery}
+                onChange={(event) => setContactQuery(event.target.value)}
+                placeholder="Search by contact, title, account, phone, email, or linked opportunity"
+                className="w-full bg-transparent text-sm text-[#17141a] outline-none placeholder:text-[#8f8b85]"
+              />
+            </div>
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0]">Account</span>
+            <Select value={contactAccountId} onChange={(event) => setContactAccountId(event.target.value)} className="rounded-xl border-[#e7e9f2] bg-[#f8f9fc]">
+              <option value="all">All accounts</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </Select>
+          </label>
+
+          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+            <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3 py-2 text-xs font-medium text-[#6f6a75]">
+              {filteredContacts.length} visible
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setContactQuery("");
+                setContactAccountId("all");
+              }}
+              className="cursor-pointer rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 border-b border-[#edf0f6] px-4 py-4 sm:px-5">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#9793a0]">Contacts</p>
+          </div>
+          <span className="inline-flex rounded-full border border-[#e7e9f2] bg-[#fafbfe] px-3 py-2 text-xs font-medium text-[#6f6a75]">
+            {contacts.length} total
+          </span>
+        </div>
+
+        {filteredContacts.length > 0 ? (
+          <>
+            <div className="hidden grid-cols-[1.2fr_1fr_1fr_0.8fr_0.75fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
+              <span>Contact</span>
+              <span>Account</span>
+              <span>Details</span>
+              <span>Title</span>
+              <span>Opportunities</span>
+              <span className="text-right">Actions</span>
+            </div>
+            <div className={filteredContacts.length > 10 ? "grid max-h-[55rem] gap-0 overflow-y-auto" : "grid gap-0"}>
+              {filteredContacts.map((contact) => {
+                const account = accountMap.get(contact.accountId);
+                const linkedOpportunityCount = opportunities.filter((opportunity) => opportunity.primaryContactId === contact.id).length;
+
+                return (
+                  <div
+                    key={contact.id}
+                    role="link"
+                    tabIndex={0}
+                    onClick={() => router.push(getAdminRoute(`/crm/${contact.accountId}`))}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        router.push(getAdminRoute(`/crm/${contact.accountId}`));
+                      }
+                    }}
+                    className="group grid cursor-pointer gap-3 border-b border-[#edf0f6] px-4 py-3.5 transition duration-200 hover:bg-[#fcfcfe] hover:shadow-[inset_3px_0_0_var(--brand)] last:border-b-0 sm:px-5 lg:grid-cols-[1.2fr_1fr_1fr_0.8fr_0.75fr_auto] lg:items-start lg:gap-4 lg:py-4"
+                  >
+                    <div className="min-w-0">
+                      <span className="font-medium text-[#17141a] transition group-hover:text-[var(--brand)]">
+                        {contact.fullName}
+                      </span>
+                      <p className="mt-1 text-sm text-[#6f6a75]">{contact.primaryEmail || contact.primaryPhone || "No primary contact detail"}</p>
+                    </div>
+                    <div className="hidden text-sm text-[#6f6a75] lg:block">
+                      {account?.name || "Unknown account"}
+                    </div>
+                    <div className="hidden rounded-[0.95rem] bg-[#fafbfe] px-3 py-2.5 text-sm text-[#3e3944] lg:block lg:bg-transparent lg:px-0 lg:py-0">
+                      <p className="mt-1 line-clamp-2 lg:mt-0">{formatContactSummary(contact)}</p>
+                    </div>
+                    <div className="hidden text-sm text-[#6f6a75] lg:block">
+                      {contact.jobTitle || "-"}
+                    </div>
+                    <div className="flex items-center gap-2 lg:block">
+                      <span className="inline-flex rounded-full border border-[#dbe2ef] bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#465064] shadow-[0_4px_10px_rgba(35,31,32,0.04)]">
+                        {linkedOpportunityCount} linked
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-end gap-3 lg:justify-end">
+                      <Link
+                        href={getAdminRoute(`/crm/${contact.accountId}`)}
+                        onClick={(event) => event.stopPropagation()}
+                        className="inline-flex items-center justify-center rounded-full border border-[#e7e9f2] bg-white px-3 py-2 text-xs font-medium text-[#17141a] transition hover:border-[#cfd5e2] hover:bg-[#fafbfe]"
+                      >
+                        Open Account
+                      </Link>
+                    </div>
+
+                    <div className="grid gap-2 sm:grid-cols-2 lg:hidden">
+                      <MobileMetaField label="Account" value={account?.name || "Unknown account"} />
+                      <MobileMetaField label="Title" value={contact.jobTitle || "-"} />
+                      <MobileMetaField label="Details" value={formatContactSummary(contact)} />
+                      <MobileMetaField label="Opportunities" value={`${linkedOpportunityCount} linked`} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="px-5 py-10 text-sm text-[#6f6a75]">
+            No contacts match the current search or filters.
+          </div>
+        )}
       </section>
       ) : null}
 
