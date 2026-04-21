@@ -1,31 +1,47 @@
 # Supabase Database ERD
 
-This document describes the current database structure for the Supabase backend.
+This document describes the current Supabase-backed data model used by the TILES & MORE website and admin workspace.
 
-## Overview
+## Purpose
 
-The schema is organized into three main domains:
+The database supports four main product areas:
 
-1. **Catalog**
-   - Brands
-   - Categories
-   - Product families
-   - Products
-   - Product media
+1. Catalog and media
+2. CRM and pipeline management
+3. Project leads
+4. Accounting
 
-2. **CRM**
-   - Accounts
-   - Contacts
-   - Opportunities
-   - Opportunity activity logs
-   - Opportunity attachments
+The public website mainly consumes catalog data, while the admin workspace uses catalog, CRM, project lead, and accounting tables together.
 
-3. **Project Leads**
-   - Project leads
-   - Project activity logs
-   - Project lead attachments
+## Domain Overview
 
----
+### Catalog
+
+- Brands
+- Categories
+- Product families
+- Products
+- Product media
+
+### CRM
+
+- Accounts
+- Contacts
+- Contact phone numbers
+- Contact emails
+- Opportunities
+- Opportunity activity logs
+- Opportunity attachments
+
+### Project leads
+
+- Project leads
+- Project activity logs
+- Project lead attachments
+
+### Accounting
+
+- Accounting periods
 
 ## ER Diagram
 
@@ -62,9 +78,9 @@ erDiagram
         text brand_id FK
         text category_id FK
         text product_family_id FK
-        text[] applications
         text material
         text finish
+        text[] applications
         text image_url
         text summary
         timestamptz created_at
@@ -86,6 +102,7 @@ erDiagram
         uuid id PK
         text name
         text industry
+        text website
         text phone
         text email
         text address
@@ -107,12 +124,42 @@ erDiagram
         timestamptz updated_at
     }
 
+    CRM_CONTACT_PHONE_NUMBERS {
+        uuid id PK
+        uuid contact_id FK
+        text label
+        text phone_number
+        boolean is_primary
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    CRM_CONTACT_EMAILS {
+        uuid id PK
+        uuid contact_id FK
+        text email
+        text email_type
+        boolean is_primary
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
     CRM_OPPORTUNITIES {
         uuid id PK
         uuid account_id FK
         uuid primary_contact_id FK
         text name
         text location
+        text architect_designer_firm
+        text architect_designer_contact_person
+        text architect_designer_position
+        text architect_designer_contact_number
+        text architect_designer_email
+        text owner_name
+        text owner_contact_person
+        text owner_position
+        text owner_contact_number
+        text owner_email
         numeric estimated_value
         text stage
         text source
@@ -176,6 +223,19 @@ erDiagram
         timestamptz created_at
     }
 
+    ACCOUNTING_PERIODS {
+        uuid id PK
+        date period_start
+        date period_end
+        numeric opening_balance
+        numeric cash_in
+        numeric cash_out
+        numeric closing_balance
+        text notes
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
     CATEGORIES ||--o{ PRODUCT_FAMILIES : has
     BRANDS ||--o{ PRODUCTS : owns
     CATEGORIES ||--o{ PRODUCTS : classifies
@@ -183,6 +243,8 @@ erDiagram
     PRODUCTS ||--o{ PRODUCT_MEDIA : has
 
     CRM_ACCOUNTS ||--o{ CRM_CONTACTS : has
+    CRM_CONTACTS ||--o{ CRM_CONTACT_PHONE_NUMBERS : has
+    CRM_CONTACTS ||--o{ CRM_CONTACT_EMAILS : has
     CRM_ACCOUNTS ||--o{ CRM_OPPORTUNITIES : has
     CRM_CONTACTS o|--o{ CRM_OPPORTUNITIES : primary_contact_for
     CRM_OPPORTUNITIES ||--o{ CRM_OPPORTUNITY_ACTIVITY_LOGS : logs
@@ -192,90 +254,128 @@ erDiagram
     PROJECT_LEADS ||--o{ PROJECT_LEAD_ATTACHMENTS : stores
 ```
 
----
+## How The Admin Workspace Uses This Schema
 
-## Domain Breakdown
+### Public site
 
-### 1. Catalog
+The public storefront primarily reads:
+
+- `brands`
+- `categories`
+- `product_families`
+- `products`
+- `product_media`
+
+### CRM workspace
+
+The admin CRM reads and writes:
+
+- `crm_accounts`
+- `crm_contacts`
+- `crm_contact_phone_numbers`
+- `crm_contact_emails`
+- `crm_opportunities`
+- `crm_opportunity_activity_logs`
+- `crm_opportunity_attachments`
+
+Important current behavior:
+
+- Contacts belong to accounts
+- Opportunities belong to accounts and can optionally point to one primary contact
+- Contacts can have multiple phone numbers and multiple emails
+- The CRM UI now includes a global contacts view so admins can search contacts across all accounts, not only within a single account detail page
+
+### Reports workspace
+
+The reports area combines:
+
+- Catalog data
+- CRM data
+- Project lead data
+- Inquiry data from the in-memory service layer
+- Accounting data
+
+### Accounting workspace
+
+The accounting area currently works from:
+
+- `accounting_periods`
+
+## Table Reference
+
+### Catalog
 
 #### `brands`
-Stores product brands.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | text | Primary key |
 | name | text | Brand name |
-| slug | text | Unique brand slug |
+| slug | text | Unique slug |
 | logo_url | text | Optional logo |
 | created_at | timestamptz | Creation timestamp |
 
 #### `categories`
-Stores top-level product categories.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | text | Primary key |
 | name | text | Category name |
-| slug | text | Unique category slug |
+| slug | text | Unique slug |
 | created_at | timestamptz | Creation timestamp |
 
 #### `product_families`
-Groups products under a category.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | text | Primary key |
 | category_id | text | FK to `categories.id` |
 | name | text | Family name |
-| slug | text | Unique family slug |
+| slug | text | Unique slug |
 | created_at | timestamptz | Creation timestamp |
 
 #### `products`
-Main product catalog table.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | product_code | text | Unique product code |
 | name | text | Product name |
-| slug | text | Unique product slug |
+| slug | text | Unique slug |
 | brand_id | text | FK to `brands.id` |
 | category_id | text | FK to `categories.id` |
 | product_family_id | text | FK to `product_families.id` |
-| applications | text[] | Array of use cases / applications |
 | material | text | Optional material |
 | finish | text | Optional finish |
+| applications | text[] | Applications array |
 | image_url | text | Optional cover image |
-| summary | text | Optional description |
+| summary | text | Optional summary |
 | created_at | timestamptz | Creation timestamp |
 | updated_at | timestamptz | Update timestamp |
 
 #### `product_media`
-Additional media for each product.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | product_id | uuid | FK to `products.id` |
-| kind | text | `application` or `sample` |
+| kind | text | Usually `application` or `sample` |
 | image_url | text | Public image URL |
 | storage_path | text | Optional storage path |
 | alt_text | text | Optional alt text |
-| sort_order | integer | Display ordering |
+| sort_order | integer | Ordering inside product gallery |
 | created_at | timestamptz | Creation timestamp |
 
----
-
-### 2. CRM
+### CRM
 
 #### `crm_accounts`
-Represents companies or organizations in the CRM.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | name | text | Account name |
 | industry | text | Optional industry |
+| website | text | Optional website |
 | phone | text | Optional phone |
 | email | text | Optional email |
 | address | text | Optional address |
@@ -285,22 +385,49 @@ Represents companies or organizations in the CRM.
 | updated_at | timestamptz | Update timestamp |
 
 #### `crm_contacts`
-Contacts belonging to CRM accounts.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | account_id | uuid | FK to `crm_accounts.id` |
-| full_name | text | Contact name |
-| job_title | text | Optional role |
-| phone | text | Optional phone |
-| email | text | Optional email |
+| full_name | text | Contact full name |
+| job_title | text | Optional job title |
+| phone | text | Legacy / denormalized primary phone |
+| email | text | Legacy / denormalized primary email |
 | notes | text | Optional notes |
 | created_at | timestamptz | Creation timestamp |
 | updated_at | timestamptz | Update timestamp |
 
+Notes:
+
+- The app still keeps `phone` and `email` on `crm_contacts` as legacy summary fields.
+- The richer contact model lives in `crm_contact_phone_numbers` and `crm_contact_emails`.
+
+#### `crm_contact_phone_numbers`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| contact_id | uuid | FK to `crm_contacts.id` |
+| label | text | Optional label such as `Main` or `Mobile` |
+| phone_number | text | Stored phone number |
+| is_primary | boolean | Primary phone flag |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
+
+#### `crm_contact_emails`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| contact_id | uuid | FK to `crm_contacts.id` |
+| email | text | Stored email address |
+| email_type | text | `personal` or `work` |
+| is_primary | boolean | Primary email flag |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
+
 #### `crm_opportunities`
-Sales opportunities tied to an account and optionally to a primary contact.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -309,15 +436,26 @@ Sales opportunities tied to an account and optionally to a primary contact.
 | primary_contact_id | uuid | Optional FK to `crm_contacts.id` |
 | name | text | Opportunity name |
 | location | text | Optional project location |
-| estimated_value | numeric | Must be `>= 0` when present |
-| stage | text | Pipeline status |
+| architect_designer_firm | text | Optional architect or designer firm |
+| architect_designer_contact_person | text | Optional architect or designer contact |
+| architect_designer_position | text | Optional architect or designer role |
+| architect_designer_contact_number | text | Optional architect or designer phone |
+| architect_designer_email | text | Optional architect or designer email |
+| owner_name | text | Optional owner name |
+| owner_contact_person | text | Optional owner contact |
+| owner_position | text | Optional owner role |
+| owner_contact_number | text | Optional owner phone |
+| owner_email | text | Optional owner email |
+| estimated_value | numeric | Non-negative when present |
+| stage | text | Opportunity pipeline stage |
 | source | text | Lead source |
 | notes | text | Optional notes |
-| quotation_finished | boolean | Quote completion flag |
+| quotation_finished | boolean | Quotation flag |
 | created_at | timestamptz | Creation timestamp |
 | updated_at | timestamptz | Update timestamp |
 
-**Allowed `stage` values**
+Allowed `stage` values:
+
 - `new_lead`
 - `opportunity`
 - `bidding`
@@ -328,35 +466,30 @@ Sales opportunities tied to an account and optionally to a primary contact.
 - `lost`
 
 #### `crm_opportunity_activity_logs`
-Activity timeline entries for each opportunity.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | opportunity_id | uuid | FK to `crm_opportunities.id` |
 | activity_type | text | Activity category |
-| content | text | Activity details |
+| content | text | Activity note |
 | created_at | timestamptz | Creation timestamp |
 
 #### `crm_opportunity_attachments`
-Files attached to an opportunity.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | opportunity_id | uuid | FK to `crm_opportunities.id` |
 | file_name | text | Original file name |
-| storage_path | text | Stored file path |
-| file_type | text | MIME / category |
+| storage_path | text | File storage path |
+| file_type | text | MIME type or file classification |
 | file_size | bigint | File size |
 | created_at | timestamptz | Creation timestamp |
 
----
-
-### 3. Project Leads
+### Project leads
 
 #### `project_leads`
-Separate lead intake table for project-based inquiries.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -367,16 +500,17 @@ Separate lead intake table for project-based inquiries.
 | email | text | Optional email |
 | project_name | text | Project title |
 | location | text | Optional location |
-| estimated_cost | numeric | Must be `>= 0` when present |
-| status | text | Lead progress status |
+| estimated_cost | numeric | Non-negative when present |
+| status | text | Lead status |
 | source | text | Lead source |
-| inquiry_type | text | Optional inquiry classification |
+| inquiry_type | text | Optional inquiry type |
 | notes | text | Optional notes |
 | quotation_finished | boolean | Quote completion flag |
 | created_at | timestamptz | Creation timestamp |
 | updated_at | timestamptz | Update timestamp |
 
-**Allowed `status` values**
+Allowed `status` values:
+
 - `new_lead`
 - `contacted`
 - `quotation_in_progress`
@@ -387,81 +521,88 @@ Separate lead intake table for project-based inquiries.
 - `lost`
 
 #### `project_activity_logs`
-Activity history for project leads.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | project_lead_id | uuid | FK to `project_leads.id` |
-| activity_type | text | Activity category |
-| content | text | Activity details |
+| activity_type | text | Activity type |
+| content | text | Activity note |
 | created_at | timestamptz | Creation timestamp |
 
 #### `project_lead_attachments`
-Files attached to project leads.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
 | project_lead_id | uuid | FK to `project_leads.id` |
 | file_name | text | Original file name |
-| storage_path | text | Stored file path |
-| file_type | text | MIME / category |
+| storage_path | text | File storage path |
+| file_type | text | MIME type or file classification |
 | file_size | bigint | File size |
 | created_at | timestamptz | Creation timestamp |
 
----
+### Accounting
+
+#### `accounting_periods`
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| period_start | date | Period start date |
+| period_end | date | Period end date |
+| opening_balance | numeric | Starting balance |
+| cash_in | numeric | Incoming cash total |
+| cash_out | numeric | Outgoing cash total |
+| closing_balance | numeric | Ending balance |
+| notes | text | Optional notes |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
 
 ## Relationship Summary
 
-### Catalog relationships
-- A **brand** can have many **products**
-- A **category** can have many **product families**
-- A **category** can also have many **products**
-- A **product family** can have many **products**
-- A **product** can have many **media items**
+### Catalog
 
-### CRM relationships
-- An **account** can have many **contacts**
-- An **account** can have many **opportunities**
-- A **contact** can optionally be the **primary contact** for many opportunities
-- An **opportunity** can have many **activity logs**
-- An **opportunity** can have many **attachments**
+- A brand has many products
+- A category has many product families
+- A category has many products
+- A product family has many products
+- A product has many media items
 
-### Project lead relationships
-- A **project lead** can have many **activity logs**
-- A **project lead** can have many **attachments**
+### CRM
 
----
+- An account has many contacts
+- A contact has many phone numbers
+- A contact has many email entries
+- An account has many opportunities
+- A contact can be the primary contact on many opportunities
+- An opportunity has many activity logs
+- An opportunity has many attachments
 
-## Notes and Documentation Suggestions
+### Project leads
 
-- `products.applications` is stored as a `text[]` array instead of a normalized join table.
-- `products.brand_id`, `category_id`, and `product_family_id` use `text` keys rather than `uuid`.
-- The schema uses a mix of:
-  - **text primary keys** for catalog lookup tables
-  - **uuid primary keys** for operational/transactional tables
-- `crm_opportunities` and `project_leads` both include:
-  - status/stage tracking
-  - notes
-  - quotation flags
-  - created/updated timestamps
+- A project lead has many activity logs
+- A project lead has many attachments
 
-This makes the schema well suited for:
-- a public-facing product catalog
-- an internal CRM for accounts and opportunities
-- a separate project inquiry / lead management workflow
+## Notes
 
----
+- Catalog lookup tables use `text` primary keys, while operational tables use `uuid`.
+- `crm_contacts.phone` and `crm_contacts.email` are retained as legacy summary fields even though the richer model is now normalized.
+- `products.applications` is stored as a `text[]` array rather than a join table.
+- The app currently mixes fully database-backed domains with a lightweight in-memory inquiry service.
 
-## Suggested Future Improvements
+## Recommended Maintenance Rules
 
-- Add `ON DELETE` rules explicitly for child tables where needed
-- Consider a normalized `product_applications` table if filtering becomes more advanced
-- Add audit metadata such as `created_by` and `updated_by`
-- Add indexes for frequently filtered fields such as:
-  - `products.brand_id`
-  - `products.category_id`
-  - `crm_opportunities.stage`
-  - `project_leads.status`
-- Consider unifying `crm_opportunities` and `project_leads` later if the workflows overlap heavily
+When the app changes, update this document if any of the following happen:
+
+- a new admin workflow introduces a new table or relation
+- a CRM field is added or removed
+- project lead status rules change
+- accounting fields change
+- product media behavior changes
+
+Keep this file aligned with:
+
+- `CRM_SCHEMA.sql`
+- `ACCOUNTING_SCHEMA.sql`
+- the service layer in `src/services`

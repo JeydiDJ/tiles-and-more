@@ -1,54 +1,73 @@
 # TILES & MORE
 
-TILES & MORE is a production Next.js showroom and catalog website for tile, surface, flooring, and sanitary products. It is already deployed through Vercel and serves as both a public-facing brand site and a lightweight private admin workspace for managing catalog content.
+TILES & MORE is a production Next.js 16 application that combines a public-facing showroom website with a private admin workspace for catalog operations, CRM, reporting, and accounting.
 
 Live site: [https://tiles-and-more.vercel.app/](https://tiles-and-more.vercel.app/)
 
-## Overview
+## What This Project Is
 
-The site is built around two main experiences:
+The codebase supports two connected experiences:
 
-- A public marketing and catalog site for browsing brands, categories, products, collections, gallery content, and inquiry forms.
-- A protected admin area for authenticated product management backed by Supabase.
+- A public brand and product website for browsing categories, products, collections, projects, and contact paths.
+- A protected admin workspace for managing products, CRM accounts and contacts, opportunities, reports, accounting periods, and workspace preferences.
 
-The frontend is built with Next.js App Router, TypeScript, Tailwind CSS 4, and React 19. Product data can be read from Supabase when environment variables are present, with local data fallbacks still available in parts of the codebase as a safety net during development.
+The current app is not just a storefront anymore. It now behaves like an operational platform for Tiles & More, with Supabase-backed catalog and CRM services, protected admin routes, reporting views, and accounting support.
 
-## What The Site Includes
+## Current Product Surface
 
-### Public site
+### Public website
 
-- Homepage with fullscreen branded hero slideshow
-- Brand-specific hero captions and catalog deep links
-- Catalog page with search, brand filtering, category filtering, material filtering, finish filtering, and application filtering
-- Category catalog pages with product image cards
-- Product detail pages with gallery and product specs
-- Collections page
-- Gallery page
+- Homepage with branded hero media and guided catalog entry
 - About page
-- Contact page with EmailJS-powered inquiry form
-- Quote page with EmailJS-powered quote request form
-- Privacy policy and terms pages
-- Floating return-to-top button on the home and catalog pages
+- Catalog page with search and multi-filter browsing
+- Category pages at `/catalog/[category]`
+- Product detail pages at `/products/[slug]`
+- Collections page
+- Projects showcase page
+- Gallery page
+- Contact page
+- Quote request page
+- Privacy and terms pages
 
-### Admin site
+### Admin workspace
 
-- Hidden admin entry path controlled by `ADMIN_SECRET_PATH`
-- Supabase Auth login flow
-- Admin dashboard
-- Product listing
-- New product creation
-- Product editing
-- Product deletion
-- Category, collection, gallery, and inquiry admin sections
+- Hidden admin route controlled by `ADMIN_SECRET_PATH`
+- Supabase-authenticated admin shell
+- Dashboard with catalog and CRM health snapshots
+- Reports workspace spanning catalog, CRM, accounting, and leads
+- Product management
+- Category management
+- CRM workspace for accounts, contacts, and opportunities
+- Global contacts search inside CRM
+- CRM opportunity detail pages with activity and attachments
+- Accounting workspace
+- CRM calendar view
+- Preferences panel
 
-### Content and interaction work already implemented
+## Key Behaviors In The Current Build
 
-- Homepage hero slideshow with RAK, Roca, Geo Tiles, and Sonite slides
-- Brand-specific `Browse` CTA buttons that pre-filter the catalog
-- Catalog redirect behavior that scrolls users directly into the filters/results section
-- Product cards that are fully clickable, image-led, and hover-reactive
-- Category browsing section on the main catalog page
-- Contact and quote forms with finalized left-panel copy instead of placeholder text
+### Catalog and storefront
+
+- Homepage hero directs users into pre-filtered catalog experiences
+- Catalog supports free-text search plus brand, category, material, finish, and application filters
+- Product cards are fully clickable and lead into detailed product pages
+- Product pages support media galleries and spec presentation
+- Projects page showcases completed work
+- Contact and quote forms are production-facing and use EmailJS
+
+### CRM and operations
+
+- Accounts and opportunities are managed in a dedicated CRM workspace
+- Contacts are modeled separately from accounts and can carry multiple phone numbers and multiple emails
+- CRM now includes a global `Contacts` tab so admin can search all contacts regardless of account or opportunity context
+- Opportunities support stage tracking, quotation status, notes, activity logs, and file attachments
+- The admin dashboard summarizes open pipeline value, quotation bottlenecks, stalled opportunities, catalog coverage, and recent CRM activity
+
+### Reporting and accounting
+
+- Reports aggregate product, CRM, inquiry, project lead, and accounting data
+- Accounting periods are managed in the admin accounting workspace
+- CRM calendar view visualizes opportunity activity timing from the current opportunity dataset
 
 ## Tech Stack
 
@@ -63,39 +82,37 @@ The frontend is built with Next.js App Router, TypeScript, Tailwind CSS 4, and R
 
 ## Architecture Summary
 
-### App structure
-
 ```text
 src/
   app/
-    (main)/        Public storefront routes
-    (admin)/       Admin routes and admin layout
-    api/           API endpoints for products, inquiries, and uploads
+    (main)/        Public site routes
+    (admin)/       Private admin workspace
+    api/           API handlers for products, inquiries, and uploads
   components/
-    admin/         Admin UI
-    catalog/       Category browsing UI
-    forms/         Contact and quote form UI
-    layout/        Navbar, footer, scroll-to-top, intro shell
-    product/       Product grid, cards, gallery, filters, specs
-    sections/      Homepage sections
-    ui/            Shared primitives
-  config/          Site metadata and nav config
-  data/            Local fallback/mock content
-  lib/             Utilities, EmailJS, Supabase helpers, validation
-  services/        Data access layer
-  store/           Client-side catalog filters
+    admin/         Admin shell, CRM, reports, accounting, product tools
+    catalog/       Catalog category browsing UI
+    forms/         Contact and quote forms
+    layout/        Shared public layout
+    product/       Product cards, gallery, filters, specs
+    sections/      Homepage and editorial sections
+    ui/            Shared UI primitives
+  config/          Navigation and site metadata
+  data/            Local fallback content used by some services
+  lib/             Auth, SEO, utils, validations, Supabase helpers
+  services/        Data access for catalog, CRM, accounting, inquiries, leads
+  store/           Client-side catalog filter store
   styles/          Additional animation styles
-  types/           Shared TypeScript types
+  types/           Shared TypeScript models
 public/
+  favicon/
   hero-images/
   hero-videos/
   logo/
-  favicon/
 ```
 
-### Route map
+## Route Map
 
-#### Public routes
+### Public routes
 
 - `/`
 - `/about`
@@ -103,70 +120,74 @@ public/
 - `/catalog/[category]`
 - `/products/[slug]`
 - `/collections`
+- `/projects`
 - `/gallery`
 - `/contact`
 - `/quote`
 - `/privacy`
 - `/terms`
 
-#### Admin routes
+### Admin routes
 
 - `/{ADMIN_SECRET_PATH}`
+- `/{ADMIN_SECRET_PATH}/reports`
 - `/{ADMIN_SECRET_PATH}/products`
 - `/{ADMIN_SECRET_PATH}/products/new`
 - `/{ADMIN_SECRET_PATH}/products/[id]`
 - `/{ADMIN_SECRET_PATH}/categories`
-- `/{ADMIN_SECRET_PATH}/collections`
-- `/{ADMIN_SECRET_PATH}/gallery`
-- `/{ADMIN_SECRET_PATH}/inquiries`
+- `/{ADMIN_SECRET_PATH}/crm`
+- `/{ADMIN_SECRET_PATH}/crm/new`
+- `/{ADMIN_SECRET_PATH}/crm/[id]`
+- `/{ADMIN_SECRET_PATH}/crm/opportunities/[id]`
+- `/{ADMIN_SECRET_PATH}/accounting`
+- `/{ADMIN_SECRET_PATH}/calendar`
+- `/{ADMIN_SECRET_PATH}/preferences`
 - `/admin-login`
 
-## Data and Integrations
+Notes:
+
+- The old inquiries route currently redirects into the CRM workspace.
+- The admin shell nav is driven by `src/config/nav.ts`.
+
+## Data Layer And Integrations
 
 ### Supabase
 
-The project is already wired to read product data from Supabase when the required environment variables are present.
+Supabase is the primary backend for the operational parts of the application.
 
-Current live-facing Supabase usage includes:
+Current Supabase-backed domains include:
 
-- Reading products from the `products` table
-- Joining related `brands`, `categories`, and `product_families`
-- Reading `product_media` for product detail galleries
-- Using Supabase Auth to protect admin actions
-- Creating products from the admin interface
-- Uploading product imagery and saving image URLs for catalog display
+- Catalog products and product media
+- CRM accounts
+- CRM contacts
+- CRM contact phone numbers
+- CRM contact emails
+- CRM opportunities
+- CRM opportunity activity logs
+- CRM opportunity attachments
+- Accounting periods
+- Project leads
+- Project lead activity logs
+- Project lead attachments
+- Supabase Auth for admin access control
 
 Fallback behavior:
 
-- If Supabase environment variables are missing, some services fall back to local data in `src/data`
-- This helps local development continue even when the database is unavailable
+- Several services still return local fallback arrays when Supabase is unavailable
+- This keeps local development possible, but the intended production mode is Supabase-backed
 
-Relevant files:
+Relevant services:
 
-- [product.service.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/services/product.service.ts)
-- [server.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/supabase/server.ts)
-- [config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/supabase/config.ts)
-- [actions.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/%28admin%29/admin/products/actions.ts)
-
-## Database Schema (ERD)
-
-The Supabase database structure for this project is documented separately for clarity and maintainability.
-
-It includes:
-
-- Full entity relationship diagram (ERD)
-- Table structures and fields
-- Relationships between catalog, CRM, and project lead modules
-- Notes on constraints and design decisions
-
-View the full documentation here:
-
-[https://github.com/JeydiDJ/tiles-and-more/docs/supabase-erd-documentation.md](https://github.com/JeydiDJ/tiles-and-more/blob/main/docs/supabase-erd-documentation.md)
-
+- `src/services/product.service.ts`
+- `src/services/crm.service.ts`
+- `src/services/accounting.service.ts`
+- `src/services/project-lead.service.ts`
+- `src/lib/supabase/server.ts`
+- `src/lib/supabase/config.ts`
 
 ### EmailJS
 
-The contact and quote forms send email through EmailJS on the client side.
+EmailJS is used for public-facing form delivery.
 
 Implemented flows:
 
@@ -175,65 +196,39 @@ Implemented flows:
 
 Relevant file:
 
-- [emailjs.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/emailjs.ts)
-
-Expected template params:
-
-- Contact template:
-  `form_type`, `name`, `email`, `phone`, `message`
-- Quote template:
-  `form_type`, `full_name`, `email`, `phone`, `project_name`, `project_type`, `square_footage`, `message`
+- `src/lib/emailjs.ts`
 
 ### Vercel
 
-The site is already deployed through Vercel and is currently accessible at:
+The app is deployed on Vercel and uses the same Next.js codebase for local and production environments.
 
-- [https://tiles-and-more.vercel.app/](https://tiles-and-more.vercel.app/)
+## CRM Snapshot
 
-The codebase is structured so local development and production deployment use the same Next.js app.
+The CRM currently has three main business entities:
 
-## Catalog Behavior
+- `crm_accounts`
+- `crm_contacts`
+- `crm_opportunities`
 
-The catalog experience currently supports:
+The contact model is richer than a single phone and email field:
 
-- Free-text search
-- Brand filtering
-- Category filtering
-- Material filtering
-- Finish filtering
-- Application filtering
-- Brand-directed entry from homepage hero slides
-- Deep-link navigation into the results section via `#catalog-results`
+- `crm_contacts` stores the person and account relationship
+- `crm_contact_phone_numbers` stores one-to-many phone entries
+- `crm_contact_emails` stores one-to-many email entries
 
-Product cards now include:
+The admin CRM workspace now exposes:
 
-- Main product image
-- Product name
-- Brand name
-- Product summary
-- Product code
-- Full-card click behavior linking to the product detail page
-- Hover motion and image zoom treatment
+- Overview tab
+- Accounts tab
+- Contacts tab with global cross-account search
+- Opportunities tab
+- Reports tab
 
-## Homepage Behavior
-
-The homepage includes a large branded slideshow with dedicated content for:
-
-- RAK Ceramics
-- Roca
-- Geo Tiles
-- Sonite
-
-Each slide includes:
-
-- Brand logo
-- Personalized fine print
-- `Browse` CTA
-- Redirect to the catalog page with the correct brand filter already applied
+See the full schema reference in [docs/supabase-erd-documentation.md](./docs/supabase-erd-documentation.md).
 
 ## Environment Variables
 
-Typical local environment values:
+Typical local values:
 
 ```env
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
@@ -251,22 +246,28 @@ ADMIN_SECRET_PATH=your-hidden-admin-segment
 
 Notes:
 
-- `ADMIN_SECRET_PATH` controls the hidden public-facing admin route segment.
-- If Supabase vars are missing, product reads may fall back to local data.
-- If EmailJS vars are missing, contact and quote form submission will fail.
+- `ADMIN_SECRET_PATH` controls the hidden admin route prefix.
+- Missing Supabase variables will disable database-backed behavior and may trigger local fallback behavior in some services.
+- Missing EmailJS variables will break public form submission.
 
 ## Local Development
 
-### Install dependencies
+### Install
 
 ```bash
 npm install
 ```
 
-### Start the dev server
+### Run development server
 
 ```bash
 npm run dev
+```
+
+### Lint
+
+```bash
+npm run lint
 ```
 
 ### Production build
@@ -276,81 +277,53 @@ npm run build
 npm run start
 ```
 
-### Lint
-
-```bash
-npm run lint
-```
-
 ## Important Files
 
 ### Core config
 
-- [package.json](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/package.json)
-- [next.config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/next.config.ts)
-- [site.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/config/site.ts)
+- `package.json`
+- `next.config.ts`
+- `src/config/site.ts`
+- `src/config/nav.ts`
 
-### Public UI
+### Public experience
 
-- [hero.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/sections/hero.tsx)
-- [catalog-search.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/product/catalog-search.tsx)
-- [product-card.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/product/product-card.tsx)
-- [scroll-to-top-button.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/layout/scroll-to-top-button.tsx)
+- `src/components/sections/hero.tsx`
+- `src/components/sections/project-showcase-grid.tsx`
+- `src/components/product/catalog-search.tsx`
+- `src/components/product/product-card.tsx`
+- `src/components/product/product-gallery.tsx`
+- `src/components/forms/contact-form.tsx`
+- `src/components/forms/quote-form.tsx`
 
-### Forms
+### Admin experience
 
-- [contact-form.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/forms/contact-form.tsx)
-- [quote-form.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/forms/quote-form.tsx)
-- [form-visual-panel.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/forms/form-visual-panel.tsx)
+- `src/components/admin/admin-shell.tsx`
+- `src/components/admin/crm-table.tsx`
+- `src/components/admin/crm-account-detail.tsx`
+- `src/components/admin/crm-opportunity-detail.tsx`
+- `src/components/admin/reports-workspace.tsx`
+- `src/components/admin/accounting-workspace.tsx`
 
-### Admin
+### Service layer
 
-- [admin-login\page.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/admin-login/page.tsx)
-- [admin-path.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/lib/admin-path.ts)
-- [actions.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/app/%28admin%29/admin/products/actions.ts)
+- `src/services/product.service.ts`
+- `src/services/crm.service.ts`
+- `src/services/accounting.service.ts`
+- `src/services/project-lead.service.ts`
+- `src/services/inquiry.service.ts`
 
-## Current State
+## Documentation Notes
 
-The site is no longer just a static concept build. It already has:
+If you update the website or workspace again, keep these two docs in sync first:
 
-- A deployed public storefront
-- Live production domain
-- Supabase-aware product services
-- Supabase Auth-protected admin product creation flow
-- Supabase-hosted product imagery
-- EmailJS-powered public inquiry forms
-- Updated brand-led homepage interactions
-- Catalog image cards and improved product browsing behavior
+- `README.md`
+- `docs/supabase-erd-documentation.md`
 
-Some parts of the repo still show an in-progress transition pattern:
+The most important things to keep current are:
 
-- Local fallback datasets still exist in `src/data`
-- Some API endpoints are scaffold-like and may not be central to the current production flow
-- Some admin sections are present structurally before being fully operationalized
-
-## Recommended Next Documentation Additions
-
-If this README keeps evolving, the next useful additions would be:
-
-1. A Supabase schema section listing exact tables and columns in production
-2. A deployment section with Vercel project/environment guidance
-3. A content operations guide for adding brands, products, and images
-4. A troubleshooting section for common issues like missing env vars, image host config, or EmailJS failures
-
-## Maintainer Notes
-
-When updating homepage slides:
-
-- Store logos in `public/logo/brand-logos`
-- Store hero backgrounds in `public/hero-images` or `public/hero-videos`
-- Update [hero.tsx](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/src/components/sections/hero.tsx)
-
-When updating product imagery:
-
-- Product card images and product detail galleries can use Supabase-hosted media
-- Remote image hosts must remain allowed in [next.config.ts](/D:/Passion%20Projects/TILESANDMORE/tiles-and-more/next.config.ts)
-
-When updating forms:
-
-- Keep EmailJS template variables aligned with `src/lib/emailjs.ts`
-- Keep left-panel form copy final and client-facing, not placeholder guidance
+- route coverage
+- admin workspace scope
+- CRM workflow changes
+- schema additions
+- environment variable expectations
