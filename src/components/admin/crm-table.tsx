@@ -100,6 +100,21 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
+function SortIndicator({
+  active,
+  direction,
+}: {
+  active: boolean;
+  direction: "asc" | "desc";
+}) {
+  return (
+    <span className="inline-flex flex-col leading-none">
+      <span className={`text-[8px] ${active && direction === "asc" ? "text-[#17141a]" : "text-[#c2c8d5]"}`}>▲</span>
+      <span className={`-mt-0.5 text-[8px] ${active && direction === "desc" ? "text-[#17141a]" : "text-[#c2c8d5]"}`}>▼</span>
+    </span>
+  );
+}
+
 function MobileMetaField({
   label,
   value,
@@ -124,6 +139,10 @@ export function CrmTable({
   contacts: CrmContact[];
   opportunities: CrmOpportunity[];
 }) {
+  type AccountSortKey = "name" | "industry" | "location" | "contact" | "projects";
+  type ContactSortKey = "fullName" | "accountName" | "details" | "jobTitle" | "opportunities";
+  type OpportunitySortKey = "name" | "accountName" | "stage" | "quotation" | "primaryContactName" | "estimatedValue";
+
   const [opportunityDeleteState, deleteOpportunityAction, isDeletingOpportunity] = useActionState(deleteCrmOpportunityAction, {
     error: null,
   } satisfies CrmDeleteState);
@@ -141,6 +160,18 @@ export function CrmTable({
   const [accountActivity, setAccountActivity] = useState("all");
   const [stage, setStage] = useState("all");
   const [accountId, setAccountId] = useState("all");
+  const [accountSort, setAccountSort] = useState<{ key: AccountSortKey; direction: "asc" | "desc" }>({
+    key: "name",
+    direction: "asc",
+  });
+  const [contactSort, setContactSort] = useState<{ key: ContactSortKey; direction: "asc" | "desc" }>({
+    key: "fullName",
+    direction: "asc",
+  });
+  const [opportunitySort, setOpportunitySort] = useState<{ key: OpportunitySortKey; direction: "asc" | "desc" }>({
+    key: "name",
+    direction: "asc",
+  });
   const [opportunityToDelete, setOpportunityToDelete] = useState<CrmOpportunity | null>(null);
   const [accountToDelete, setAccountToDelete] = useState<CrmAccount | null>(null);
   const wasDeletingOpportunity = useRef(false);
@@ -209,6 +240,23 @@ export function CrmTable({
     });
   }, [accountId, normalizedQuery, opportunities, stage]);
 
+  const opportunityCountByAccount = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const opportunity of opportunities) {
+      counts.set(opportunity.accountId, (counts.get(opportunity.accountId) ?? 0) + 1);
+    }
+    return counts;
+  }, [opportunities]);
+
+  const opportunityCountByContact = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const opportunity of opportunities) {
+      if (!opportunity.primaryContactId) continue;
+      counts.set(opportunity.primaryContactId, (counts.get(opportunity.primaryContactId) ?? 0) + 1);
+    }
+    return counts;
+  }, [opportunities]);
+
   const industryOptions = useMemo(
     () =>
       Array.from(new Set(accounts.map((account) => account.industry).filter((value): value is string => Boolean(value))))
@@ -218,7 +266,7 @@ export function CrmTable({
 
   const filteredAccounts = useMemo(() => {
     return accounts.filter((account) => {
-      const opportunityCount = opportunities.filter((opportunity) => opportunity.accountId === account.id).length;
+      const opportunityCount = opportunityCountByAccount.get(account.id) ?? 0;
       const matchesQuery = normalizedAccountQuery
         ? [
             account.name,
@@ -240,7 +288,92 @@ export function CrmTable({
 
       return matchesQuery && matchesIndustry && matchesActivity;
     });
-  }, [accountActivity, accountIndustry, accounts, normalizedAccountQuery, opportunities]);
+  }, [accountActivity, accountIndustry, accounts, normalizedAccountQuery, opportunityCountByAccount]);
+
+  const sortedAccounts = useMemo(() => {
+    const getSortableText = (account: CrmAccount, key: AccountSortKey) => {
+      switch (key) {
+        case "name":
+          return account.name;
+        case "industry":
+          return account.industry ?? "";
+        case "location":
+          return [account.city, account.address].filter(Boolean).join(", ");
+        case "contact":
+          return account.phone || account.email || "Not set yet";
+        default:
+          return "";
+      }
+    };
+
+    const sorted = [...filteredAccounts].sort((a, b) => {
+      if (accountSort.key === "projects") {
+        const leftCount = opportunityCountByAccount.get(a.id) ?? 0;
+        const rightCount = opportunityCountByAccount.get(b.id) ?? 0;
+        if (leftCount !== rightCount) {
+          return leftCount - rightCount;
+        }
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      }
+
+      const left = getSortableText(a, accountSort.key);
+      const right = getSortableText(b, accountSort.key);
+      const compared = left.localeCompare(right, undefined, { sensitivity: "base" });
+      if (compared !== 0) {
+        return compared;
+      }
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+    });
+
+    return accountSort.direction === "asc" ? sorted : sorted.reverse();
+  }, [accountSort.direction, accountSort.key, filteredAccounts, opportunityCountByAccount]);
+
+  const sortedOpportunities = useMemo(() => {
+    const getSortableText = (opportunity: CrmOpportunity, key: OpportunitySortKey) => {
+      switch (key) {
+        case "name":
+          return opportunity.name;
+        case "accountName":
+          return opportunity.accountName;
+        case "stage":
+          return formatStageLabel(opportunity.stage);
+        case "primaryContactName":
+          return opportunity.primaryContactName ?? "";
+        default:
+          return "";
+      }
+    };
+
+    const sorted = [...filteredOpportunities].sort((a, b) => {
+      if (opportunitySort.key === "quotation") {
+        const left = a.quotationFinished ? 1 : 0;
+        const right = b.quotationFinished ? 1 : 0;
+        if (left !== right) {
+          return left - right;
+        }
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      }
+
+      if (opportunitySort.key === "estimatedValue") {
+        const left = a.estimatedValue ?? 0;
+        const right = b.estimatedValue ?? 0;
+        if (left !== right) {
+          return left - right;
+        }
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      }
+
+      const left = getSortableText(a, opportunitySort.key);
+      const right = getSortableText(b, opportunitySort.key);
+      const compared = left.localeCompare(right, undefined, { sensitivity: "base" });
+      if (compared !== 0) {
+        return compared;
+      }
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+    });
+
+    return opportunitySort.direction === "asc" ? sorted : sorted.reverse();
+  }, [filteredOpportunities, opportunitySort.direction, opportunitySort.key]);
 
   const filteredContacts = useMemo(() => {
     return contacts.filter((contact) => {
@@ -272,6 +405,44 @@ export function CrmTable({
       return matchesQuery && matchesAccount;
     });
   }, [accountMap, contactAccountId, contacts, normalizedContactQuery, opportunities]);
+
+  const sortedContacts = useMemo(() => {
+    const getSortableText = (contact: CrmContact, key: ContactSortKey) => {
+      switch (key) {
+        case "fullName":
+          return contact.fullName;
+        case "accountName":
+          return accountMap.get(contact.accountId)?.name ?? "Unknown account";
+        case "details":
+          return formatContactSummary(contact);
+        case "jobTitle":
+          return contact.jobTitle ?? "";
+        default:
+          return "";
+      }
+    };
+
+    const sorted = [...filteredContacts].sort((a, b) => {
+      if (contactSort.key === "opportunities") {
+        const left = opportunityCountByContact.get(a.id) ?? 0;
+        const right = opportunityCountByContact.get(b.id) ?? 0;
+        if (left !== right) {
+          return left - right;
+        }
+        return a.fullName.localeCompare(b.fullName, undefined, { sensitivity: "base" });
+      }
+
+      const left = getSortableText(a, contactSort.key);
+      const right = getSortableText(b, contactSort.key);
+      const compared = left.localeCompare(right, undefined, { sensitivity: "base" });
+      if (compared !== 0) {
+        return compared;
+      }
+      return a.fullName.localeCompare(b.fullName, undefined, { sensitivity: "base" });
+    });
+
+    return contactSort.direction === "asc" ? sorted : sorted.reverse();
+  }, [accountMap, contactSort.direction, contactSort.key, filteredContacts, opportunityCountByContact]);
 
   const grouped = useMemo(() => {
     return crmOpportunityStages.map((groupStage) => ({
@@ -430,6 +601,30 @@ export function CrmTable({
       event.preventDefault();
       event.stopPropagation();
     }
+  }
+
+  function toggleAccountSort(key: AccountSortKey) {
+    setAccountSort((current) =>
+      current.key === key
+        ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: "asc" },
+    );
+  }
+
+  function toggleOpportunitySort(key: OpportunitySortKey) {
+    setOpportunitySort((current) =>
+      current.key === key
+        ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: "asc" },
+    );
+  }
+
+  function toggleContactSort(key: ContactSortKey) {
+    setContactSort((current) =>
+      current.key === key
+        ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: "asc" },
+    );
   }
 
   return (
@@ -762,16 +957,51 @@ export function CrmTable({
             {filteredAccounts.length > 0 ? (
               <>
                 <div className="hidden grid-cols-[1.45fr_0.8fr_0.95fr_0.95fr_0.7fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
-                  <span>Account</span>
-                  <span>Industry</span>
-                  <span>Location</span>
-                  <span>Contact</span>
-                  <span>Projects</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleAccountSort("name")}
+                    className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+                  >
+                    <span>Account</span>
+                    <SortIndicator active={accountSort.key === "name"} direction={accountSort.direction} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleAccountSort("industry")}
+                    className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+                  >
+                    <span>Industry</span>
+                    <SortIndicator active={accountSort.key === "industry"} direction={accountSort.direction} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleAccountSort("location")}
+                    className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+                  >
+                    <span>Location</span>
+                    <SortIndicator active={accountSort.key === "location"} direction={accountSort.direction} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleAccountSort("contact")}
+                    className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+                  >
+                    <span>Contact</span>
+                    <SortIndicator active={accountSort.key === "contact"} direction={accountSort.direction} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleAccountSort("projects")}
+                    className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+                  >
+                    <span>Projects</span>
+                    <SortIndicator active={accountSort.key === "projects"} direction={accountSort.direction} />
+                  </button>
                   <span className="text-right">Actions</span>
                 </div>
                 <div className={accountListScrollable ? "grid max-h-[55rem] gap-0 overflow-y-auto" : "grid gap-0"}>
-                  {filteredAccounts.map((account) => {
-                    const count = opportunities.filter((opportunity) => opportunity.accountId === account.id).length;
+                  {sortedAccounts.map((account) => {
+                    const count = opportunityCountByAccount.get(account.id) ?? 0;
                     const location = [account.city, account.address].filter(Boolean).join(", ");
                     const contactLine = account.phone || account.email || "Not set yet";
 
@@ -923,17 +1153,52 @@ export function CrmTable({
         {filteredContacts.length > 0 ? (
           <>
             <div className="hidden grid-cols-[1.2fr_1fr_1fr_0.8fr_0.75fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
-              <span>Contact</span>
-              <span>Account</span>
-              <span>Details</span>
-              <span>Title</span>
-              <span>Opportunities</span>
+              <button
+                type="button"
+                onClick={() => toggleContactSort("fullName")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Contact</span>
+                <SortIndicator active={contactSort.key === "fullName"} direction={contactSort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleContactSort("accountName")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Account</span>
+                <SortIndicator active={contactSort.key === "accountName"} direction={contactSort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleContactSort("details")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Details</span>
+                <SortIndicator active={contactSort.key === "details"} direction={contactSort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleContactSort("jobTitle")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Title</span>
+                <SortIndicator active={contactSort.key === "jobTitle"} direction={contactSort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleContactSort("opportunities")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Opportunities</span>
+                <SortIndicator active={contactSort.key === "opportunities"} direction={contactSort.direction} />
+              </button>
               <span className="text-right">Actions</span>
             </div>
-            <div className={filteredContacts.length > 10 ? "grid max-h-[55rem] gap-0 overflow-y-auto" : "grid gap-0"}>
-              {filteredContacts.map((contact) => {
+            <div className={sortedContacts.length > 10 ? "grid max-h-[55rem] gap-0 overflow-y-auto" : "grid gap-0"}>
+              {sortedContacts.map((contact) => {
                 const account = accountMap.get(contact.accountId);
-                const linkedOpportunityCount = opportunities.filter((opportunity) => opportunity.primaryContactId === contact.id).length;
+                const linkedOpportunityCount = opportunityCountByContact.get(contact.id) ?? 0;
 
                 return (
                   <div
@@ -1086,16 +1351,58 @@ export function CrmTable({
         ) : (
           <div className="overflow-hidden rounded-[1.5rem] border border-[#e3e7f0] bg-white shadow-[0_12px_26px_rgba(35,31,32,0.04)]">
             <div className="hidden grid-cols-[1.2fr_1fr_0.9fr_0.95fr_0.9fr_0.9fr_auto] gap-4 border-b border-[#edf0f6] bg-[#fafbfe] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#9793a0] lg:grid">
-              <span>Opportunity</span>
-              <span>Account</span>
-              <span>Stage</span>
-              <span>Quotation</span>
-              <span>Primary Contact</span>
-              <span>Value</span>
+              <button
+                type="button"
+                onClick={() => toggleOpportunitySort("name")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Opportunity</span>
+                <SortIndicator active={opportunitySort.key === "name"} direction={opportunitySort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleOpportunitySort("accountName")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Account</span>
+                <SortIndicator active={opportunitySort.key === "accountName"} direction={opportunitySort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleOpportunitySort("stage")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Stage</span>
+                <SortIndicator active={opportunitySort.key === "stage"} direction={opportunitySort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleOpportunitySort("quotation")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Quotation</span>
+                <SortIndicator active={opportunitySort.key === "quotation"} direction={opportunitySort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleOpportunitySort("primaryContactName")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Primary Contact</span>
+                <SortIndicator active={opportunitySort.key === "primaryContactName"} direction={opportunitySort.direction} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleOpportunitySort("estimatedValue")}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-left transition hover:text-[#6f6a75]"
+              >
+                <span>Value</span>
+                <SortIndicator active={opportunitySort.key === "estimatedValue"} direction={opportunitySort.direction} />
+              </button>
               <span className="text-right">Actions</span>
             </div>
             <div className={opportunityListScrollable ? "grid max-h-[55rem] gap-0 overflow-y-auto" : "grid gap-0"}>
-              {filteredOpportunities.map((opportunity) => (
+              {sortedOpportunities.map((opportunity) => (
                 <div
                   key={opportunity.id}
                   role="link"
