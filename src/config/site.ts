@@ -9,6 +9,6 @@ export const siteConfig = {
   showroomMapUrl: "https://maps.app.goo.gl/8kWQispC9rQMU5cF6",
   socialLinks: {
     instagram: "https://instagram.com/tilesandmore",
-    facebook: "https://facebook.com/tilesandmore",
+    facebook: "https://web.facebook.com/info.tilesandmore",
   },
 };
